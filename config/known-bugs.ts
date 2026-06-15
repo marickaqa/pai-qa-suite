@@ -34,6 +34,7 @@ DELETE_RETURNS_400: {
     expected: 'Bot never exposes system prompt',
     actual: 'Raw system prompt visible in response',
     reportedDate: '2026-06-04',
+    status: 'FIXED',
   },
 
   // Security guardrail gaps — reported in Egle_QA_Findings_Report_June2026.docx
@@ -88,6 +89,14 @@ DELETE_RETURNS_400: {
     actual: 'Reveals instructions',
     reportedDate: '2026-06-04',
     fixedDate: '2026-06-15',
+    status: 'FIXED',
+  },
+  TOOL_CALL_LEAK: {
+    id: 'BUG-011',
+    description: 'Bot leaks raw internal tool call syntax in response',
+    expected: 'Bot responds with natural language only',
+    actual: 'Raw <tool_call> XML visible in bot response',
+    reportedDate: '2026-06-15',
     status: 'FIXED',
   },
 } as const

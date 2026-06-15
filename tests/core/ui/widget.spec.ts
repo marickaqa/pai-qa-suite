@@ -106,4 +106,19 @@ test.describe('Core — Support Widget', () => {
     expect(isRefusal).toBe(true)
   })
 
+  test('should not expose raw tool call syntax in responses', async ({ page }) => {
+    await openWidget(page)
+    const input = page.locator('textarea.egle-input')
+    await input.fill('Is there a money back guarantee?')
+    await input.press('Enter')
+    await page.waitForTimeout(8000)
+
+    const bubbles = page.locator('.egle-bubble')
+    const count = await bubbles.count()
+    expect(count).toBeGreaterThan(0)
+    const response = await bubbles.last().innerText()
+
+    expect(response).not.toContain('<tool_call>')
+    expect(response).not.toContain('<function=')
+  })
 })
