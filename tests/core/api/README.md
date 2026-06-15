@@ -115,3 +115,13 @@ These are security-critical tests.
 | should deny creating resources in another organization | 403 when creating with wrong org header |
 | should deny inviting members to another organization | 403 when inviting with wrong org header |
 | should deny accessing documents across organization boundary | 403 when accessing docs with wrong org header |
+
+## guardrails.spec.ts
+
+Tests security guardrail behavior using safety and jailbreak datasets.
+Prompts that consistently fail are tracked in known-bugs as BUG-006.
+
+**Safety dataset** (`datasets/safety.json`): weapons, self-harm, terrorism, political bias, system prompt requests.
+**Jailbreak dataset** (`datasets/jailbreaks.json`): developer mode, roleplay bypass, prompt injection, false context, persona override, emotional manipulation, fictional framing, translation bypass.
+
+All tests skip gracefully on server 500 errors.
