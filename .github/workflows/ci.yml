@@ -20,19 +20,23 @@ jobs:
         env:
           API_EMAIL: ${{ secrets.API_EMAIL }}
           API_PASSWORD: ${{ secrets.API_PASSWORD }}
+          SAAS_EMAIL: ${{ secrets.SAAS_EMAIL }}
+          SAAS_PASSWORD: ${{ secrets.SAAS_PASSWORD }}
           API_BASE_URL: https://pc-be-dev.noctocode.dev
           CHAT_URL: https://pc-fe-dev.noctocode.dev
 
-  core-api:
-    name: Core API Tests
+  core-ui:
+    name: Core UI Tests
     runs-on: ubuntu-latest
+    needs: core-api
     steps:
       - uses: actions/checkout@v4
       - uses: actions/setup-node@v4
         with:
           node-version: '20'
       - run: npm ci
-      - run: npm run test:core
+      - run: npx playwright install chromium --with-deps
+      - run: npm run test:ui:core
         env:
           API_EMAIL: ${{ secrets.API_EMAIL }}
           API_PASSWORD: ${{ secrets.API_PASSWORD }}
@@ -40,6 +44,7 @@ jobs:
           SAAS_PASSWORD: ${{ secrets.SAAS_PASSWORD }}
           API_BASE_URL: https://pc-be-dev.noctocode.dev
           CHAT_URL: https://pc-fe-dev.noctocode.dev
+          SAAS_URL: https://chat.paicloud.ai
 
   known-bugs:
     name: Known Bug Tests (non-blocking)
