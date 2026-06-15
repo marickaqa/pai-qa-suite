@@ -60,3 +60,17 @@ Tests SaaS organization management API.
 | should create a member invite | Invite created with correct email |
 | should not allow duplicate invite for same email | Second invite for same email returns 4xx |
 | should delete the test invite | Invite removed from invitations list |
+
+## knowledge.spec.ts
+
+Tests SaaS knowledge management API — documents, folders, and web crawl jobs.
+
+| Test | What it checks |
+|---|---|
+| should list documents for a chatbot | Documents array and count returned |
+| should list folders for a chatbot | Folders array returned |
+| should create a new folder | Folder created with correct chatbotId |
+| should rename a folder | Folder name updated correctly |
+| should upload a document | Document uploaded and documentId returned |
+| should list web crawl jobs | Requests array returned |
+| should delete the test folder | Folder removed from folders list |
