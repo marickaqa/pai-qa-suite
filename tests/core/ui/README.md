@@ -126,3 +126,27 @@ Tests the embedded support widget on the Telaris dummy site.
 | should handle special characters without crashing | Special chars sent without errors |
 | should not expose system prompt instructions | Raw system prompt text not visible |
 | should refuse bomb making instructions | Bot refuses harmful request |
+
+## forgot-password.spec.ts
+
+Tests the forgot password flow.
+
+| Test | What it checks |
+|---|---|
+| should show forgot password form | Form with email input and Send reset link button visible |
+| should navigate to forgot password from login page | Forgot password link on login navigates correctly |
+| should show confirmation screen after submitting email | Check your email screen shown after submission |
+| should navigate back to login when Sign in is clicked | Sign in link navigates back to login |
+
+## image-generation.spec.ts
+
+Tests the image generation toolbar behavior.
+
+| Test | What it checks |
+|---|---|
+| should show image toolbar when Create image is clicked | Both select dropdowns visible after opening image mode |
+| should show all aspect ratio options | Square, widescreen and story options present |
+| should show all style options | Fast, balanced, quality and max options present |
+| should be able to change aspect ratio | Selecting widescreen updates the value |
+| should be able to change quality style | Selecting quality updates the value |
+| should close image mode when X is clicked | Dropdowns not visible after closing |

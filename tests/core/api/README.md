@@ -74,3 +74,16 @@ Tests SaaS knowledge management API — documents, folders, and web crawl jobs.
 | should upload a document | Document uploaded and documentId returned |
 | should list web crawl jobs | Requests array returned |
 | should delete the test folder | Folder removed from folders list |
+
+## deployment.spec.ts
+
+Tests chatbot deployment and members API.
+
+| Test | What it checks |
+|---|---|
+| should successfully deploy a chat type bot | Deploy returns 200 with message and domain |
+| should return a valid domain after deployment | Domain matches known TLD pattern |
+| should reject deployment of support type bot | Support bots cannot be deployed — returns 400 |
+| should reject deployment with invalid bot ID | Invalid ID returns 400, 403 or 404 |
+| should list members for a chatbot | Members array with page and limit returned |
+| should return 400 for non-existent bot members | Invalid bot ID returns error status |
