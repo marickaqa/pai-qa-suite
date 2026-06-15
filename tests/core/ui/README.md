@@ -64,3 +64,14 @@ Tests the chat history sidebar behavior.
 | should show no results for non-existent search term | No chats shown for gibberish search |
 | should clear search and restore all chats | Clearing search restores full chat list |
 | should delete a chat | Chat count decreases after deletion |
+
+## file-upload.spec.ts
+
+Tests file attachment behavior in the chat interface.
+
+| Test | What it checks |
+|---|---|
+| should show filename chip after file is attached | Filename appears as a chip after selecting a file |
+| should remove file when X is clicked | Clicking X removes the file chip |
+| should accept expected file types | Input accepts .pdf and .txt at minimum |
+| should allow sending a message with an attached file | Message with file attached gets a response |
