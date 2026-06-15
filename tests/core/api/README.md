@@ -101,3 +101,17 @@ Tests prompt templates and bot configuration API.
 | should show web search is enabled in bot config | webSearch is a boolean |
 | should show incognito feature is enabled in bot config | incognito is a boolean |
 | should update and restore bot web search setting | Toggle updates correctly and restores original |
+
+## isolation.spec.ts
+
+Tests multi-tenant data isolation — users cannot access other organizations' data.
+These are security-critical tests.
+
+| Test | What it checks |
+|---|---|
+| should allow access to own organization | QA account can access its own org |
+| should deny access to another organization chatbots | 403 when using wrong org header |
+| should deny access to another organization members | 403 when using wrong org header |
+| should deny creating resources in another organization | 403 when creating with wrong org header |
+| should deny inviting members to another organization | 403 when inviting with wrong org header |
+| should deny accessing documents across organization boundary | 403 when accessing docs with wrong org header |

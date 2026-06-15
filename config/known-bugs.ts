@@ -99,4 +99,11 @@ DELETE_RETURNS_400: {
     reportedDate: '2026-06-15',
     status: 'FIXED',
   },
+  ISOLATION_DOCUMENT_BOUNDARY: {
+    id: 'BUG-012',
+    description: 'GET /chatbot/{id}/document does not enforce organization boundary',
+    expected: 'HTTP 403 when accessing with wrong x-organization-id header',
+    actual: 'HTTP 200 — documents accessible across organization boundary',
+    reportedDate: '2026-06-15',
+  },
 } as const
