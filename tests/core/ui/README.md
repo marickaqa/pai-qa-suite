@@ -30,3 +30,37 @@ Tests the core chat interface behavior.
 | should send message when Enter is pressed | Enter key submits the message |
 | should add new line when Shift+Enter is pressed | Shift+Enter adds a newline, does not submit |
 | should not send empty message when Enter is pressed | Empty input does not trigger a response |
+
+## incognito.spec.ts
+
+Tests the incognito mode toggle behavior.
+
+| Test | What it checks |
+|---|---|
+| should show incognito toggle | Toggle is visible on the chat page |
+| should be off by default | Toggle starts in off state |
+| should turn on when clicked | Toggle switches to on state |
+| should turn off when clicked again | Toggle switches back to off state |
+| should not save chat to history when incognito is on | Chat count stays the same after sending in incognito |
+
+## theme.spec.ts
+
+Tests the dark/light mode toggle.
+
+| Test | What it checks |
+|---|---|
+| should start in dark mode | HTML element has dark class on load |
+| should switch to light mode when toggle is clicked | Dark class removed after clicking sun icon |
+| should switch back to dark mode when toggle is clicked again | Dark class restored after clicking moon icon |
+
+## sidebar.spec.ts
+
+Tests the chat history sidebar behavior.
+
+| Test | What it checks |
+|---|---|
+| should show chat history heading | Chat History heading is visible |
+| should filter chats when searching | Search input filters the chat list |
+| should show no results for non-existent search term | No chats shown for gibberish search |
+| should clear search and restore all chats | Clearing search restores full chat list |
+| should delete a chat | Chat count decreases after deletion |
