@@ -1,0 +1,25 @@
+{
+  "name": "pai-qa-suite",
+  "version": "1.0.0",
+  "description": "Automated QA test suite for PAI platform",
+  "scripts": {
+    "test:core": "vitest run --config vitest.core.config.ts",
+    "test:bugs": "vitest run --config vitest.bugs.config.ts",
+    "test:monitoring": "vitest run --config vitest.monitoring.config.ts",
+    "test:ui:core": "playwright test tests/core/ui",
+    "test:ui:bugs": "playwright test tests/known-bugs/ui",
+    "test:all": "npm run test:core && npm run test:ui:core"
+  },
+  "license": "MIT",
+  "devDependencies": {
+    "@playwright/test": "^1.40.0",
+    "@types/node": "^22.0.0",
+    "axios": "^1.7.0",
+    "dotenv": "^17.4.2",
+    "form-data": "^4.0.0",
+    "ts-node": "^10.9.0",
+    "typescript": "^5.0.0",
+    "vitest": "^2.0.0",
+    "zod": "^3.22.0"
+  }
+}

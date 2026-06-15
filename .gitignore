@@ -1,0 +1,27 @@
+# Dependencies
+node_modules/
+
+# Environment variables
+.env
+.env.*
+!.env.example
+
+# Session files — never commit these
+reports/session.json
+reports/saas-session.json
+
+# Test output
+reports/latency.json
+reports/eval-report.json
+test-results/
+
+# TypeScript
+dist/
+*.tsbuildinfo
+
+# Logs
+*.log
+npm-debug.log*
+
+# OS
+.DS_Store
