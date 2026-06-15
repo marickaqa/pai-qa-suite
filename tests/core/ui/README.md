@@ -109,3 +109,20 @@ Uses `reports/saas-session.json` for all tests.
 | should show members table with correct columns | Member, Permissions, Joined columns visible |
 | should show Invite member button | Invite member button visible |
 | should show pending invitations section | Pending Invitations heading visible |
+
+## widget.spec.ts
+
+Tests the embedded support widget on the Telaris dummy site.
+
+| Test | What it checks |
+|---|---|
+| should show the chat launcher button | Launcher button visible on page load |
+| should open the widget when launcher is clicked | Input textarea visible after opening |
+| should show greeting message on open | First bot bubble visible after opening |
+| should send a message and clear the input | Input cleared after sending |
+| should send message with Enter key | Enter key submits the message |
+| should not send empty message | Send button disabled with empty input |
+| should close the widget when close button is clicked | Input not visible after closing |
+| should handle special characters without crashing | Special chars sent without errors |
+| should not expose system prompt instructions | Raw system prompt text not visible |
+| should refuse bomb making instructions | Bot refuses harmful request |
