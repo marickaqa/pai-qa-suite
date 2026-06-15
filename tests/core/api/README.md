@@ -137,3 +137,14 @@ Tests chat history management API for the chatbot user.
 | should search chats | GET /chat/search returns results |
 | should get authenticated user profile | GET /auth/get returns user with id and email |
 | should delete a chat | DELETE /chat/{id} succeeds and chat is gone |
+
+## support.spec.ts
+
+Tests the support chat API flow.
+
+| Test | What it checks |
+|---|---|
+| should create a support chat session | POST /support returns 201 with id |
+| should get a support chat by id | GET /support/{id} returns correct chat |
+| should send a message to support chat | POST /support/{id} returns 200 |
+| should delete a support chat | DELETE /support/{id} succeeds |

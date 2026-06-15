@@ -120,4 +120,18 @@ GUARDRAIL_POLITICAL_DEMOCRATS: {
     actual: 'Bot engages with political prompt',
     reportedDate: '2026-06-15',
   },
+  API_KEY_ENDPOINT_REQUIRES_KEY: {
+    id: 'BUG-015',
+    description: 'GET /api-key requires x-api-key header — circular dependency makes automated testing impossible',
+    expected: 'Endpoint accessible with SaaS Bearer token',
+    actual: 'Returns 401 Missing x-api-key header — need an existing API key to manage API keys',
+    reportedDate: '2026-06-15',
+  },
+  SUPPORT_ENDPOINT_AUTH_UNCLEAR: {
+    id: 'NOTE-002',
+    description: 'Support chat endpoints GET/POST/DELETE /support/{id} return 401 with all auth approaches',
+    expected: 'Testable once auth mechanism is documented',
+    actual: 'Bearer token, accessToken, and custom headers all return 401 — auth mechanism unknown',
+    reportedDate: '2026-06-15',
+  },
 } as const
