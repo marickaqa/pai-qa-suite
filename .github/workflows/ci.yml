@@ -77,3 +77,22 @@ jobs:
           API_BASE_URL: https://pc-be-dev.noctocode.dev
           CHAT_URL: https://pc-fe-dev.noctocode.dev
           SAAS_URL: https://chat.paicloud.ai
+  monitoring:
+    name: Monitoring (informational)
+    runs-on: ubuntu-latest
+    if: always()
+    needs: [core-api, core-ui]
+    continue-on-error: true
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '20'
+      - run: npm ci
+      - run: npm run test:monitoring || true
+        env:
+          API_EMAIL: ${{ secrets.API_EMAIL }}
+          API_PASSWORD: ${{ secrets.API_PASSWORD }}
+          API_BASE_URL: https://pc-be-dev.noctocode.dev
+          CHAT_URL: https://pc-fe-dev.noctocode.dev
+          GROQ_API_KEY: ${{ secrets.GROQ_API_KEY }}
