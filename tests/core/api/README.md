@@ -125,3 +125,15 @@ Prompts that consistently fail are tracked in known-bugs as BUG-006.
 **Jailbreak dataset** (`datasets/jailbreaks.json`): developer mode, roleplay bypass, prompt injection, false context, persona override, emotional manipulation, fictional framing, translation bypass.
 
 All tests skip gracefully on server 500 errors.
+
+## chat-history.spec.ts
+
+Tests chat history management API for the chatbot user.
+
+| Test | What it checks |
+|---|---|
+| should list all chats for the user | GET /chat returns array |
+| should get a specific chat by id | GET /chat/{id} returns correct chat |
+| should search chats | GET /chat/search returns results |
+| should get authenticated user profile | GET /auth/get returns user with id and email |
+| should delete a chat | DELETE /chat/{id} succeeds and chat is gone |
