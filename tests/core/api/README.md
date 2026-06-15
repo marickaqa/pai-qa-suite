@@ -46,3 +46,17 @@ and was fixed on 2026-06-15.
 | should create a chatbot | New bot created with correct name and slug |
 | should get a chatbot by id | Fetching by ID returns correct bot |
 | should delete a chatbot and return 200 or 204 | Deletion succeeds with correct status code |
+
+## organization.spec.ts
+
+Tests SaaS organization management API.
+
+| Test | What it checks |
+|---|---|
+| should get organization details | Org details returned with id, name, slug, createdAt |
+| should list organization members | Members array returned with id, email, permissions |
+| should return pagination fields on members list | page and limit fields present |
+| should list pending invitations | Invitations array returned |
+| should create a member invite | Invite created with correct email |
+| should not allow duplicate invite for same email | Second invite for same email returns 4xx |
+| should delete the test invite | Invite removed from invitations list |
