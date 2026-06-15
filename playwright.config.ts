@@ -5,6 +5,7 @@ import path from 'path'
 dotenv.config({ path: path.resolve(__dirname, '.env') })
 
 export default defineConfig({
+  globalSetup: './global-setup.ts',
   testDir: './tests',
   timeout: 60000,
   retries: 1,
