@@ -57,6 +57,15 @@ jobs:
           node-version: '20'
       - run: npm ci
       - run: npx playwright install chromium --with-deps
+      - run: npm run test:bugs || true
+        env:
+          API_EMAIL: ${{ secrets.API_EMAIL }}
+          API_PASSWORD: ${{ secrets.API_PASSWORD }}
+          SAAS_EMAIL: ${{ secrets.SAAS_EMAIL }}
+          SAAS_PASSWORD: ${{ secrets.SAAS_PASSWORD }}
+          API_BASE_URL: https://pc-be-dev.noctocode.dev
+          CHAT_URL: https://pc-fe-dev.noctocode.dev
+          SAAS_URL: https://chat.paicloud.ai
       - run: npm run test:ui:bugs || true
         env:
           API_EMAIL: ${{ secrets.API_EMAIL }}

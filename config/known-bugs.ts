@@ -3,12 +3,14 @@
 
 export const KNOWN_BUGS = {
   // SaaS API bugs — reported in PAI_SaaS_API_Bug_Report_Week7.pdf
-  DELETE_RETURNS_400: {
+DELETE_RETURNS_400: {
     id: 'BUG-001',
     description: 'DELETE /chatbot/{id} returns HTTP 400 on successful deletion',
     expected: 'HTTP 200 or 204',
     actual: 'HTTP 400',
     reportedDate: '2026-06-04',
+    fixedDate: '2026-06-15',
+    status: 'FIXED',
   },
   GET_NONEXISTENT_RETURNS_400: {
     id: 'BUG-002',

@@ -33,3 +33,16 @@ The chatbot uses a two-step flow:
 
 The response is a stream of JSON chunks in the format `data: {"content":"..."}`.
 `chatClient.ts` handles both steps and assembles the chunks into a single message string.
+
+## saas.spec.ts
+
+Tests core SaaS chatbot API behavior. Note: DELETE test was previously a known bug (BUG-001)
+and was fixed on 2026-06-15.
+
+| Test | What it checks |
+|---|---|
+| should authenticate with SaaS credentials | SaaS token is returned and has valid length |
+| should list chatbots | Returns array with at least one chatbot |
+| should create a chatbot | New bot created with correct name and slug |
+| should get a chatbot by id | Fetching by ID returns correct bot |
+| should delete a chatbot and return 200 or 204 | Deletion succeeds with correct status code |
