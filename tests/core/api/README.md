@@ -14,6 +14,17 @@ Tests the fundamental chatbot API behavior.
 | should respond within 15 seconds | Performance baseline for simple prompts |
 | should handle a long prompt without timing out | The API doesn't crash or hang on longer inputs |
 
+## schema.spec.ts
+
+Tests that the API response always has the correct shape and types.
+
+| Test | What it checks |
+|---|---|
+| should return a valid response schema | Response has status (number), message (string), responseTime (number) |
+| should always return a string message, never null or undefined | Message field is always a string, never missing |
+| should always return a positive response time | responseTime is always a real measured value above 0 |
+| should return a message with meaningful content | Message is not just empty whitespace |
+
 ## How the API works
 
 The chatbot uses a two-step flow:
