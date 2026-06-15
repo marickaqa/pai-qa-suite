@@ -87,3 +87,17 @@ Tests chatbot deployment and members API.
 | should reject deployment with invalid bot ID | Invalid ID returns 400, 403 or 404 |
 | should list members for a chatbot | Members array with page and limit returned |
 | should return 400 for non-existent bot members | Invalid bot ID returns error status |
+
+## guidelines.spec.ts
+
+Tests prompt templates and bot configuration API.
+
+| Test | What it checks |
+|---|---|
+| should list prompt templates | Templates array with id, name, content, type, chatbotType, section |
+| should return prompt templates with valid sections | All sections match known valid values |
+| should filter prompt templates by chatbotType | All templates have support or chat type |
+| should get chatbot with config | Config has options with tools and features |
+| should show web search is enabled in bot config | webSearch is a boolean |
+| should show incognito feature is enabled in bot config | incognito is a boolean |
+| should update and restore bot web search setting | Toggle updates correctly and restores original |
