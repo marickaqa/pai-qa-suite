@@ -89,3 +89,23 @@ Uses `reports/saas-session.json` for authenticated tests.
 | should show support bots and AI assistants sections | Both bot type sections visible on overview |
 | should show organization name in sidebar | noctocode.dev visible in sidebar |
 | should show New button on dashboard | New button visible for creating agents |
+
+## saas-agent.spec.ts
+
+Tests PAI SaaS agent pages — knowledge, guidelines, style config, and team management.
+Uses `reports/saas-session.json` for all tests.
+
+| Test | What it checks |
+|---|---|
+| should show knowledge page with files and crawl sections | Files heading, Website URLs, Upload and Crawl buttons visible |
+| should navigate to knowledge from agent sidebar | Sidebar link navigates to knowledge page |
+| should show guidelines page with all sections | All guideline sections visible |
+| should show New guideline button in each section | At least one New guideline button visible |
+| should navigate to guidelines from agent sidebar | Sidebar link navigates to guidelines page |
+| should show style config page | Style Config heading, Light and Dark theme visible |
+| should show Save changes button | Save changes button visible |
+| should show Upload buttons for logo slots | At least 6 Upload buttons visible |
+| should show team management page | Team management heading visible |
+| should show members table with correct columns | Member, Permissions, Joined columns visible |
+| should show Invite member button | Invite member button visible |
+| should show pending invitations section | Pending Invitations heading visible |
