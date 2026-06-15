@@ -75,3 +75,17 @@ Tests file attachment behavior in the chat interface.
 | should remove file when X is clicked | Clicking X removes the file chip |
 | should accept expected file types | Input accepts .pdf and .txt at minimum |
 | should allow sending a message with an attached file | Message with file attached gets a response |
+
+## saas-dashboard.spec.ts
+
+Tests the PAI SaaS dashboard behavior.
+Uses `reports/saas-session.json` for authenticated tests.
+
+| Test | What it checks |
+|---|---|
+| should redirect unauthenticated users to login | Accessing dashboard without session redirects to login |
+| should login and land on dashboard | Authenticated session lands on dashboard URL |
+| should show key dashboard metrics | Total agents, messages, resolution rate, token usage visible |
+| should show support bots and AI assistants sections | Both bot type sections visible on overview |
+| should show organization name in sidebar | noctocode.dev visible in sidebar |
+| should show New button on dashboard | New button visible for creating agents |
