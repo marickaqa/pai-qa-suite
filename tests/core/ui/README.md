@@ -300,3 +300,21 @@ Destructive actions (archive, delete) are visibility-only — not executed.
 | should show danger zone page with Archive and Delete buttons | Archive chatbot and Delete chatbot buttons are visible |
 | should show archive description text | Archive description text is visible |
 | should show delete warning text | Cannot be undone warning text is visible |
+
+## saas-dashboard.spec.ts
+
+Tests the PAI SaaS dashboard behavior at chat.paicloud.ai.
+Uses `reports/saas-session.json` for authenticated tests.
+
+| Test | What it checks |
+|---|---|
+| should redirect unauthenticated users to login | Accessing dashboard without session redirects to login |
+| should login and land on dashboard | Authenticated session lands on dashboard URL |
+| should show key dashboard metrics | Total agents, messages, resolution rate, token usage labels are visible |
+| should show support bots and AI assistants sections | Both bot type sections visible on overview |
+| should show organization name in sidebar | noctocode.dev visible in sidebar |
+| should show New button on dashboard | New button visible for creating agents |
+| should show total agents count as a number | Total agents card shows a numeric value |
+| should show dynamic metric values for messages, resolution rate and token usage | All three metric cards have numeric values |
+| should show theme toggle button on dashboard | Toggle theme button is visible |
+| should toggle from dark to light mode when theme button is clicked | Clicking toggle changes the HTML class |
