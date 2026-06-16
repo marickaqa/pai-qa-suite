@@ -49,4 +49,24 @@ test.describe('Core — Login', () => {
     expect(page.url()).not.toContain('dashboard')
   })
 
+  test('should show password toggle icon', async ({ page }) => {
+    await page.goto('/')
+    await expect(page.locator('input[name="password"]').locator('../..').locator('svg').first()).toBeVisible()
+  })
+
+  test('should show password in plain text when toggle is clicked', async ({ page }) => {
+    await page.goto('/')
+    await expect(page.locator('input[name="password"]')).toHaveAttribute('type', 'password')
+    await page.locator('input[name="password"]').locator('../..').locator('svg').last().click()
+    await expect(page.locator('input[name="password"]')).toHaveAttribute('type', 'text')
+  })
+
+  test('should hide password again when toggle is clicked twice', async ({ page }) => {
+    await page.goto('/')
+    await page.locator('input[name="password"]').locator('../..').locator('svg').last().click()
+    await expect(page.locator('input[name="password"]')).toHaveAttribute('type', 'text')
+    await page.locator('input[name="password"]').locator('../..').locator('svg').last().click()
+    await expect(page.locator('input[name="password"]')).toHaveAttribute('type', 'password')
+  })
+
 })

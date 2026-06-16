@@ -35,24 +35,21 @@ test.describe('Core — Incognito Mode', () => {
         expect(checked).toBe('false')
     })
 
-    test('should not save chat to history when incognito is on', async ({ page }) => {
-        const chatItems = page.locator('div[role="button"]').filter({ has: page.locator('p.truncate') })
-        const countBefore = await chatItems.count()
-
-        const toggle = page.locator('button[role="switch"]').first()
+    test('should show incognito chat in history with incognito label', async ({ page }) => {
+        await page.goto('/')
+        const toggle = page.locator('button').filter({ hasText: /incognito/i }).first()
         await toggle.click()
         await page.waitForTimeout(500)
 
-        const input = page.locator('textarea[placeholder="Type a message..."]')
-        await input.fill('incognito test message abc123')
+        const input = page.locator('textarea')
+        await input.fill('This is an incognito test message')
         await input.press('Enter')
-        await page.waitForTimeout(4000)
+        await page.waitForTimeout(5000)
 
-        await page.goto('/')
-        await page.waitForTimeout(1000)
-
-        const countAfter = await chatItems.count()
-        expect(countAfter).toBe(countBefore)
+        const badgeExists = await page.evaluate(() => {
+            const spans = Array.from(document.querySelectorAll('span'))
+            return spans.some(s => s.textContent?.trim() === 'Incognito')
+        })
+        expect(badgeExists).toBe(true)
     })
-
 })

@@ -15,6 +15,38 @@ Tests the login page behavior.
 | should show error with wrong password | Wrong password shows an error, stays on login page |
 | should not login with empty email | Empty email does not proceed to dashboard |
 | should not login with empty password | Empty password does not proceed to dashboard |
+| should show password toggle icon | Eye icon is visible next to the password field |
+| should show password in plain text when toggle is clicked | Input type changes from password to text after clicking toggle |
+| should hide password again when toggle is clicked twice | Input type returns to password after clicking toggle twice |
+
+## signup.spec.ts
+
+Tests the signup flow from the login page.
+Uses a fresh context with no session.
+
+| Test | What it checks |
+|---|---|
+| should show signup link on login page | Sign Up link is visible on the login page |
+| should navigate to signup page when link is clicked | Clicking Sign Up navigates to /signup |
+| should show signup form with all fields | Email, password and confirm password fields and Sign Up button are visible |
+| should not submit with empty fields | Empty form does not proceed past signup page |
+| should show error for mismatched passwords | Mismatched passwords show an error message |
+| should show error for invalid email format | Invalid email format stays on signup page |
+| should show error for already registered email | Existing email shows an error message |
+| should show sign in link on signup page | Sign In link is visible on the signup page |
+
+## logout.spec.ts
+
+Tests the logout flow from the chatbot UI.
+Logout is accessed via the profile button at the bottom of the sidebar.
+Uses the saved session from `reports/session.json`.
+
+| Test | What it checks |
+|---|---|
+| should show email in profile button before logout | Profile button with email is visible in sidebar |
+| should show logout option when profile is clicked | Clicking profile button shows Log out option |
+| should log out and redirect to login page | Clicking Log out redirects to login page |
+| should not be able to access chat after logout | Navigating to / after logout redirects to login |
 
 ## chat.spec.ts
 
@@ -34,6 +66,7 @@ Tests the core chat interface behavior.
 ## incognito.spec.ts
 
 Tests the incognito mode toggle behavior.
+Incognito chats are encrypted, appear in history with an Incognito badge, and are deleted after 1 hour.
 
 | Test | What it checks |
 |---|---|
@@ -41,7 +74,7 @@ Tests the incognito mode toggle behavior.
 | should be off by default | Toggle starts in off state |
 | should turn on when clicked | Toggle switches to on state |
 | should turn off when clicked again | Toggle switches back to off state |
-| should not save chat to history when incognito is on | Chat count stays the same after sending in incognito |
+| should show incognito chat in history with incognito label | Incognito chat appears in sidebar with Incognito badge |
 
 ## theme.spec.ts
 
@@ -75,6 +108,8 @@ Tests file attachment behavior in the chat interface.
 | should remove file when X is clicked | Clicking X removes the file chip |
 | should accept expected file types | Input accepts .pdf and .txt at minimum |
 | should allow sending a message with an attached file | Message with file attached gets a response |
+| should reject unsupported file types | Unsupported file type does not appear as a chip |
+| should handle oversized file gracefully | File over 10MB shows an error message |
 
 ## saas-dashboard.spec.ts
 
@@ -150,3 +185,25 @@ Tests the image generation toolbar behavior.
 | should be able to change aspect ratio | Selecting widescreen updates the value |
 | should be able to change quality style | Selecting quality updates the value |
 | should close image mode when X is clicked | Dropdowns not visible after closing |
+
+## email-export.spec.ts
+
+Tests the email export behavior triggered by natural language commands.
+The chatbot sends files to the signed-in user's email when asked — no UI button.
+
+| Test | What it checks |
+|---|---|
+| should confirm sending file to signed-in email when asked | Bot confirms file was sent to the signed-in email address |
+| should only send to signed-in email not a different address | Bot does not send to a different email address when requested |
+
+## file-creation.spec.ts
+
+Tests file creation triggered by natural language commands.
+The chatbot creates PDF or TXT files when asked — no UI button.
+
+| Test | What it checks |
+|---|---|
+| should create a TXT file when asked | Bot response references a .txt file |
+| should create a PDF file when asked | Bot response references a .pdf file |
+| should show a download link or attachment for created TXT file | A downloadable link or attachment appears for TXT files |
+| should show a download link or attachment for created PDF file | A downloadable link or attachment appears for PDF files |

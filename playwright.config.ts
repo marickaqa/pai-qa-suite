@@ -6,7 +6,6 @@ dotenv.config({ path: path.resolve(__dirname, '.env') })
 
 export default defineConfig({
   globalSetup: './global-setup.ts',
-  testDir: './tests',
   timeout: 60000,
   retries: 1,
   workers: 1,
@@ -20,7 +19,15 @@ export default defineConfig({
     {
       name: 'core-ui',
       testDir: './tests/core/ui',
+      testIgnore: '**/logout.spec.ts',
       use: { storageState: 'reports/session.json' }
+    },
+    {
+      name: 'core-ui-logout',
+      testDir: './tests/core/ui',
+      testMatch: '**/logout.spec.ts',
+      use: { storageState: 'reports/session.json' },
+      dependencies: ['core-ui']
     },
     {
       name: 'known-bugs-ui',

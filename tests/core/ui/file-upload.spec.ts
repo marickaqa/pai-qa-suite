@@ -61,4 +61,28 @@ test.describe('Core — File Upload', () => {
     await expect(page.locator('div.prose').first()).toBeVisible({ timeout: 20000 })
   })
 
+  test('should reject unsupported file types', async ({ page }) => {
+    const filePath = path.join('reports', 'test-upload.exe')
+    fs.writeFileSync(filePath, 'fake executable content')
+
+    const fileInput = page.locator('input[type="file"]')
+    await fileInput.setInputFiles(filePath)
+    await page.waitForTimeout(500)
+
+    await expect(page.getByText('test-upload.exe')).not.toBeVisible()
+  })
+
+  test('should handle oversized file gracefully', async ({ page }) => {
+    const filePath = path.join('reports', 'test-large.txt')
+    const largeContent = 'A'.repeat(11 * 1024 * 1024) // 11MB
+    fs.writeFileSync(filePath, largeContent)
+
+    const fileInput = page.locator('input[type="file"]')
+    await fileInput.setInputFiles(filePath)
+
+    await expect(page.getByText(/exceeds the 10 MB limit|cannot be uploaded/i)).toBeVisible({ timeout: 3000 })
+
+    fs.unlinkSync(filePath)
+  })
+
 })
