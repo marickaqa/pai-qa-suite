@@ -207,3 +207,96 @@ The chatbot creates PDF or TXT files when asked — no UI button.
 | should create a PDF file when asked | Bot response references a .pdf file |
 | should show a download link or attachment for created TXT file | A downloadable link or attachment appears for TXT files |
 | should show a download link or attachment for created PDF file | A downloadable link or attachment appears for PDF files |
+
+## saas-auth.spec.ts
+
+Tests the PAI SaaS authentication flows at chat.paicloud.ai.
+Google OAuth is deferred — not automatable without a real Google session.
+Uses a fresh context with no session for all tests.
+
+| Test | What it checks |
+|---|---|
+| should show sign in form | Email, password fields and Sign In button are visible |
+| should show Create an account link on login page | Create an account link is visible on login page |
+| should sign in with valid credentials | Valid credentials redirect away from login page |
+| should show error with wrong password | Wrong password stays on login page |
+| should not sign in with empty email | Empty email does not proceed past login |
+| should not sign in with empty password | Empty password does not proceed past login |
+| should show sign up form | Email, password fields and Sign Up button are visible |
+| should show sign in link on signup page | Sign In link is visible on signup page |
+| should navigate to signup from login page | Create an account link navigates to /signup |
+| should not submit signup with empty fields | Empty form stays on signup page |
+| should show error for already registered email | Existing email stays on signup page |
+| should show no-org empty state for user without organization | User with no org sees the no-organization screen (skipped if no credentials) |
+
+## saas-create-agent.spec.ts
+
+Tests the Create New Agent flow at chat.paicloud.ai/agent/new.
+Covers form visibility, type toggle defaults, validation, and successful creation.
+
+| Test | What it checks |
+|---|---|
+| should show create agent form with all fields | Name, slug, Chat/Support toggle and Create agent button are visible |
+| should default to Chat type when opened via ?type=chat | Chat button is pressed, Support is not |
+| should default to Support type when opened via ?type=support | Support button is pressed, Chat is not |
+| should toggle from Chat to Support when Support is clicked | Support becomes pressed after clicking |
+| should toggle from Support to Chat when Chat is clicked | Chat becomes pressed after clicking |
+| should not submit with empty name | Empty name stays on create page |
+| should not submit with empty slug | Empty slug stays on create page |
+| should auto-populate slug from name | Slug field populates after typing a name |
+| should create a chat agent and redirect to agent page | Chat agent creation redirects away from /agent/new |
+| should create a support agent and redirect to agent page | Support agent creation redirects away from /agent/new |
+
+## saas-support-bot.spec.ts
+
+Tests the support bot agent pages at chat.paicloud.ai.
+Uses the stable Telaris test agent for all tests.
+Destructive actions (archive, delete) are visibility-only — not executed.
+
+| Test | What it checks |
+|---|---|
+| should show team page with Add member button | Agent team heading and Add member button are visible |
+| should show members table with correct columns | Member, Permissions and Joined column headers are visible |
+| should show role descriptions on team page | Admin, Analytics and Chats role descriptions are visible |
+| should open Add member dialog when button is clicked | Clicking Add member opens a dialog |
+| should show guidelines page with all sections | Guidelines heading and all section names are visible |
+| should show New guideline button | At least one New guideline button is visible |
+| should expand a guideline section when clicked | Clicking a section reveals the New guideline button |
+| should show enable/disable toggle on existing guideline | A toggle switch is visible on an existing guideline |
+| should show knowledge page with Files and Website URLs sections | Knowledge heading, Files and Website URLs sections are visible |
+| should show Upload file and New folder buttons | Upload file and New folder buttons are visible |
+| should show Crawl website button | Crawl website button is visible |
+| should show existing crawled website in Website URLs table | A completed crawl entry is visible |
+| should show widget page with all config fields | Header text, Theme, Primary colour, Launcher position, spacing and Starter questions are visible |
+| should show live preview iframe | Live preview section is visible |
+| should show theme toggle buttons | System, Dark and Light theme buttons are visible |
+| should show launcher position toggle buttons | Left and Right position buttons are visible |
+| should show Add question button for starter questions | Add question button is visible |
+| should show Save widget button | Save widget button is visible |
+| should show embed code section | Embed code section and HTML button are visible |
+| should show danger zone page with Archive and Delete buttons | Archive chatbot and Delete chatbot buttons are visible |
+| should show archive description text | Archive description text is visible |
+| should show delete warning text | Cannot be undone warning text is visible |
+
+## saas-ai-assistant.spec.ts
+
+Tests the AI assistant agent pages at chat.paicloud.ai.
+Uses the stable AI assistant test agent for all tests.
+Destructive actions (archive, delete) are visibility-only — not executed.
+
+| Test | What it checks |
+|---|---|
+| should show team page with Add member button | Agent team heading and Add member button are visible |
+| should show members table with correct columns | Member, Permissions and Joined column headers are visible |
+| should show role descriptions on team page | Admin, Analytics and Chats role descriptions are visible |
+| should open Add member dialog when button is clicked | Clicking Add member opens a dialog |
+| should show guidelines page with all sections | Guidelines heading and all section names are visible |
+| should show New guideline button | At least one New guideline button is visible |
+| should show enable/disable toggle on existing guideline | A toggle switch is visible on an existing guideline |
+| should show style config page | Style Config heading is visible |
+| should show all 6 logo upload slots | Light theme, Dark theme, Vertical light, Vertical dark, Icon light and Icon dark slots are visible |
+| should show at least 6 Upload buttons | Exactly 6 Upload buttons are visible |
+| should show Save changes button | Save changes button is visible |
+| should show danger zone page with Archive and Delete buttons | Archive chatbot and Delete chatbot buttons are visible |
+| should show archive description text | Archive description text is visible |
+| should show delete warning text | Cannot be undone warning text is visible |
