@@ -333,3 +333,19 @@ Each test is self-contained — created guidelines are deleted after.
 | should create a new guideline and show it in the section | New guideline appears in the section after creation |
 | should enable and disable a guideline toggle | Toggle state changes after clicking |
 | should delete a guideline | Guideline disappears after deletion via the edit dialog |
+
+## saas-knowledge.spec.ts
+
+Tests knowledge CRUD operations on the Telaris support bot agent.
+Each test is self-contained — created items are deleted after where possible.
+
+| Test | What it checks |
+|---|---|
+| should show folder name input when New folder is clicked | Clicking New folder shows the folder name input |
+| should create a new folder and show it in the list | New folder appears in the list after creation |
+| should show upload area when Upload file is clicked | Clicking Upload file shows the drag & drop area and Cancel button |
+| should close upload area when Cancel is clicked | Clicking Cancel hides the upload area |
+| should upload a file and show it in the list | Uploaded file appears in the knowledge list |
+| should show crawl form when Crawl website is clicked | Clicking Crawl website shows the URL input and Start crawling button |
+| should not start crawling with empty URL | Start crawling button is disabled when URL is empty |
+| should show Add pattern button in crawl form | Add pattern button is visible in the crawl form |
