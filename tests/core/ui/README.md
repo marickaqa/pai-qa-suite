@@ -318,3 +318,18 @@ Uses `reports/saas-session.json` for authenticated tests.
 | should show dynamic metric values for messages, resolution rate and token usage | All three metric cards have numeric values |
 | should show theme toggle button on dashboard | Toggle theme button is visible |
 | should toggle from dark to light mode when theme button is clicked | Clicking toggle changes the HTML class |
+
+## saas-guidelines.spec.ts
+
+Tests guideline CRUD operations on the Telaris support bot agent.
+Each test is self-contained — created guidelines are deleted after.
+
+| Test | What it checks |
+|---|---|
+| should show New guideline form when button is clicked | Clicking New guideline shows name, content, Create and Cancel fields |
+| should cancel guideline creation when Cancel is clicked | Clicking Cancel hides the form |
+| should not submit guideline with empty name | Empty name keeps the form visible |
+| should not submit guideline with empty content | Empty content keeps the form visible |
+| should create a new guideline and show it in the section | New guideline appears in the section after creation |
+| should enable and disable a guideline toggle | Toggle state changes after clicking |
+| should delete a guideline | Guideline disappears after deletion via the edit dialog |
