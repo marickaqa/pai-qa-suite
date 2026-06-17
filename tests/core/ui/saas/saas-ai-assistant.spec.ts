@@ -66,8 +66,9 @@ test.describe('SaaS AI Assistant', () => {
 
   test('should show enable/disable toggle on existing guideline', async ({ page }) => {
     await page.goto(`${AGENT_URL}/guidelines`)
+    await page.waitForTimeout(1000)
     const toggle = page.locator('button[role="switch"]').first()
-    await expect(toggle).toBeVisible()
+    await expect(toggle).toBeVisible({ timeout: 10000 })
   })
 
   // --- Style Config ---

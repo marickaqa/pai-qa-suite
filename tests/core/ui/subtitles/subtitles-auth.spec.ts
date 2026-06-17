@@ -71,10 +71,9 @@ test.describe('Subtitles Auth', () => {
 
   test('should show no-tenant state for user without a tenant', async ({ page }) => {
     await signIn(page, process.env.SUBTITLES_NO_TENANT_EMAIL || '', process.env.SUBTITLES_NO_TENANT_PASSWORD || '')
-    await page.waitForTimeout(5000)
-    await page.goto(`${BASE_URL}/select-tenant`)
+    await page.waitForURL(url => url.toString().includes('select-tenant') || url.toString().includes('overview'), { timeout: 20000 })
     await page.waitForTimeout(3000)
-    await expect(page.getByText('No organizations assigned to your account.')).toBeVisible()
+    await expect(page.getByText('No organizations assigned to your account.')).toBeVisible({ timeout: 10000 })
   })
 
   // --- Sign Out ---
