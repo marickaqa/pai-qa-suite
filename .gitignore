@@ -9,6 +9,7 @@ node_modules/
 # Session files — never commit these
 reports/session.json
 reports/saas-session.json
+reports/subtitles-session.json
 
 # Test output
 reports/latency.json

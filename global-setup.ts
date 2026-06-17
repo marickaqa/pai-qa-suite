@@ -6,8 +6,10 @@ dotenv.config({ path: path.resolve(__dirname, '.env') })
 
 const CHAT_SESSION = 'reports/session.json'
 const SAAS_SESSION = 'reports/saas-session.json'
+const SUBTITLES_SESSION = 'reports/subtitles-session.json'
 const CHAT_URL = process.env.CHAT_URL || 'https://pc-fe-dev.noctocode.dev'
 const SAAS_URL = process.env.SAAS_URL || 'https://chat.paicloud.ai'
+const SUBTITLES_URL = process.env.SUBTITLES_URL || 'https://subtitles-dev.paicloud.ai'
 
 async function globalSetup(config: FullConfig) {
   const browser = await chromium.launch()
@@ -35,6 +37,18 @@ async function globalSetup(config: FullConfig) {
   await saasContext.storageState({ path: SAAS_SESSION })
   await saasPage.close()
   await saasContext.close()
+
+  // Subtitles session
+  const subtitlesContext = await browser.newContext()
+  const subtitlesPage = await subtitlesContext.newPage()
+  await subtitlesPage.goto(SUBTITLES_URL + '/login')
+  await subtitlesPage.fill('input[name="email"]', process.env.SUBTITLES_QA_EMAIL || '')
+  await subtitlesPage.fill('input[name="password"]', process.env.SUBTITLES_QA_PASSWORD || '')
+  await subtitlesPage.click('button[type="submit"]')
+  await subtitlesPage.waitForURL((url: URL) => !url.toString().includes('login'), { timeout: 35000 })
+  await subtitlesContext.storageState({ path: SUBTITLES_SESSION })
+  await subtitlesPage.close()
+  await subtitlesContext.close()
 
   await browser.close()
 }

@@ -36,6 +36,6 @@ test('should confirm sending file to signed-in email when asked', async ({ page 
     await page.waitForTimeout(8000)
     const response = page.locator('div.prose').last()
     await expect(response).toBeVisible()
-    await expect(response).not.toContainText('other@example.com')
+    await expect(response).toContainText(/cannot send|only.*signed-in|only.*own email/i)
   })
 })

@@ -17,22 +17,35 @@ export default defineConfig({
   },
   projects: [
     {
-      name: 'core-ui',
-      testDir: './tests/core/ui',
+      name: 'core-chatbot-ui',
+      testDir: './tests/core/ui/chatbot',
       testIgnore: '**/logout.spec.ts',
       use: { storageState: 'reports/session.json' }
     },
     {
-      name: 'core-ui-logout',
-      testDir: './tests/core/ui',
+      name: 'core-chatbot-ui-logout',
+      testDir: './tests/core/ui/chatbot',
       testMatch: '**/logout.spec.ts',
       use: { storageState: 'reports/session.json' },
-      dependencies: ['core-ui']
+      dependencies: ['core-chatbot-ui']
+    },
+    {
+      name: 'core-saas-ui',
+      testDir: './tests/core/ui/saas',
+      use: { storageState: 'reports/saas-session.json' }
+    },
+    {
+      name: 'core-subtitles-ui',
+      testDir: './tests/core/ui/subtitles',
+      use: {
+        baseURL: process.env.SUBTITLES_URL || 'https://subtitles-dev.paicloud.ai',
+        storageState: 'reports/subtitles-session.json'
+      }
     },
     {
       name: 'known-bugs-ui',
       testDir: './tests/known-bugs/ui',
       use: { storageState: 'reports/session.json' }
-    }
+    },
   ]
 })
