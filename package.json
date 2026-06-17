@@ -6,7 +6,7 @@
     "test:core": "vitest run --config vitest.core.config.ts",
     "test:bugs": "vitest run --config vitest.bugs.config.ts",
     "test:monitoring": "vitest run --config vitest.monitoring.config.ts",
-    "test:ui:core": "playwright test tests/core/ui",
+    "test:ui:core": "playwright test --project=core-chatbot-ui --project=core-chatbot-ui-logout --project=core-saas-ui --project=core-subtitles-ui",
     "test:ui:bugs": "playwright test tests/known-bugs/ui",
     "test:all": "npm run test:core && npm run test:ui:core"
   },

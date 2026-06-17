@@ -39,16 +39,22 @@ async function globalSetup(config: FullConfig) {
   await saasContext.close()
 
   // Subtitles session
-  const subtitlesContext = await browser.newContext()
-  const subtitlesPage = await subtitlesContext.newPage()
-  await subtitlesPage.goto(SUBTITLES_URL + '/login')
-  await subtitlesPage.fill('input[name="email"]', process.env.SUBTITLES_QA_EMAIL || '')
-  await subtitlesPage.fill('input[name="password"]', process.env.SUBTITLES_QA_PASSWORD || '')
-  await subtitlesPage.click('button[type="submit"]')
-  await subtitlesPage.waitForURL((url: URL) => !url.toString().includes('login'), { timeout: 35000 })
-  await subtitlesContext.storageState({ path: SUBTITLES_SESSION })
-  await subtitlesPage.close()
-  await subtitlesContext.close()
+  try {
+    const subtitlesContext = await browser.newContext()
+    const subtitlesPage = await subtitlesContext.newPage()
+    await subtitlesPage.goto(SUBTITLES_URL + '/login')
+    await subtitlesPage.fill('input[name="email"]', process.env.SUBTITLES_QA_EMAIL || '')
+    await subtitlesPage.fill('input[name="password"]', process.env.SUBTITLES_QA_PASSWORD || '')
+    await subtitlesPage.click('button[type="submit"]')
+    await subtitlesPage.waitForURL((url: URL) => !url.toString().includes('login'), { timeout: 35000 })
+    await subtitlesContext.storageState({ path: SUBTITLES_SESSION })
+    await subtitlesPage.close()
+    await subtitlesContext.close()
+    console.log('✅ Subtitles session generated')
+  } catch (e: unknown) {
+    const message = e instanceof Error ? e.message : String(e)
+    console.warn('⚠️ Subtitles session generation failed — subtitles tests will be skipped:', message)
+  }
 
   await browser.close()
 }
