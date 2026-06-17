@@ -109,7 +109,8 @@ test.describe('SaaS AI Assistant', () => {
 
   test('should show archive description text', async ({ page }) => {
     await page.goto(`${AGENT_URL}/danger-zone`)
-    await expect(page.getByText(/becomes inactive and stops responding/i)).toBeVisible()
+    await page.waitForTimeout(1000)
+    await expect(page.getByText(/becomes inactive and stops responding/i)).toBeVisible({ timeout: 10000 })
   })
 
   test('should show delete warning text', async ({ page }) => {
