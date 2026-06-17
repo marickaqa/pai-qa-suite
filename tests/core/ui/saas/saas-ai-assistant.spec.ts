@@ -35,6 +35,7 @@ test.describe('SaaS AI Assistant', () => {
 
   test('should show role descriptions on team page', async ({ page }) => {
     await page.goto(`${AGENT_URL}/team`)
+    await page.waitForTimeout(1000)
     await expect(page.getByText('Full access to manage this agent')).toBeVisible()
     await expect(page.getByText('View analytics and insights')).toBeVisible()
     await expect(page.getByText('Access chat conversations')).toBeVisible()
@@ -112,6 +113,7 @@ test.describe('SaaS AI Assistant', () => {
 
   test('should show delete warning text', async ({ page }) => {
     await page.goto(`${AGENT_URL}/danger-zone`)
+    await page.waitForTimeout(1000)
     await expect(page.getByText(/cannot be undone/i)).toBeVisible()
   })
 })
