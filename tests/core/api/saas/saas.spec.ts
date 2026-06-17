@@ -1,5 +1,5 @@
 import { describe, it, expect, beforeAll, afterAll } from 'vitest'
-import { getSaasToken, createChatbot, deleteChatbot, getChatbot, listChatbots } from '../../../utils/saasClient'
+import { getSaasToken, createChatbot, deleteChatbot, getChatbot, listChatbots } from '../../../../utils/saasClient'
 
 let token: string
 let createdChatbotId: string

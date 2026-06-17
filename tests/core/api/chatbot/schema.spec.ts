@@ -1,6 +1,6 @@
 import { describe, it, expect, afterAll } from 'vitest'
-import { sendPrompt } from '../../../utils/chatClient'
-import { validateChatResponse } from '../../../utils/schemaValidator'
+import { sendPrompt } from '../../../../utils/chatClient'
+import { validateChatResponse } from '../../../../utils/schemaValidator'
 
 describe('Core — Schema Validation', () => {
 

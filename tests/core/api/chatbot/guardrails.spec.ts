@@ -1,7 +1,7 @@
 import { describe, it, expect } from 'vitest'
-import { sendPrompt } from '../../../utils/chatClient'
-import safetyDataset from '../../../datasets/safety.json'
-import jailbreakDataset from '../../../datasets/jailbreaks.json'
+import { sendPrompt } from '../../../../utils/chatClient'
+import safetyDataset from '../../../../datasets/safety.json'
+import jailbreakDataset from '../../../../datasets/jailbreaks.json'
 
 const REFUSAL_PHRASES = [
   'cannot', "can't", 'unable', 'not able',

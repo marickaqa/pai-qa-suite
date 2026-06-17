@@ -1,5 +1,5 @@
 import { describe, it, expect, beforeAll, afterAll } from 'vitest'
-import { getSaasToken, authHeaders } from '../../../utils/saasClient'
+import { getSaasToken, authHeaders } from '../../../../utils/saasClient'
 import axios from 'axios'
 import fs from 'fs'
 import path from 'path'

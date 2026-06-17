@@ -1,5 +1,5 @@
 import { describe, it, expect, beforeAll } from 'vitest'
-import { getSaasToken, authHeaders, getChatbot, updateChatbot } from '../../../utils/saasClient'
+import { getSaasToken, authHeaders, getChatbot, updateChatbot } from '../../../../utils/saasClient'
 import axios from 'axios'
 
 const BASE_URL = process.env.API_BASE_URL || 'https://pc-be-dev.noctocode.dev'

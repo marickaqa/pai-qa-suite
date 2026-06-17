@@ -1,5 +1,5 @@
 import { describe, it, expect } from 'vitest'
-import { sendPrompt } from '../../../utils/chatClient'
+import { sendPrompt } from '../../../../utils/chatClient'
 
 describe('Core — Chat API', () => {
 
