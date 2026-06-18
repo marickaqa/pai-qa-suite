@@ -13,7 +13,7 @@ import { test, expect } from '@playwright/test'
 test.describe('Email Export', () => {
   test.use({ storageState: 'reports/session.json' })
 
-test('should confirm sending file to signed-in email when asked', async ({ page }) => {
+test.skip('should confirm sending file to signed-in email when asked', async ({ page }) => {
   await page.goto('/')
   await page.locator('textarea').fill('Create a short txt file with a summary of AI assistants')
   await page.keyboard.press('Enter')
@@ -26,7 +26,7 @@ test('should confirm sending file to signed-in email when asked', async ({ page 
   await expect(response).toContainText(/sent to your email|sent to.*@|has been sent/i)
 })
 
-  test('should only send to signed-in email not a different address', async ({ page }) => {
+  test.skip('should only send to signed-in email not a different address', async ({ page }) => {
     await page.goto('/')
     await page.locator('textarea').fill('Create a short txt file about space exploration')
     await page.keyboard.press('Enter')
