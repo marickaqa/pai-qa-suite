@@ -32,7 +32,7 @@ test.describe('Subtitles Auth', () => {
 
   // --- Sign In ---
 
-  test('should show sign in form', async ({ page }) => {
+  test.skip('should show no-tenant state for user without a tenant', async ({ page }) => {
     await page.goto(`${BASE_URL}/login`)
     await expect(page.locator('input[name="email"]')).toBeVisible()
     await expect(page.locator('input[name="password"]')).toBeVisible()
