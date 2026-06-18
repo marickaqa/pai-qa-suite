@@ -90,4 +90,65 @@ test.describe('Subtitles Dashboard', () => {
     await page.getByRole('link', { name: 'Team' }).click()
     await expect(page).toHaveURL(/team/)
   })
+
+  // --- Action card navigation ---
+
+  test('should navigate to new job page when Subtitles from video is clicked', async ({ page }) => {
+    await page.goto(`${BASE_URL}/overview`)
+    await page.getByRole('link', { name: 'Subtitles from video' }).click()
+    await expect(page).toHaveURL(/jobs\/new/)
+  })
+
+  test('should navigate to translate page when Translate subtitles is clicked', async ({ page }) => {
+    await page.goto(`${BASE_URL}/overview`)
+    await page.getByRole('link', { name: 'Translate subtitles' }).click()
+    await expect(page).toHaveURL(/jobs\/translate/)
+  })
+
+  // --- Metric card navigation ---
+
+  test('should navigate to jobs when Total Jobs card is clicked', async ({ page }) => {
+    await page.goto(`${BASE_URL}/overview`)
+    await page.getByRole('link', { name: /Total Jobs/i }).click()
+    await expect(page).toHaveURL(/\/jobs/)
+  })
+
+  test('should navigate to billing when GPU seconds card is clicked', async ({ page }) => {
+    await page.goto(`${BASE_URL}/overview`)
+    await page.getByRole('link', { name: /GPU/i }).click()
+    await expect(page).toHaveURL(/settings#billing/)
+  })
+
+  test('should navigate to billing when Tokens Used card is clicked', async ({ page }) => {
+    await page.goto(`${BASE_URL}/overview`)
+    await page.getByRole('link', { name: /Tokens Used/i }).click()
+    await expect(page).toHaveURL(/settings#billing/)
+  })
+
+  // --- Recent jobs ---
+
+  test('should navigate to jobs when View All is clicked', async ({ page }) => {
+    await page.goto(`${BASE_URL}/overview`)
+    await page.getByRole('link', { name: 'View All' }).click()
+    await expect(page).toHaveURL(/\/jobs/)
+  })
+
+  test('should show at least one job in recent jobs', async ({ page }) => {
+    await page.goto(`${BASE_URL}/overview`)
+    await expect(page.getByText('test-video.mp4')).toBeVisible()
+  })
+
+  test('should show completed status on recent job', async ({ page }) => {
+    await page.goto(`${BASE_URL}/overview`)
+    await expect(page.getByText('Completed').first()).toBeVisible()
+  })
+
+  // --- New Job button ---
+
+  test('should open New Job menu when clicked', async ({ page }) => {
+    await page.goto(`${BASE_URL}/overview`)
+    await page.getByRole('button', { name: /new job/i }).click()
+    await page.waitForTimeout(500)
+    await expect(page.getByRole('menu')).toBeVisible()
+  })
 })

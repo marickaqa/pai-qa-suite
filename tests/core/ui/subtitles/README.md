@@ -56,3 +56,12 @@ Uses `reports/subtitles-session.json` for all tests.
 | should show recent jobs table columns | FILE / REFERENCE, DURATION and STATUS columns are visible |
 | should navigate to jobs page | Clicking Jobs navigates to /jobs |
 | should navigate to team page | Clicking Team navigates to /team |
+| should navigate to new job page when Subtitles from video is clicked | Clicking Subtitles from video navigates to /jobs/new |
+| should navigate to translate page when Translate subtitles is clicked | Clicking Translate subtitles navigates to /jobs/translate |
+| should navigate to jobs when Total Jobs card is clicked | Clicking Total Jobs card navigates to /jobs |
+| should navigate to billing when GPU seconds card is clicked | Clicking GPU seconds card navigates to /settings#billing |
+| should navigate to billing when Tokens Used card is clicked | Clicking Tokens Used card navigates to /settings#billing |
+| should navigate to jobs when View All is clicked | Clicking View All navigates to /jobs |
+| should show at least one job in recent jobs | test-video.mp4 appears in recent jobs |
+| should show completed status on recent job | At least one Completed status is visible in recent jobs |
+| should open New Job menu when clicked | Clicking New Job button opens a dropdown menu |
