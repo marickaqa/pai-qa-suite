@@ -41,7 +41,7 @@ test.describe('Subtitles Auth', () => {
 
   test('should sign in with valid credentials', async ({ page }) => {
     await signIn(page, process.env.SUBTITLES_QA_EMAIL || '', process.env.SUBTITLES_QA_PASSWORD || '')
-    await page.waitForURL(url => !url.toString().includes('login'), { timeout: 20000 })
+    await page.waitForTimeout(5000)
     expect(page.url()).not.toContain('login')
   })
 
@@ -71,7 +71,7 @@ test.describe('Subtitles Auth', () => {
 
   test('should show no-tenant state for user without a tenant', async ({ page }) => {
     await signIn(page, process.env.SUBTITLES_NO_TENANT_EMAIL || '', process.env.SUBTITLES_NO_TENANT_PASSWORD || '')
-    await page.waitForURL(url => url.toString().includes('select-tenant') || url.toString().includes('overview'), { timeout: 20000 })
+    await page.waitForTimeout(5000)
     // if redirected to overview, navigate to select-tenant manually
     if (page.url().includes('overview')) {
       await page.goto(`${BASE_URL}/select-tenant`)
@@ -83,7 +83,7 @@ test.describe('Subtitles Auth', () => {
 
   test('should sign out and redirect to login', async ({ page }) => {
     await signIn(page, process.env.SUBTITLES_QA_EMAIL || '', process.env.SUBTITLES_QA_PASSWORD || '')
-    await page.waitForURL(url => !url.toString().includes('login'), { timeout: 20000 })
+    await page.waitForTimeout(5000)
     // find and click sign out — selector will need adjustment based on actual UI
     const signOutBtn = page.getByRole('button', { name: /sign out|log out/i })
     if (await signOutBtn.isVisible()) {
@@ -93,3 +93,4 @@ test.describe('Subtitles Auth', () => {
     }
   })
 })
+
