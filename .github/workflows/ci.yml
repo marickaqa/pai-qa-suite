@@ -80,6 +80,10 @@ jobs:
           API_BASE_URL: https://pc-be-dev.noctocode.dev
           CHAT_URL: https://pc-fe-dev.noctocode.dev
           SAAS_URL: https://chat.paicloud.ai
+          SUBTITLES_URL: https://subtitles-dev.paicloud.ai
+          SUBTITLES_NO_TENANT_EMAIL: ${{ secrets.SUBTITLES_NO_TENANT_EMAIL }}
+          SUBTITLES_NO_TENANT_PASSWORD: ${{ secrets.SUBTITLES_NO_TENANT_PASSWORD }}
+
   monitoring:
     name: Monitoring (informational)
     runs-on: ubuntu-latest

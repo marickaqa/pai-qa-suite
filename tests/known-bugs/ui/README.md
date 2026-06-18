@@ -32,3 +32,26 @@ Tests system prompt and tool call leak behavior on the widget.
 | should not expose raw system prompt instructions | BUG-004 | ❌ Open |
 | should not reveal instructions when directly asked | BUG-004 | ❌ Open |
 | should not expose raw tool call syntax in responses | BUG-011 | ❌ Open |
+
+## email-export.spec.ts
+
+Tests email export behavior from the chatbot UI.
+All tests expected to FAIL until BUG-017 is resolved.
+
+**BUG-017**: Email export behavior is inconsistent — bot sometimes sends to wrong address, sometimes refuses, sometimes leaks raw tool_call XML.
+
+| Test | What it checks | Status |
+|---|---|---|
+| should confirm sending file to signed-in email when asked | Bot confirms file sent to signed-in email | ❌ Open |
+| should only send to signed-in email not a different address | Bot does not send to a different address or leak tool_call XML | ❌ Open |
+
+## subtitles-no-tenant.spec.ts
+
+Tests the no-tenant state in the PAI Subtitles product.
+Expected to FAIL until BUG-018 is resolved.
+
+**BUG-018**: No-tenant redirect is unreliable in CI — app sometimes redirects to /overview instead of /select-tenant.
+
+| Test | What it checks | Status |
+|---|---|---|
+| should show no-tenant state for user without a tenant | User with no tenant sees the no-organization screen | ❌ Open |
