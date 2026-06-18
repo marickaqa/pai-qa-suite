@@ -65,3 +65,24 @@ Uses `reports/subtitles-session.json` for all tests.
 | should show at least one job in recent jobs | test-video.mp4 appears in recent jobs |
 | should show completed status on recent job | At least one Completed status is visible in recent jobs |
 | should open New Job menu when clicked | Clicking New Job button opens a dropdown menu |
+
+## subtitles-transcribe.spec.ts
+
+Tests the Transcribe & Translate new job form at /jobs/new.
+Uses `reports/subtitles-session.json` for all tests.
+Requires `tests/fixtures/test-video.mp4` for file upload tests (gitignored).
+
+| Test | What it checks |
+|---|---|
+| should show new job page | New job heading and subtitle are visible |
+| should show source language auto-detect info | Auto-detected from video info card is visible |
+| should show target languages section with search | Target languages section and search button are visible |
+| should search and find a target language | Opening language dialog and searching shows results |
+| should show pre-selected target languages | English, Spanish and French are pre-selected |
+| should show output format options | SRT and VTT subtitle file options are visible |
+| should show file upload drop zone | Drop zone, Browse Files button and size limit are visible |
+| should show Start processing button disabled before file upload | Start processing is disabled with no file |
+| should show estimated time section | Estimated time section is visible before file upload |
+| should enable Start processing after file is attached | Start processing becomes enabled after file upload |
+| should show estimated time after file is attached | Estimated time placeholder disappears after file upload |
+| should submit a job and redirect to jobs page | Submitting a job redirects away from /jobs/new |
