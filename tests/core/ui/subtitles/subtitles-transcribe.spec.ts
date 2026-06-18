@@ -98,4 +98,22 @@ test.describe('Subtitles Transcribe & Translate', () => {
         await page.waitForURL(url => !url.toString().includes('jobs/new'), { timeout: 30000 })
         expect(page.url()).not.toContain('jobs/new')
     })
+
+    test('should add a language via the dialog', async ({ page }) => {
+        await page.goto(`${BASE_URL}/jobs/new`)
+        await page.getByRole('button', { name: 'Search languages...' }).click()
+        await page.waitForTimeout(300)
+        await page.getByRole('button', { name: /Danish/i }).click()
+        await page.getByRole('button', { name: /Apply/i }).click()
+        await page.waitForTimeout(300)
+        await expect(page.getByText('Danish')).toBeVisible()
+    })
+
+    test('should remove a language using the remove button', async ({ page }) => {
+        await page.goto(`${BASE_URL}/jobs/new`)
+        await expect(page.getByText('Russian')).toBeVisible()
+        await page.getByRole('button', { name: 'Remove Russian' }).click()
+        await page.waitForTimeout(300)
+        await expect(page.getByRole('button', { name: 'Remove Russian' })).not.toBeVisible()
+    })
 })
