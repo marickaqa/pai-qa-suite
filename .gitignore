@@ -27,5 +27,3 @@ npm-debug.log*
 # OS
 .DS_Store
 
-#fixtures
-tests/fixtures/test-video.mp4

@@ -135,7 +135,7 @@ test.describe('Subtitles Dashboard', () => {
 
   test('should show at least one job in recent jobs', async ({ page }) => {
     await page.goto(`${BASE_URL}/overview`)
-    await expect(page.getByText('test-video.mp4')).toBeVisible()
+    await expect(page.getByText('test-video.mp4').first()).toBeVisible()
   })
 
   test('should show completed status on recent job', async ({ page }) => {
