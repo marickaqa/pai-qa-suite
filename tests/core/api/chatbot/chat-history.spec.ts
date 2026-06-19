@@ -1,26 +1,14 @@
 import { describe, it, expect, beforeAll, afterAll } from 'vitest'
 import axios from 'axios'
-import dotenv from 'dotenv'
-import path from 'path'
-
-dotenv.config({ path: path.resolve(__dirname, '../../../.env') })
+import { getChatToken } from '@utils/tokenCache'
 
 const BASE_URL = process.env.API_BASE_URL || 'https://pc-be-dev.noctocode.dev'
 
 let token: string
 let createdChatId: string
 
-async function getChatToken(): Promise<string> {
-  const response = await axios.post(`${BASE_URL}/auth/signin`, {
-    email: process.env.API_EMAIL,
-    password: process.env.API_PASSWORD,
-  })
-  return response.data.token
-}
-
 beforeAll(async () => {
   token = await getChatToken()
-  // Create a chat to work with
   const response = await axios.post(
     `${BASE_URL}/chat`,
     {},
@@ -81,8 +69,30 @@ describe('Core — Chat History API', () => {
     expect(response.data.user.email).toBe(process.env.API_EMAIL)
   })
 
+  it('should return 401 with no token on GET /chat', async () => {
+    let status = 0
+    try {
+      await axios.get(`${BASE_URL}/chat`)
+    } catch (error: any) {
+      status = error.response?.status
+    }
+    expect(status).toBe(401)
+  })
+
+  it('should return 400 or 404 for non-existent chat id', async () => {
+    let status = 0
+    try {
+      await axios.get(
+        `${BASE_URL}/chat/00000000-0000-0000-0000-000000000000`,
+        { headers: { Authorization: `Bearer ${token}` } }
+      )
+    } catch (error: any) {
+      status = error.response?.status
+    }
+    expect([400, 404]).toContain(status)
+  })
+
   it('should delete a chat', async () => {
-    // Create a disposable chat to delete
     const created = await axios.post(
       `${BASE_URL}/chat`,
       {},
@@ -97,7 +107,6 @@ describe('Core — Chat History API', () => {
     )
     expect([200, 204]).toContain(deleteResponse.status)
 
-    // Verify it's gone
     let status: number = 0
     try {
       await axios.get(

@@ -10,6 +10,7 @@ node_modules/
 reports/session.json
 reports/saas-session.json
 reports/subtitles-session.json
+reports/api-token.json
 
 # Test output
 reports/latency.json

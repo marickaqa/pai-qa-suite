@@ -164,11 +164,11 @@ export const KNOWN_BUGS = {
     actual: 'HTTP 400 for unregistered email — reveals whether account exists',
     reportedDate: '2026-06-19',
   },
-  IMAGE_GET_RETURNS_500: {
+  CHAT_GROUP_GET_HANGS: {
     id: 'BUG-021',
-    description: 'GET /chats/{chatId}/images/{imageId} returns 500 Internal Server Error',
-    expected: 'HTTP 200 with image metadata',
-    actual: 'HTTP 500 — server error on image retrieval',
+    description: 'GET /chat/{chatId}/group hangs indefinitely — no response returned',
+    expected: 'HTTP 200 with group data',
+    actual: 'Request never resolves — times out after 15s',
     reportedDate: '2026-06-19',
   },
 } as const
