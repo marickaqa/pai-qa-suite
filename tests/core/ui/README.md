@@ -1,351 +1,144 @@
-# Core UI Tests
+# Subtitles Tests
 
-These tests must always pass. If any fail, the pipeline fails.
-All tests use the saved session from `reports/session.json`.
-Login tests use a fresh context with no session.
+Tests for the PAI Subtitles product at subtitles-dev.paicloud.ai.
+No self-service signup — users are created by superadmin or tenant admins.
 
-## login.spec.ts
+## Test Accounts
 
-Tests the login page behavior.
+| Account | Role | Tenant |
+|---|---|---|
+| qa-subtitles@noctocode.com | Admin | qa-automation |
+| qa-notenant2@noctocode.com | User | None |
 
-| Test | What it checks |
-|---|---|
-| should show the login form | Email, password fields and Sign In button are visible |
-| should login successfully with valid credentials | Valid credentials redirect away from login page |
-| should show error with wrong password | Wrong password shows an error, stays on login page |
-| should not login with empty email | Empty email does not proceed to dashboard |
-| should not login with empty password | Empty password does not proceed to dashboard |
-| should show password toggle icon | Eye icon is visible next to the password field |
-| should show password in plain text when toggle is clicked | Input type changes from password to text after clicking toggle |
-| should hide password again when toggle is clicked twice | Input type returns to password after clicking toggle twice |
+## Setup
 
-## signup.spec.ts
+Test accounts are created and verified via scripts:
+- `scripts/setup-subtitles-qa.ts` — creates QA tenant and users
+- `scripts/verify-subtitles-users.ts` — verifies email and sets passwords
+- `scripts/fix-subtitles-tenant.ts` — accepts pending tenant invite for QA user
+- `scripts/submit-test-job.ts` — submits a test video job to populate the QA tenant
 
-Tests the signup flow from the login page.
-Uses a fresh context with no session.
+Test fixtures:
+- `tests/fixtures/test-video.mp4` — short test video for job submission
+- `tests/fixtures/test-subtitles.srt` — short SRT file for subtitle translation tests
 
-| Test | What it checks |
-|---|---|
-| should show signup link on login page | Sign Up link is visible on the login page |
-| should navigate to signup page when link is clicked | Clicking Sign Up navigates to /signup |
-| should show signup form with all fields | Email, password and confirm password fields and Sign Up button are visible |
-| should not submit with empty fields | Empty form does not proceed past signup page |
-| should show error for mismatched passwords | Mismatched passwords show an error message |
-| should show error for invalid email format | Invalid email format stays on signup page |
-| should show error for already registered email | Existing email shows an error message |
-| should show sign in link on signup page | Sign In link is visible on the signup page |
+## subtitles-auth.spec.ts
 
-## logout.spec.ts
-
-Tests the logout flow from the chatbot UI.
-Logout is accessed via the profile button at the bottom of the sidebar.
-Uses the saved session from `reports/session.json`.
-
-| Test | What it checks |
-|---|---|
-| should show email in profile button before logout | Profile button with email is visible in sidebar |
-| should show logout option when profile is clicked | Clicking profile button shows Log out option |
-| should log out and redirect to login page | Clicking Log out redirects to login page |
-| should not be able to access chat after logout | Navigating to / after logout redirects to login |
-
-## chat.spec.ts
-
-Tests the core chat interface behavior.
-
-| Test | What it checks |
-|---|---|
-| should show the main chat UI after login | Textarea, New Chat button and Chat History are visible |
-| should send a message and clear the input | After sending, the input field is cleared |
-| should show a response after sending a message | A prose response appears after sending |
-| should create a new chat when New Chat is clicked | Clicking New Chat shows the welcome message |
-| should show chat history in sidebar | At least one chat exists in the sidebar |
-| should send message when Enter is pressed | Enter key submits the message |
-| should add new line when Shift+Enter is pressed | Shift+Enter adds a newline, does not submit |
-| should not send empty message when Enter is pressed | Empty input does not trigger a response |
-
-## incognito.spec.ts
-
-Tests the incognito mode toggle behavior.
-Incognito chats are encrypted, appear in history with an Incognito badge, and are deleted after 1 hour.
-
-| Test | What it checks |
-|---|---|
-| should show incognito toggle | Toggle is visible on the chat page |
-| should be off by default | Toggle starts in off state |
-| should turn on when clicked | Toggle switches to on state |
-| should turn off when clicked again | Toggle switches back to off state |
-| should show incognito chat in history with incognito label | Incognito chat appears in sidebar with Incognito badge |
-
-## theme.spec.ts
-
-Tests the dark/light mode toggle.
-
-| Test | What it checks |
-|---|---|
-| should start in dark mode | HTML element has dark class on load |
-| should switch to light mode when toggle is clicked | Dark class removed after clicking sun icon |
-| should switch back to dark mode when toggle is clicked again | Dark class restored after clicking moon icon |
-
-## sidebar.spec.ts
-
-Tests the chat history sidebar behavior.
-
-| Test | What it checks |
-|---|---|
-| should show chat history heading | Chat History heading is visible |
-| should filter chats when searching | Search input filters the chat list |
-| should show no results for non-existent search term | No chats shown for gibberish search |
-| should clear search and restore all chats | Clearing search restores full chat list |
-| should delete a chat | Chat count decreases after deletion |
-
-## file-upload.spec.ts
-
-Tests file attachment behavior in the chat interface.
-
-| Test | What it checks |
-|---|---|
-| should show filename chip after file is attached | Filename appears as a chip after selecting a file |
-| should remove file when X is clicked | Clicking X removes the file chip |
-| should accept expected file types | Input accepts .pdf and .txt at minimum |
-| should allow sending a message with an attached file | Message with file attached gets a response |
-| should reject unsupported file types | Unsupported file type does not appear as a chip |
-| should handle oversized file gracefully | File over 10MB shows an error message |
-
-## saas-dashboard.spec.ts
-
-Tests the PAI SaaS dashboard behavior.
-Uses `reports/saas-session.json` for authenticated tests.
-
-| Test | What it checks |
-|---|---|
-| should redirect unauthenticated users to login | Accessing dashboard without session redirects to login |
-| should login and land on dashboard | Authenticated session lands on dashboard URL |
-| should show key dashboard metrics | Total agents, messages, resolution rate, token usage visible |
-| should show support bots and AI assistants sections | Both bot type sections visible on overview |
-| should show organization name in sidebar | noctocode.dev visible in sidebar |
-| should show New button on dashboard | New button visible for creating agents |
-
-## saas-agent.spec.ts
-
-Tests PAI SaaS agent pages — knowledge, guidelines, style config, and team management.
-Uses `reports/saas-session.json` for all tests.
-
-| Test | What it checks |
-|---|---|
-| should show knowledge page with files and crawl sections | Files heading, Website URLs, Upload and Crawl buttons visible |
-| should navigate to knowledge from agent sidebar | Sidebar link navigates to knowledge page |
-| should show guidelines page with all sections | All guideline sections visible |
-| should show New guideline button in each section | At least one New guideline button visible |
-| should navigate to guidelines from agent sidebar | Sidebar link navigates to guidelines page |
-| should show style config page | Style Config heading, Light and Dark theme visible |
-| should show Save changes button | Save changes button visible |
-| should show Upload buttons for logo slots | At least 6 Upload buttons visible |
-| should show team management page | Team management heading visible |
-| should show members table with correct columns | Member, Permissions, Joined columns visible |
-| should show Invite member button | Invite member button visible |
-| should show pending invitations section | Pending Invitations heading visible |
-
-## widget.spec.ts
-
-Tests the embedded support widget on the Telaris dummy site.
-
-| Test | What it checks |
-|---|---|
-| should show the chat launcher button | Launcher button visible on page load |
-| should open the widget when launcher is clicked | Input textarea visible after opening |
-| should show greeting message on open | First bot bubble visible after opening |
-| should send a message and clear the input | Input cleared after sending |
-| should send message with Enter key | Enter key submits the message |
-| should not send empty message | Send button disabled with empty input |
-| should close the widget when close button is clicked | Input not visible after closing |
-| should handle special characters without crashing | Special chars sent without errors |
-| should not expose system prompt instructions | Raw system prompt text not visible |
-| should refuse bomb making instructions | Bot refuses harmful request |
-
-## forgot-password.spec.ts
-
-Tests the forgot password flow.
-
-| Test | What it checks |
-|---|---|
-| should show forgot password form | Form with email input and Send reset link button visible |
-| should navigate to forgot password from login page | Forgot password link on login navigates correctly |
-| should show confirmation screen after submitting email | Check your email screen shown after submission |
-| should navigate back to login when Sign in is clicked | Sign in link navigates back to login |
-
-## image-generation.spec.ts
-
-Tests the image generation toolbar behavior.
-
-| Test | What it checks |
-|---|---|
-| should show image toolbar when Create image is clicked | Both select dropdowns visible after opening image mode |
-| should show all aspect ratio options | Square, widescreen and story options present |
-| should show all style options | Fast, balanced, quality and max options present |
-| should be able to change aspect ratio | Selecting widescreen updates the value |
-| should be able to change quality style | Selecting quality updates the value |
-| should close image mode when X is clicked | Dropdowns not visible after closing |
-
-## email-export.spec.ts
-
-Tests the email export behavior triggered by natural language commands.
-The chatbot sends files to the signed-in user's email when asked — no UI button.
-
-| Test | What it checks |
-|---|---|
-| should confirm sending file to signed-in email when asked | Bot confirms file was sent to the signed-in email address |
-| should only send to signed-in email not a different address | Bot does not send to a different email address when requested |
-
-## file-creation.spec.ts
-
-Tests file creation triggered by natural language commands.
-The chatbot creates PDF or TXT files when asked — no UI button.
-
-| Test | What it checks |
-|---|---|
-| should create a TXT file when asked | Bot response references a .txt file |
-| should create a PDF file when asked | Bot response references a .pdf file |
-| should show a download link or attachment for created TXT file | A downloadable link or attachment appears for TXT files |
-| should show a download link or attachment for created PDF file | A downloadable link or attachment appears for PDF files |
-
-## saas-auth.spec.ts
-
-Tests the PAI SaaS authentication flows at chat.paicloud.ai.
-Google OAuth is deferred — not automatable without a real Google session.
+Tests the PAI Subtitles authentication flows.
 Uses a fresh context with no session for all tests.
 
 | Test | What it checks |
 |---|---|
+| should redirect unauthenticated users to login | Accessing / without session redirects to login |
 | should show sign in form | Email, password fields and Sign In button are visible |
-| should show Create an account link on login page | Create an account link is visible on login page |
 | should sign in with valid credentials | Valid credentials redirect away from login page |
 | should show error with wrong password | Wrong password stays on login page |
-| should not sign in with empty email | Empty email does not proceed past login |
-| should not sign in with empty password | Empty password does not proceed past login |
-| should show sign up form | Email, password fields and Sign Up button are visible |
-| should show sign in link on signup page | Sign In link is visible on signup page |
-| should navigate to signup from login page | Create an account link navigates to /signup |
-| should not submit signup with empty fields | Empty form stays on signup page |
-| should show error for already registered email | Existing email stays on signup page |
-| should show no-org empty state for user without organization | User with no org sees the no-organization screen (skipped if no credentials) |
+| should not sign in with empty email | Empty email stays on login page |
+| should not sign in with empty password | Empty password stays on login page |
+| should sign out and redirect to login | Clicking sign out redirects to login page |
 
-## saas-create-agent.spec.ts
+## subtitles-dashboard.spec.ts
 
-Tests the Create New Agent flow at chat.paicloud.ai/agent/new.
-Covers form visibility, type toggle defaults, validation, and successful creation.
+Tests the PAI Subtitles dashboard overview page.
+Uses `reports/subtitles-session.json` for all tests.
 
 | Test | What it checks |
 |---|---|
-| should show create agent form with all fields | Name, slug, Chat/Support toggle and Create agent button are visible |
-| should default to Chat type when opened via ?type=chat | Chat button is pressed, Support is not |
-| should default to Support type when opened via ?type=support | Support button is pressed, Chat is not |
-| should toggle from Chat to Support when Support is clicked | Support becomes pressed after clicking |
-| should toggle from Support to Chat when Chat is clicked | Chat becomes pressed after clicking |
-| should not submit with empty name | Empty name stays on create page |
-| should not submit with empty slug | Empty slug stays on create page |
-| should auto-populate slug from name | Slug field populates after typing a name |
-| should create a chat agent and redirect to agent page | Chat agent creation redirects away from /agent/new |
-| should create a support agent and redirect to agent page | Support agent creation redirects away from /agent/new |
+| should land on overview after login | Overview heading is visible |
+| should show navigation items | Overview, Jobs, Transcribe & Translate, Translate and Team links are visible |
+| should show New Job button | New Job button is visible |
+| should show search bar | Search jobs input is visible |
+| should show theme toggle | Theme toggle button is visible |
+| should show action cards | Subtitles from video and Translate subtitles cards are visible |
+| should show metrics cards | Total Jobs, GPU usage, Top Languages and Tokens Used cards are visible |
+| should show total jobs as a number | Total Jobs card is visible |
+| should show processing volume chart | Processing Volume - last 7 days chart is visible |
+| should show recent jobs section | Recent Jobs section and View All link are visible |
+| should show recent jobs table columns | FILE / REFERENCE, DURATION and STATUS columns are visible |
+| should navigate to jobs page | Clicking Jobs navigates to /jobs |
+| should navigate to team page | Clicking Team navigates to /team |
+| should navigate to new job page when Subtitles from video is clicked | Clicking Subtitles from video navigates to /jobs/new |
+| should navigate to translate page when Translate subtitles is clicked | Clicking Translate subtitles navigates to /jobs/translate |
+| should navigate to jobs when Total Jobs card is clicked | Clicking Total Jobs card navigates to /jobs |
+| should navigate to billing when GPU seconds card is clicked | Clicking GPU seconds card navigates to /settings#billing |
+| should navigate to billing when Tokens Used card is clicked | Clicking Tokens Used card navigates to /settings#billing |
+| should navigate to jobs when View All is clicked | Clicking View All navigates to /jobs |
+| should show at least one job in recent jobs | test-video.mp4 appears in recent jobs |
+| should show completed status on recent job | At least one Completed status is visible in recent jobs |
+| should open New Job menu when clicked | Clicking New Job button opens a dropdown menu |
 
-## saas-support-bot.spec.ts
+## subtitles-transcribe.spec.ts
 
-Tests the support bot agent pages at chat.paicloud.ai.
-Uses the stable Telaris test agent for all tests.
-Destructive actions (archive, delete) are visibility-only — not executed.
-
-| Test | What it checks |
-|---|---|
-| should show team page with Add member button | Agent team heading and Add member button are visible |
-| should show members table with correct columns | Member, Permissions and Joined column headers are visible |
-| should show role descriptions on team page | Admin, Analytics and Chats role descriptions are visible |
-| should open Add member dialog when button is clicked | Clicking Add member opens a dialog |
-| should show guidelines page with all sections | Guidelines heading and all section names are visible |
-| should show New guideline button | At least one New guideline button is visible |
-| should expand a guideline section when clicked | Clicking a section reveals the New guideline button |
-| should show enable/disable toggle on existing guideline | A toggle switch is visible on an existing guideline |
-| should show knowledge page with Files and Website URLs sections | Knowledge heading, Files and Website URLs sections are visible |
-| should show Upload file and New folder buttons | Upload file and New folder buttons are visible |
-| should show Crawl website button | Crawl website button is visible |
-| should show existing crawled website in Website URLs table | A completed crawl entry is visible |
-| should show widget page with all config fields | Header text, Theme, Primary colour, Launcher position, spacing and Starter questions are visible |
-| should show live preview iframe | Live preview section is visible |
-| should show theme toggle buttons | System, Dark and Light theme buttons are visible |
-| should show launcher position toggle buttons | Left and Right position buttons are visible |
-| should show Add question button for starter questions | Add question button is visible |
-| should show Save widget button | Save widget button is visible |
-| should show embed code section | Embed code section and HTML button are visible |
-| should show danger zone page with Archive and Delete buttons | Archive chatbot and Delete chatbot buttons are visible |
-| should show archive description text | Archive description text is visible |
-| should show delete warning text | Cannot be undone warning text is visible |
-
-## saas-ai-assistant.spec.ts
-
-Tests the AI assistant agent pages at chat.paicloud.ai.
-Uses the stable AI assistant test agent for all tests.
-Destructive actions (archive, delete) are visibility-only — not executed.
+Tests the Transcribe & Translate new job form at /jobs/new.
+Uses `reports/subtitles-session.json` for all tests.
+Requires `tests/fixtures/test-video.mp4` for file upload tests.
 
 | Test | What it checks |
 |---|---|
-| should show team page with Add member button | Agent team heading and Add member button are visible |
-| should show members table with correct columns | Member, Permissions and Joined column headers are visible |
-| should show role descriptions on team page | Admin, Analytics and Chats role descriptions are visible |
-| should open Add member dialog when button is clicked | Clicking Add member opens a dialog |
-| should show guidelines page with all sections | Guidelines heading and all section names are visible |
-| should show New guideline button | At least one New guideline button is visible |
-| should show enable/disable toggle on existing guideline | A toggle switch is visible on an existing guideline |
-| should show style config page | Style Config heading is visible |
-| should show all 6 logo upload slots | Light theme, Dark theme, Vertical light, Vertical dark, Icon light and Icon dark slots are visible |
-| should show at least 6 Upload buttons | Exactly 6 Upload buttons are visible |
-| should show Save changes button | Save changes button is visible |
-| should show danger zone page with Archive and Delete buttons | Archive chatbot and Delete chatbot buttons are visible |
-| should show archive description text | Archive description text is visible |
-| should show delete warning text | Cannot be undone warning text is visible |
+| should show new job page | New job heading and subtitle are visible |
+| should show source language auto-detect info | Auto-detected from video info card is visible |
+| should show target languages section with search | Target languages section and search button are visible |
+| should search and find a target language | Opening language dialog and searching shows results |
+| should show pre-selected target languages | English, Spanish and French are pre-selected |
+| should show output format options | SRT and VTT subtitle file options are visible |
+| should show file upload drop zone | Drop zone, Browse Files button and size limit are visible |
+| should show Start processing button disabled before file upload | Start processing is disabled with no file |
+| should show estimated time section | Estimated time section is visible before file upload |
+| should enable Start processing after file is attached | Start processing becomes enabled after file upload |
+| should show estimated time after file is attached | Estimated time placeholder disappears after file upload |
+| should submit a job and redirect to jobs page | Submitting a job redirects away from /jobs/new |
+| should add a language via the dialog | Selecting Danish in the dialog adds it to the list |
+| should remove a language using the remove button | Clicking Remove Russian removes it from the list |
 
-## saas-dashboard.spec.ts
+## subtitles-translate.spec.ts
 
-Tests the PAI SaaS dashboard behavior at chat.paicloud.ai.
-Uses `reports/saas-session.json` for authenticated tests.
-
-| Test | What it checks |
-|---|---|
-| should redirect unauthenticated users to login | Accessing dashboard without session redirects to login |
-| should login and land on dashboard | Authenticated session lands on dashboard URL |
-| should show key dashboard metrics | Total agents, messages, resolution rate, token usage labels are visible |
-| should show support bots and AI assistants sections | Both bot type sections visible on overview |
-| should show organization name in sidebar | noctocode.dev visible in sidebar |
-| should show New button on dashboard | New button visible for creating agents |
-| should show total agents count as a number | Total agents card shows a numeric value |
-| should show dynamic metric values for messages, resolution rate and token usage | All three metric cards have numeric values |
-| should show theme toggle button on dashboard | Toggle theme button is visible |
-| should toggle from dark to light mode when theme button is clicked | Clicking toggle changes the HTML class |
-
-## saas-guidelines.spec.ts
-
-Tests guideline CRUD operations on the Telaris support bot agent.
-Each test is self-contained — created guidelines are deleted after.
+Tests the Translate subtitles form at /jobs/translate.
+Uses `reports/subtitles-session.json` for all tests.
+Requires `tests/fixtures/test-subtitles.srt` for file upload tests.
 
 | Test | What it checks |
 |---|---|
-| should show New guideline form when button is clicked | Clicking New guideline shows name, content, Create and Cancel fields |
-| should cancel guideline creation when Cancel is clicked | Clicking Cancel hides the form |
-| should not submit guideline with empty name | Empty name keeps the form visible |
-| should not submit guideline with empty content | Empty content keeps the form visible |
-| should create a new guideline and show it in the section | New guideline appears in the section after creation |
-| should enable and disable a guideline toggle | Toggle state changes after clicking |
-| should delete a guideline | Guideline disappears after deletion via the edit dialog |
+| should show translate subtitles page | Translate subtitles heading and subtitle are visible |
+| should show source language auto-detect info | Auto-detected from subtitles info card is visible |
+| should show target languages section with search | Target languages section and search button are visible |
+| should show pre-selected target languages | English, Spanish and French are pre-selected |
+| should show output format options | SRT and VTT subtitle file options are visible |
+| should show file upload drop zone for subtitle files | Drop zone, Browse Files button and SRT/VTT label are visible |
+| should show Start translation button disabled before file upload | Start translation is disabled with no file |
+| should show estimated time section | Estimated time section is visible before file upload |
+| should enable Start translation after SRT file is attached | Start translation becomes enabled after file upload |
+| should submit a translation job and redirect | Submitting a job redirects away from /jobs/translate |
+| should add a language via the dialog | Selecting Danish in the dialog adds it to the list |
+| should remove a language using the remove button | Clicking Remove Russian removes it from the list |
 
-## saas-knowledge.spec.ts
+## subtitles-jobs.spec.ts
 
-Tests knowledge CRUD operations on the Telaris support bot agent.
-Each test is self-contained — created items are deleted after where possible.
+Tests the Jobs list page and job detail page.
+Uses `reports/subtitles-session.json` for all tests.
 
 | Test | What it checks |
 |---|---|
-| should show folder name input when New folder is clicked | Clicking New folder shows the folder name input |
-| should create a new folder and show it in the list | New folder appears in the list after creation |
-| should show upload area when Upload file is clicked | Clicking Upload file shows the drag & drop area and Cancel button |
-| should close upload area when Cancel is clicked | Clicking Cancel hides the upload area |
-| should upload a file and show it in the list | Uploaded file appears in the knowledge list |
-| should show crawl form when Crawl website is clicked | Clicking Crawl website shows the URL input and Start crawling button |
-| should not start crawling with empty URL | Start crawling button is disabled when URL is empty |
-| should show Add pattern button in crawl form | Add pattern button is visible in the crawl form |
+| should show jobs page with table | Jobs heading, FILE / REFERENCE and STATUS columns are visible |
+| should show job rows with file name and status | test-video.mp4 and Completed status are visible |
+| should navigate to job detail when row is clicked | Clicking a row navigates to job detail page |
+| should show job detail tabs | Activity, Confidence and Violations tabs are visible |
+| should show output files with download buttons | Output files section with SRT and VTT download links are visible |
+| should show job details panel | Job details panel with Created, File size and Tokens used are visible |
+| should show Download all and Re-run buttons | Download all link and Re-run button are visible |
+
+## subtitles-jobs-filter.spec.ts
+
+Tests the Jobs list filtering, search, and pagination.
+Uses `reports/subtitles-session.json` for all tests.
+
+| Test | What it checks |
+|---|---|
+| should show status filter tabs | All, Processing, Completed, Failed and Pending tabs are visible |
+| should show job count in All tab | All tab shows a numeric count |
+| should filter by Completed status | Clicking Completed tab shows completed jobs |
+| should show search bar | Search jobs input is visible |
+| should search for a job by filename | Searching test-video shows matching jobs |
+| should show Filters button | Filters button is visible |
+| should open filters panel when Filters is clicked | Clicking Filters shows Status, Language and Created filter sections |
+| should show date range filter options | Last 7 days, Last 30 days and All time options are visible |
+| should show pagination info | Showing X-Y of Z jobs text is visible |
