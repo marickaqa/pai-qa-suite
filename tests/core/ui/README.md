@@ -142,3 +142,23 @@ Uses `reports/subtitles-session.json` for all tests.
 | should open filters panel when Filters is clicked | Clicking Filters shows Status, Language and Created filter sections |
 | should show date range filter options | Last 7 days, Last 30 days and All time options are visible |
 | should show pagination info | Showing X-Y of Z jobs text is visible |
+
+## subtitles-team.spec.ts
+
+Tests the Team page and member detail page.
+Uses `reports/subtitles-session.json` for all tests.
+
+| Test | What it checks |
+|---|---|
+| should show team members page | Team members heading is visible |
+| should show table columns | Member, Role, Status and Last active columns are visible |
+| should show QA user in members list | QA Automation, Admin and Active status are visible |
+| should show Invite teammate button | Invite teammate button is visible |
+| should open invite dialog when Invite teammate is clicked | Clicking Invite teammate opens a dialog |
+| should show 3-dot menu on member row | Clicking 3-dot button shows Edit member option |
+| should navigate to member detail when Edit member is clicked | Clicking Edit member navigates to member detail page |
+| should show member detail page | Member name and email are visible on detail page |
+| should show personal data section | Personal data section with Full name, Email and Role fields is visible |
+| should show cannot change own role message | You cannot change your own role message is visible |
+| should show recent activity section | Recent activity section with Joined team entry is visible |
+| should show breadcrumb on member detail page | Team breadcrumb link and member name are visible |
