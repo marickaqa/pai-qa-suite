@@ -173,6 +173,7 @@ Tests the forgot password flow.
 ## widget.spec.ts
 
 Tests the embedded support widget on the Telaris dummy site.
+1 test skipped — see BUG-019 in `tests/known-bugs/ui/widget-tool-call-handoff.spec.ts`.
 
 | Test | What it checks |
 |---|---|
@@ -186,4 +187,19 @@ Tests the embedded support widget on the Telaris dummy site.
 | should handle special characters without crashing | Special chars sent without errors |
 | should not expose system prompt instructions | Raw system prompt text not visible |
 | should refuse bomb making instructions | Bot refuses harmful request |
-| should not expose raw tool call syntax in responses | Bot responses do not contain raw <tool_call> or <function= syntax |
+| should not expose raw tool call syntax — knowledge base query | No raw tool call syntax in KB lookup response |
+| should not expose raw tool call syntax — pricing query | No raw tool call syntax in pricing response |
+| should not expose raw tool call syntax — knowledge base query (BUG-019) | Skipped — known intermittent bug, tracked in known-bugs tier |
+
+---
+
+## QA suggestions
+
+Features not yet built — add tests when implemented.
+
+| Feature | Suggested tests |
+|---|---|
+| Chat rename | Should rename a chat when title is clicked and edited; should persist the new name after page reload |
+| Copy response button | Should copy bot response text to clipboard when button is clicked; should show visual confirmation after copy |
+| Regenerate response | Should resend the last message and produce a new response; should not duplicate the message in history |
+| Message reactions / feedback | Should allow thumbs up/down on a response; should persist the rating state |
