@@ -46,16 +46,21 @@ async function globalSetup(config: FullConfig) {
     await subtitlesPage.fill('input[name="email"]', process.env.SUBTITLES_QA_EMAIL || '')
     await subtitlesPage.fill('input[name="password"]', process.env.SUBTITLES_QA_PASSWORD || '')
     await subtitlesPage.click('button[type="submit"]')
-    await subtitlesPage.waitForURL((url: URL) => !url.toString().includes('login'), { timeout: 35000 })
+    await subtitlesPage.waitForTimeout(5000)
+    // Handle org selector
+    if (subtitlesPage.url().includes('select-tenant')) {
+      await subtitlesPage.locator('button:has(span[title="qa-automation"])').click()
+      await subtitlesPage.waitForURL((url: URL) => url.toString().includes('/overview'), { timeout: 15000 })
+      await subtitlesPage.waitForTimeout(3000)
+    }
     await subtitlesContext.storageState({ path: SUBTITLES_SESSION })
     await subtitlesPage.close()
     await subtitlesContext.close()
     console.log('✅ Subtitles session generated')
   } catch (e: unknown) {
     const message = e instanceof Error ? e.message : String(e)
-    console.warn('⚠️ Subtitles session generation failed — subtitles tests will be skipped:', message)
+    console.error('❌ Subtitles session generation failed:', message)
   }
-
   await browser.close()
 }
 
