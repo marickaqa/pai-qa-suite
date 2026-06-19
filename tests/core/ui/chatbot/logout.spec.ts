@@ -8,7 +8,7 @@ import { test, expect, type Page } from '@playwright/test';
  * (shows avatar + email), which opens a small popup with a Log out option.
  *
  * Uses the saved session from `reports/session.json`.
- * After logout, the session is invalidated — tests run in isolation.
+ * Each test is fully independent — no ordering dependencies.
  */
 
 test.describe('Logout', () => {
@@ -39,19 +39,23 @@ test.describe('Logout', () => {
     await expect(page).toHaveURL(/login|sign-in/);
   });
 
-  test('should not be able to access chat after logout', async ({ page }) => {
-    // Log in fresh since test 3 invalidated the session
-    await page.goto('/login')
-    await page.fill('#email', process.env.API_EMAIL || '')
-    await page.fill('#password', process.env.API_PASSWORD || '')
-    await page.click('button[type="submit"]')
-    await page.waitForURL(url => !url.toString().includes('login'), { timeout: 20000 })
+  test('should not be able to access chat after logout', async ({ browser }) => {
+    const context = await browser.newContext({ storageState: { cookies: [], origins: [] } });
+    const page = await context.newPage();
 
-    // Now log out and verify redirect blocks re-entry
-    await page.locator('button').filter({ hasText: /@/ }).last().click()
-    await page.getByRole('button', { name: 'Log out' }).first().click()
-    await expect(page).toHaveURL(/login|sign-in/)
-    await page.goto('/')
-    await expect(page).toHaveURL(/login|sign-in/)
-  })
+    await page.goto('/login');
+    await page.fill('#email', process.env.API_EMAIL || '');
+    await page.fill('#password', process.env.API_PASSWORD || '');
+    await page.click('button[type="submit"]');
+    await page.waitForURL(url => !url.toString().includes('login'), { timeout: 20000 });
+
+    await page.locator('button').filter({ hasText: /@/ }).last().click();
+    await page.getByRole('button', { name: 'Log out' }).first().click();
+    await expect(page).toHaveURL(/login|sign-in/);
+
+    await page.goto('/');
+    await expect(page).toHaveURL(/login|sign-in/);
+
+    await context.close();
+  });
 });

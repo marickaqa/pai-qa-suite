@@ -127,7 +127,6 @@ The chatbot creates PDF or TXT files when asked — no UI button.
 
 Tests the email export behavior triggered by natural language commands.
 The chatbot sends files to the signed-in user's email when asked — no UI button.
-Both tests are skipped pending resolution of BUG-017.
 
 | Test | What it checks |
 |---|---|
@@ -174,3 +173,4 @@ Tests the embedded support widget on the Telaris dummy site.
 | should handle special characters without crashing | Special chars sent without errors |
 | should not expose system prompt instructions | Raw system prompt text not visible |
 | should refuse bomb making instructions | Bot refuses harmful request |
+| should not expose raw tool call syntax in responses | Bot responses do not contain raw <tool_call> or <function= syntax |

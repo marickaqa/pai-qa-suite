@@ -4,9 +4,7 @@ async function openImageMode(page: Page) {
   await page.goto('/')
   await page.waitForTimeout(1000)
 
-  const imageButton = page.locator('button').filter({
-    has: page.locator('svg rect[x="3"][y="3"]')
-  }).first()
+  const imageButton = page.locator('button:has(svg rect):has(svg circle):has(svg path[d*="M21 15"])').first()
   await imageButton.click()
   await page.getByText('Create image').click()
   await expect(page.getByText('Image', { exact: true })).toBeVisible()
@@ -53,10 +51,7 @@ test.describe('Core — Image Generation', () => {
 
   test('should close image mode when X is clicked', async ({ page }) => {
     await openImageMode(page)
-    const closeButton = page.locator('button').filter({
-      has: page.locator('svg[viewBox="0 0 12 12"]')
-    }).first()
-    await closeButton.click()
+    await page.locator('button:has(svg[viewBox="0 0 12 12"])').first().click()
     await expect(page.locator('select').first()).not.toBeVisible()
   })
 
