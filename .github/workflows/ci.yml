@@ -24,6 +24,12 @@ jobs:
           SAAS_PASSWORD: ${{ secrets.SAAS_PASSWORD }}
           API_BASE_URL: https://pc-be-dev.noctocode.dev
           CHAT_URL: https://pc-fe-dev.noctocode.dev
+          FTP_HOST: ${{ secrets.FTP_HOST }}
+          FTP_USER: ${{ secrets.FTP_USER }}
+          FTP_PASSWORD: ${{ secrets.FTP_PASSWORD }}
+          SUBTITLES_QA_EMAIL: ${{ secrets.SUBTITLES_QA_EMAIL }}
+          SUBTITLES_QA_PASSWORD: ${{ secrets.SUBTITLES_QA_PASSWORD }}
+          SUBTITLES_QA_TENANT_ID: ${{ secrets.SUBTITLES_QA_TENANT_ID }}
 
   core-ui:
     name: Core UI Tests
