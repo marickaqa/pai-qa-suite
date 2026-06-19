@@ -63,6 +63,19 @@ Tests the core chat interface behavior.
 | should add new line when Shift+Enter is pressed | Shift+Enter adds a newline, does not submit |
 | should not send empty message when Enter is pressed | Empty input does not trigger a response |
 
+## multi-turn.spec.ts
+
+Tests multi-turn conversation context retention.
+Each test starts a fresh chat to ensure isolation.
+Verifies the bot remembers information from earlier in the same conversation and does not leak context across separate chats.
+
+| Test | What it checks |
+|---|---|
+| should remember a name given earlier in the conversation | Bot recalls a name established two turns earlier |
+| should remember a number given earlier in the conversation | Bot recalls a number established two turns earlier |
+| should maintain context across three turns | Bot recalls destination and duration after three exchanges |
+| should not confuse context from a new chat | A new chat has no memory of the previous chat's context |
+
 ## incognito.spec.ts
 
 Tests the incognito mode toggle behavior.
