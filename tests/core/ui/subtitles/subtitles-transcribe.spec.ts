@@ -75,6 +75,7 @@ test.describe('Subtitles Transcribe & Translate', () => {
 
     test('should enable Start processing after file is attached', async ({ page }) => {
         await page.goto(`${BASE_URL}/jobs/new`)
+        await page.waitForTimeout(2000)
         const fileInput = page.locator('input[type="file"]')
         await fileInput.setInputFiles(path.join('tests', 'fixtures', 'test-video.mp4'))
         await page.waitForTimeout(2000)
@@ -83,6 +84,7 @@ test.describe('Subtitles Transcribe & Translate', () => {
 
     test('should show estimated time after file is attached', async ({ page }) => {
         await page.goto(`${BASE_URL}/jobs/new`)
+        await page.waitForTimeout(2000)
         const fileInput = page.locator('input[type="file"]')
         await fileInput.setInputFiles(path.join('tests', 'fixtures', 'test-video.mp4'))
         await page.waitForTimeout(3000)
@@ -91,6 +93,7 @@ test.describe('Subtitles Transcribe & Translate', () => {
 
     test('should submit a job and redirect to jobs page', async ({ page }) => {
         await page.goto(`${BASE_URL}/jobs/new`)
+        await page.waitForTimeout(2000)
         const fileInput = page.locator('input[type="file"]')
         await fileInput.setInputFiles(path.join('tests', 'fixtures', 'test-video.mp4'))
         await page.waitForTimeout(2000)
