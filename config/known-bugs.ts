@@ -157,4 +157,11 @@ export const KNOWN_BUGS = {
     actual: 'Raw <tool_call><function=handoff_to_human>...</tool_call> visible in bot response',
     reportedDate: '2026-06-19',
   },
+  FORGOT_PASSWORD_EMAIL_ENUMERATION: {
+    id: 'BUG-020',
+    description: 'POST /auth/forgot-password returns 400 for non-existent email — allows user enumeration',
+    expected: 'HTTP 200 regardless of whether email exists (prevent account enumeration)',
+    actual: 'HTTP 400 for unregistered email — reveals whether account exists',
+    reportedDate: '2026-06-19',
+  },
 } as const
