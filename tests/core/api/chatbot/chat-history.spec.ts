@@ -119,4 +119,13 @@ describe('Core — Chat History API', () => {
     expect([400, 404]).toContain(status)
   })
 
+  it('should return limited results when limit param is set', async () => {
+    const response = await axios.get(
+      `${BASE_URL}/chat?limit=2&offset=0`,
+      { headers: { Authorization: `Bearer ${token}` } }
+    )
+    expect(response.status).toBe(200)
+    expect(Array.isArray(response.data)).toBe(true)
+    expect(response.data.length).toBeLessThanOrEqual(2)
+  })
 })

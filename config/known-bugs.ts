@@ -171,4 +171,11 @@ export const KNOWN_BUGS = {
     actual: 'Request never resolves — times out after 15s',
     reportedDate: '2026-06-19',
   },
+  PAGINATION_OFFSET_IGNORED: {
+    id: 'BUG-022',
+    description: 'GET /chat?limit=N&offset=M — offset param accepted but silently ignored, always returns same results',
+    expected: 'offset shifts the result window — offset=2 skips first 2 results',
+    actual: 'offset has no effect — all offset values return identical results',
+    reportedDate: '2026-06-19',
+  },
 } as const
