@@ -164,4 +164,11 @@ export const KNOWN_BUGS = {
     actual: 'HTTP 400 for unregistered email — reveals whether account exists',
     reportedDate: '2026-06-19',
   },
+  IMAGE_GET_RETURNS_500: {
+    id: 'BUG-021',
+    description: 'GET /chats/{chatId}/images/{imageId} returns 500 Internal Server Error',
+    expected: 'HTTP 200 with image metadata',
+    actual: 'HTTP 500 — server error on image retrieval',
+    reportedDate: '2026-06-19',
+  },
 } as const
