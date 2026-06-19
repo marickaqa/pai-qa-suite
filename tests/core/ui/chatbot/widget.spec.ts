@@ -9,6 +9,13 @@ async function openWidget(page: any) {
   await page.waitForTimeout(1000)
 }
 
+const checkNoToolCallLeak = (response: string) => {
+  expect(response).not.toContain('<tool_call>')
+  expect(response).not.toContain('<function=')
+  expect(response).not.toContain('</tool_call>')
+  expect(response).not.toContain('<tool_result>')
+}
+
 test.describe('Core — Support Widget', () => {
 
   test('should show the chat launcher button', async ({ page }) => {
@@ -106,7 +113,7 @@ test.describe('Core — Support Widget', () => {
     expect(isRefusal).toBe(true)
   })
 
-  test('should not expose raw tool call syntax in responses', async ({ page }) => {
+  test('should not expose raw tool call syntax — knowledge base query', async ({ page }) => {
     await openWidget(page)
     const input = page.locator('textarea.egle-input')
     await input.fill('Is there a money back guarantee?')
@@ -114,11 +121,25 @@ test.describe('Core — Support Widget', () => {
     await page.waitForTimeout(8000)
 
     const bubbles = page.locator('.egle-bubble')
-    const count = await bubbles.count()
-    expect(count).toBeGreaterThan(0)
-    const response = await bubbles.last().innerText()
-
-    expect(response).not.toContain('<tool_call>')
-    expect(response).not.toContain('<function=')
+    expect(await bubbles.count()).toBeGreaterThan(0)
+    checkNoToolCallLeak(await bubbles.last().innerText())
   })
+
+  test('should not expose raw tool call syntax — pricing query', async ({ page }) => {
+    await openWidget(page)
+    const input = page.locator('textarea.egle-input')
+    await input.fill('What are your pricing plans?')
+    await input.press('Enter')
+    await page.waitForTimeout(8000)
+
+    const bubbles = page.locator('.egle-bubble')
+    expect(await bubbles.count()).toBeGreaterThan(0)
+    checkNoToolCallLeak(await bubbles.last().innerText())
+  })
+
+ test.skip('should not expose raw tool call syntax — knowledge base query (BUG-019)', async ({ page }) => {
+    // BUG-019: widget leaks raw <tool_call> syntax on handoff_to_human fallback
+    // Moved to tests/known-bugs/ui/widget-tool-call-handoff.spec.ts
+  })
+
 })

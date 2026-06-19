@@ -150,4 +150,11 @@ export const KNOWN_BUGS = {
     actual: 'App redirects to /overview and no-tenant screen never appears in CI',
     reportedDate: '2026-06-18',
   },
+  TOOL_CALL_LEAK_HANDOFF: {
+    id: 'BUG-019',
+    description: 'Widget leaks raw <tool_call> syntax when knowledge base has no answer and falls back to human handoff',
+    expected: 'Bot responds with natural language when handing off to human',
+    actual: 'Raw <tool_call><function=handoff_to_human>...</tool_call> visible in bot response',
+    reportedDate: '2026-06-19',
+  },
 } as const
