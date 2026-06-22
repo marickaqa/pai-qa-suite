@@ -182,4 +182,11 @@ export const KNOWN_BUGS = {
     actual: 'offset has no effect — all offset values return identical results',
     reportedDate: '2026-06-19',
   },
+  GET_ORGANIZATION_BY_ID_UNAUTHORIZED: {
+    id: 'BUG-023',
+    description: 'GET /organization/{organizationId} returns 401 with valid SaaS Bearer token',
+    expected: 'HTTP 200 with organization details',
+    actual: 'HTTP 401 Unauthorized — endpoint rejects valid SaaS token',
+    reportedDate: '2026-06-22',
+  },
 } as const
