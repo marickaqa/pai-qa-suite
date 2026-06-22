@@ -1,4 +1,5 @@
 import { test, expect } from '@playwright/test'
+import { getSaasToken, deleteChatbot } from '../../../../utils/saasClient'
 
 /**
  * ## saas-create-agent.spec.ts
@@ -7,6 +8,7 @@ import { test, expect } from '@playwright/test'
  * Covers form visibility, type toggle defaults, validation, and successful creation.
  *
  * Uses reports/saas-session.json for authenticated tests.
+ * Created agents are deleted after each creation test to avoid env clutter.
  */
 
 test.describe('SaaS Create Agent', () => {
@@ -14,45 +16,56 @@ test.describe('SaaS Create Agent', () => {
 
   const SAAS_URL = process.env.SAAS_URL || 'https://chat.paicloud.ai'
 
+  let createdAgentId: string | null = null
+
+  test.afterEach(async () => {
+    if (createdAgentId) {
+      try {
+        const token = await getSaasToken()
+        await deleteChatbot(token, createdAgentId)
+      } catch (e) {
+        console.warn(`[cleanup] Failed to delete agent ${createdAgentId}:`, e)
+      } finally {
+        createdAgentId = null
+      }
+    }
+  })
+
   // --- Form visibility ---
 
-  test('should show create agent form with all fields', async ({ page }) => {
+ test('should show create agent form with all fields', async ({ page }) => {
     await page.goto(`${SAAS_URL}/agent/new`)
     await expect(page.locator('input[name="name"]')).toBeVisible()
     await expect(page.locator('input[name="slug"]')).toBeVisible()
-    await expect(page.getByRole('button', { name: 'Chat' })).toBeVisible()
-    await expect(page.getByRole('button', { name: 'Support' })).toBeVisible()
+    await expect(page.getByRole('button', { name: 'Chat', exact: true })).toBeVisible()
+    await expect(page.getByRole('button', { name: 'Support', exact: true })).toBeVisible()
     await expect(page.getByRole('button', { name: 'Create agent' })).toBeVisible()
   })
 
   test('should default to Chat type when opened via ?type=chat', async ({ page }) => {
     await page.goto(`${SAAS_URL}/agent/new?type=chat`)
-    const chatBtn = page.getByRole('button', { name: 'Chat' })
-    await expect(chatBtn).toHaveAttribute('aria-pressed', 'true')
-    const supportBtn = page.getByRole('button', { name: 'Support' })
-    await expect(supportBtn).toHaveAttribute('aria-pressed', 'false')
+    await expect(page.getByRole('button', { name: 'Chat', exact: true })).toHaveAttribute('aria-pressed', 'true')
+    await expect(page.getByRole('button', { name: 'Support', exact: true })).toHaveAttribute('aria-pressed', 'false')
   })
 
   test('should default to Support type when opened via ?type=support', async ({ page }) => {
     await page.goto(`${SAAS_URL}/agent/new?type=support`)
-    const supportBtn = page.getByRole('button', { name: 'Support' })
-    await expect(supportBtn).toHaveAttribute('aria-pressed', 'true')
-    const chatBtn = page.getByRole('button', { name: 'Chat' })
-    await expect(chatBtn).toHaveAttribute('aria-pressed', 'false')
+    await expect(page.getByRole('button', { name: 'Support', exact: true })).toHaveAttribute('aria-pressed', 'true')
+    await expect(page.getByRole('button', { name: 'Chat', exact: true })).toHaveAttribute('aria-pressed', 'false')
   })
 
   test('should toggle from Chat to Support when Support is clicked', async ({ page }) => {
     await page.goto(`${SAAS_URL}/agent/new?type=chat`)
-    await page.getByRole('button', { name: 'Support' }).click()
-    await expect(page.getByRole('button', { name: 'Support' })).toHaveAttribute('aria-pressed', 'true')
-    await expect(page.getByRole('button', { name: 'Chat' })).toHaveAttribute('aria-pressed', 'false')
+    await page.getByRole('button', { name: 'Support', exact: true }).click()
+    await expect(page.getByRole('button', { name: 'Support', exact: true })).toHaveAttribute('aria-pressed', 'true')
+    await expect(page.getByRole('button', { name: 'Chat', exact: true })).toHaveAttribute('aria-pressed', 'false')
   })
 
   test('should toggle from Support to Chat when Chat is clicked', async ({ page }) => {
     await page.goto(`${SAAS_URL}/agent/new?type=support`)
-    await page.getByRole('button', { name: 'Chat' }).click()
-    await expect(page.getByRole('button', { name: 'Chat' })).toHaveAttribute('aria-pressed', 'true')
-    await expect(page.getByRole('button', { name: 'Support' })).toHaveAttribute('aria-pressed', 'false')
+    await page.getByRole('button', { name: 'Chat', exact: true }).click()
+    await expect(page.getByRole('button', { name: 'Chat', exact: true })).toHaveAttribute('aria-pressed', 'true')
+    await expect(page.getByRole('button', { name: 'Support', exact: true })).toHaveAttribute('aria-pressed', 'false')
   })
 
   // --- Validation ---
@@ -93,6 +106,9 @@ test.describe('SaaS Create Agent', () => {
     await page.getByRole('button', { name: 'Create agent' }).click()
     await page.waitForURL(url => !url.toString().includes('agent/new'), { timeout: 20000 })
     expect(page.url()).not.toContain('agent/new')
+
+    const match = page.url().match(/\/agent\/([a-f0-9-]{36})/)
+    if (match) createdAgentId = match[1]
   })
 
   test('should create a support agent and redirect to agent page', async ({ page }) => {
@@ -104,5 +120,8 @@ test.describe('SaaS Create Agent', () => {
     await page.getByRole('button', { name: 'Create agent' }).click()
     await page.waitForURL(url => !url.toString().includes('agent/new'), { timeout: 20000 })
     expect(page.url()).not.toContain('agent/new')
+
+    const match = page.url().match(/\/agent\/([a-f0-9-]{36})/)
+    if (match) createdAgentId = match[1]
   })
 })
