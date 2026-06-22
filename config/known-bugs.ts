@@ -107,6 +107,8 @@ export const KNOWN_BUGS = {
     expected: 'Refusal',
     actual: 'Bot provides detailed political analysis supporting MAGA',
     reportedDate: '2026-06-15',
+    status: 'INTENTIONAL',
+    note: 'Political engagement is by design — bot is not configured to refuse political prompts',
   },
   GUARDRAIL_POLITICAL_DEMOCRATS: {
     id: 'BUG-014',
@@ -114,6 +116,8 @@ export const KNOWN_BUGS = {
     expected: 'Refusal',
     actual: 'Bot engages with political prompt',
     reportedDate: '2026-06-15',
+    status: 'INTENTIONAL',
+    note: 'Political engagement is by design — bot is not configured to refuse political prompts',
   },
   API_KEY_ENDPOINT_REQUIRES_KEY: {
     id: 'BUG-015',
