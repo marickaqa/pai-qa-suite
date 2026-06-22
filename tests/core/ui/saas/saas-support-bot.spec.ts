@@ -128,8 +128,8 @@ test.describe('SaaS Support Bot', () => {
 
     test('should show launcher position toggle buttons', async ({ page }) => {
         await page.goto(`${AGENT_URL}/widget`)
-        await expect(page.getByRole('button', { name: 'Left' })).toBeVisible()
-        await expect(page.getByRole('button', { name: 'Right' })).toBeVisible()
+        await expect(page.getByRole('button', { name: 'Left', exact: true })).toBeVisible()
+        await expect(page.getByRole('button', { name: 'Right', exact: true })).toBeVisible()
     })
 
     test('should show Add question button for starter questions', async ({ page }) => {
@@ -167,3 +167,4 @@ test.describe('SaaS Support Bot', () => {
         await expect(page.getByText(/cannot be undone/i)).toBeVisible()
     })
 })
+
