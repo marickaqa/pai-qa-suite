@@ -11,15 +11,15 @@ test.describe('Known Bug BUG-019 — tool call syntax leak on human handoff', ()
   test('widget should not expose raw tool call syntax when falling back to human handoff', async ({ page }) => {
     await page.goto(WIDGET_URL)
     await page.waitForTimeout(2000)
-    await page.locator('button.egle-launcher').click()
+    await page.locator('button.pai-launcher').click()
     await page.waitForTimeout(1000)
 
-    const input = page.locator('textarea.egle-input')
+    const input = page.locator('textarea.pai-input')
     await input.fill('Is there a money back guarantee?')
     await input.press('Enter')
     await page.waitForTimeout(8000)
 
-    const bubbles = page.locator('.egle-bubble')
+    const bubbles = page.locator('.pai-bubble')
     expect(await bubbles.count()).toBeGreaterThan(0)
     const response = await bubbles.last().innerText()
 
@@ -29,3 +29,4 @@ test.describe('Known Bug BUG-019 — tool call syntax leak on human handoff', ()
   })
 
 })
+

@@ -23,7 +23,7 @@ test.describe('SaaS Auth', () => {
         await page.goto(`${SAAS_URL}/login`)
         await expect(emailInput(page)).toBeVisible()
         await expect(passwordInput(page)).toBeVisible()
-        await expect(page.getByRole('button', { name: /sign in|log in/i })).toBeVisible()
+        await expect(page.getByRole('button', { name: /sign in|log in|login/i })).toBeVisible()
     })
 
     test('should show Create an account link on login page', async ({ page }) => {
@@ -35,7 +35,7 @@ test.describe('SaaS Auth', () => {
         await page.goto(`${SAAS_URL}/login`)
         await emailInput(page).fill(process.env.SAAS_EMAIL || '')
         await passwordInput(page).fill(process.env.SAAS_PASSWORD || '')
-        await page.getByRole('button', { name: /sign in|log in/i }).click()
+        await page.getByRole('button', { name: /sign in|log in|login/i }).click()
         await page.waitForURL(url => !url.toString().includes('login'), { timeout: 20000 })
         expect(page.url()).not.toContain('login')
     })
@@ -44,7 +44,7 @@ test.describe('SaaS Auth', () => {
         await page.goto(`${SAAS_URL}/login`)
         await emailInput(page).fill(process.env.SAAS_EMAIL || '')
         await passwordInput(page).fill('WrongPassword999!')
-        await page.getByRole('button', { name: /sign in|log in/i }).click()
+        await page.getByRole('button', { name: /sign in|log in|login/i }).click()
         await page.waitForTimeout(2000)
         expect(page.url()).toContain('login')
     })
@@ -53,7 +53,7 @@ test.describe('SaaS Auth', () => {
         await page.goto(`${SAAS_URL}/login`)
         await emailInput(page).fill('')
         await passwordInput(page).fill(process.env.SAAS_PASSWORD || '')
-        await page.getByRole('button', { name: /sign in|log in/i }).click()
+        await page.getByRole('button', { name: /sign in|log in|login/i }).click()
         await page.waitForTimeout(1000)
         expect(page.url()).toContain('login')
     })
@@ -62,7 +62,7 @@ test.describe('SaaS Auth', () => {
         await page.goto(`${SAAS_URL}/login`)
         await emailInput(page).fill(process.env.SAAS_EMAIL || '')
         await passwordInput(page).fill('')
-        await page.getByRole('button', { name: /sign in|log in/i }).click()
+        await page.getByRole('button', { name: /sign in|log in|login/i }).click()
         await page.waitForTimeout(1000)
         expect(page.url()).toContain('login')
     })
@@ -78,7 +78,7 @@ test.describe('SaaS Auth', () => {
 
     test('should show sign in link on signup page', async ({ page }) => {
         await page.goto(`${SAAS_URL}/signup`)
-        await expect(page.getByRole('link', { name: /sign in|log in/i })).toBeVisible()
+        await expect(page.getByRole('link', { name: /sign in|log in|login/i })).toBeVisible()
     })
 
     test('should navigate to signup from login page', async ({ page }) => {
@@ -115,7 +115,7 @@ test.describe('SaaS Auth', () => {
         await page.goto(`${SAAS_URL}/login`)
         await emailInput(page).fill(noOrgEmail)
         await passwordInput(page).fill(noOrgPassword)
-        await page.getByRole('button', { name: /sign in|log in/i }).click()
+        await page.getByRole('button', { name: /sign in|log in|login/i }).click()
         await page.waitForTimeout(3000)
         await expect(page.getByRole('heading', { name: /not in any organization/i })).toBeVisible()
     })

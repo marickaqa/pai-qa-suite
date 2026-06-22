@@ -6,18 +6,18 @@ const WIDGET_URL = 'https://perception-chatbot-dummy-company-env-testing-noctoco
 async function openWidget(page: any) {
   await page.goto(WIDGET_URL)
   await page.waitForTimeout(2000)
-  await page.locator('button.egle-launcher').click()
+  await page.locator('button.pai-launcher').click()
   await page.waitForTimeout(1000)
 }
 
 async function askAndGetResponse(page: any, question: string): Promise<string> {
-  const input = page.locator('textarea.egle-input')
+  const input = page.locator('textarea.pai-input')
   await input.fill(question)
   await input.press('Enter')
   await page.waitForTimeout(8000)
 
   // Target only the bot response bubbles, not the whole page
-  const bubbles = page.locator('.egle-bubble')
+  const bubbles = page.locator('.pai-bubble')
   const count = await bubbles.count()
   if (count > 0) {
     return await bubbles.last().innerText()
@@ -69,3 +69,4 @@ test.describe(`Known Bug ${KNOWN_BUGS.RAG_NOT_RETRIEVING_CONTENT.id} — RAG Kno
   })
 
 })
+
