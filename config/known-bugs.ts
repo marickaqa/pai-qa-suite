@@ -160,6 +160,8 @@ export const KNOWN_BUGS = {
     expected: 'Bot responds with natural language when handing off to human',
     actual: 'Raw <tool_call><function=handoff_to_human>...</tool_call> visible in bot response',
     reportedDate: '2026-06-19',
+    fixedDate: '2026-06-26',
+    status: 'FIXED',
   },
   FORGOT_PASSWORD_EMAIL_ENUMERATION: {
     id: 'BUG-020',
@@ -175,12 +177,15 @@ export const KNOWN_BUGS = {
     actual: 'Request never resolves — times out after 15s',
     reportedDate: '2026-06-19',
   },
-  PAGINATION_OFFSET_IGNORED: {
+  PAGINATION_WRONG_PARAM: {
     id: 'BUG-022',
-    description: 'GET /chat?limit=N&offset=M — offset param accepted but silently ignored, always returns same results',
-    expected: 'offset shifts the result window — offset=2 skips first 2 results',
-    actual: 'offset has no effect — all offset values return identical results',
+    description: 'BUG-022 test used wrong pagination param — offset does not exist, correct param is page',
+    expected: 'N/A',
+    actual: 'N/A',
     reportedDate: '2026-06-19',
+    closedDate: '2026-06-26',
+    status: 'INVALID',
+    note: 'API uses page-based pagination (?limit=N&page=N), not offset. Backend works correctly. Test updated to use page param.',
   },
   GET_ORGANIZATION_BY_ID_UNAUTHORIZED: {
     id: 'BUG-023',

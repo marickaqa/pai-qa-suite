@@ -121,11 +121,27 @@ describe('Core — Chat History API', () => {
 
   it('should return limited results when limit param is set', async () => {
     const response = await axios.get(
-      `${BASE_URL}/chat?limit=2&offset=0`,
+      `${BASE_URL}/chat?limit=2&page=1`,
       { headers: { Authorization: `Bearer ${token}` } }
     )
     expect(response.status).toBe(200)
     expect(Array.isArray(response.data)).toBe(true)
     expect(response.data.length).toBeLessThanOrEqual(2)
   })
+
+  it('should return different results for different pages', async () => {
+    const [p1, p2] = await Promise.all([
+      axios.get(`${BASE_URL}/chat?limit=2&page=1`, { headers: { Authorization: `Bearer ${token}` } }),
+      axios.get(`${BASE_URL}/chat?limit=2&page=2`, { headers: { Authorization: `Bearer ${token}` } }),
+    ])
+    expect(p1.status).toBe(200)
+    expect(p2.status).toBe(200)
+    expect(Array.isArray(p1.data)).toBe(true)
+    expect(Array.isArray(p2.data)).toBe(true)
+    const p1Ids = p1.data.map((c: any) => c.id)
+    const p2Ids = p2.data.map((c: any) => c.id)
+    const overlap = p1Ids.filter((id: string) => p2Ids.includes(id))
+    expect(overlap.length).toBe(0)
+  })
+
 })

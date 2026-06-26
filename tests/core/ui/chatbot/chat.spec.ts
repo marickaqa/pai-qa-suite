@@ -66,4 +66,66 @@ test.describe('Core — Chat UI', () => {
     expect(responseCount).toBe(0)
   })
 
+  test('should rename chat via header button', async ({ page }) => {
+    await page.setViewportSize({ width: 1280, height: 900 })
+    const input = page.locator('textarea[placeholder="Type a message..."]')
+    await input.fill('rename test message')
+    await input.press('Enter')
+    await expect(page.locator('div.prose').first()).toBeVisible({ timeout: 20000 })
+
+    const renameBtn = page.locator('button[title="Rename chat"]').first()
+    await renameBtn.waitFor({ state: 'attached', timeout: 15000 })
+    await renameBtn.dispatchEvent('click')
+
+    const renameInput = page.locator('input[maxlength="128"]')
+    await expect(renameInput).toBeVisible({ timeout: 5000 })
+    await renameInput.fill('Renamed Chat')
+    await page.getByRole('button', { name: 'Save' }).click()
+    await page.waitForTimeout(1000)
+
+    await expect(page.locator('span.truncate').filter({ hasText: 'Renamed Chat' }).first()).toBeVisible()
+  })
+
+  test('should rename chat via sidebar history button', async ({ page }) => {
+    await page.setViewportSize({ width: 1280, height: 900 })
+    const input = page.locator('textarea[placeholder="Type a message..."]')
+    await input.fill('sidebar rename test')
+    await input.press('Enter')
+    await expect(page.locator('div.prose').first()).toBeVisible({ timeout: 20000 })
+
+    const chatItems = page.locator('div[role="button"]').filter({ has: page.locator('p.truncate') })
+    await chatItems.first().waitFor({ state: 'attached', timeout: 15000 })
+
+    const renameBtn = chatItems.first().locator('button[title="Rename chat"]')
+    await renameBtn.waitFor({ state: 'attached', timeout: 5000 })
+    await renameBtn.dispatchEvent('click')
+
+    const renameInput = page.locator('input[maxlength="128"]')
+    await expect(renameInput).toBeVisible({ timeout: 5000 })
+    await renameInput.fill('Sidebar Renamed Chat')
+    await page.getByRole('button', { name: 'Save' }).click()
+    await page.waitForTimeout(1000)
+
+    await expect(page.locator('span.truncate').filter({ hasText: 'Sidebar Renamed Chat' }).first()).toBeVisible()
+  })
+  test('should copy chat response to clipboard', async ({ page, context }) => {
+    await context.grantPermissions(['clipboard-read', 'clipboard-write'])
+
+    const input = page.locator('textarea[placeholder="Type a message..."]')
+    await input.fill('What is 2 + 2?')
+    await input.press('Enter')
+
+    const response = page.locator('div.prose').first()
+    await expect(response).toBeVisible({ timeout: 20000 })
+
+    await response.hover()
+    const copyBtn = page.locator('button[title="Copy to clipboard"]').first()
+    await expect(copyBtn).toBeVisible({ timeout: 5000 })
+    await copyBtn.click()
+    await page.waitForTimeout(500)
+
+    const clipboard = await page.evaluate(() => navigator.clipboard.readText())
+    expect(clipboard.length).toBeGreaterThan(0)
+  })
+
 })

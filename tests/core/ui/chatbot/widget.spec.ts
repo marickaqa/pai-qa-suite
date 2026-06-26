@@ -137,11 +137,37 @@ test.describe('Core — Support Widget', () => {
     checkNoToolCallLeak(await bubbles.last().innerText())
   })
 
- test.skip('should not expose raw tool call syntax — knowledge base query (BUG-019)', async ({ page }) => {
-    // BUG-019: widget leaks raw <tool_call> syntax on handoff_to_human fallback
-    // Moved to tests/known-bugs/ui/widget-tool-call-handoff.spec.ts
+  test('should not expose raw tool call syntax — knowledge base query (BUG-019)', async ({ page }) => {
+    await openWidget(page)
+    const input = page.locator('textarea.pai-input')
+    await input.fill('Is there a money back guarantee?')
+    await input.press('Enter')
+    await page.waitForTimeout(8000)
+
+    const bubbles = page.locator('.pai-bubble')
+    expect(await bubbles.count()).toBeGreaterThan(0)
+    checkNoToolCallLeak(await bubbles.last().innerText())
+  })
+
+  test('should not expose raw tool call syntax — multi-prompt handoff scenario', async ({ page }) => {
+    await openWidget(page)
+    const input = page.locator('textarea.pai-input')
+
+    const prompts = [
+      'Can I get a custom enterprise quote?',
+      'I need to speak to someone about a billing issue',
+      'How do I cancel my subscription?',
+    ]
+
+    for (const prompt of prompts) {
+      await input.fill(prompt)
+      await input.press('Enter')
+      await page.waitForTimeout(8000)
+
+      const bubbles = page.locator('.pai-bubble')
+      expect(await bubbles.count()).toBeGreaterThan(0)
+      checkNoToolCallLeak(await bubbles.last().innerText())
+    }
   })
 
 })
-
-
