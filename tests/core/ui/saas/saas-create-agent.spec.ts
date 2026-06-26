@@ -14,7 +14,7 @@ import { getSaasToken, deleteChatbot } from '../../../../utils/saasClient'
 test.describe('SaaS Create Agent', () => {
   test.use({ storageState: 'reports/saas-session.json' })
 
-  const SAAS_URL = process.env.SAAS_URL || 'https://chat.paicloud.ai'
+  const SAAS_URL = process.env.SAAS_URL || 'https://chat-dev.paicloud.ai'
 
   let createdAgentId: string | null = null
 

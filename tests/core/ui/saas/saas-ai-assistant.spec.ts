@@ -14,7 +14,7 @@ import { test, expect } from '@playwright/test'
 test.describe('SaaS AI Assistant', () => {
   test.use({ storageState: 'reports/saas-session.json' })
 
-  const SAAS_URL = process.env.SAAS_URL || 'https://chat.paicloud.ai'
+  const SAAS_URL = process.env.SAAS_URL || 'https://chat-dev.paicloud.ai'
   const AGENT_ID = 'edb91849-b4eb-4dbc-aa9f-5ae816833e56'
   const AGENT_URL = `${SAAS_URL}/agent/${AGENT_ID}`
 

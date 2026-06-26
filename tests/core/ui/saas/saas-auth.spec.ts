@@ -13,7 +13,7 @@ import { test, expect, type Page } from '@playwright/test'
 test.describe('SaaS Auth', () => {
     test.use({ storageState: { cookies: [], origins: [] } })
 
-    const SAAS_URL = process.env.SAAS_URL || 'https://chat.paicloud.ai'
+    const SAAS_URL = process.env.SAAS_URL || 'https://chat-dev.paicloud.ai'
     const emailInput = (page: Page) => page.locator('input[name="email"]')
     const passwordInput = (page: Page) => page.locator('input[name="password"]')
 

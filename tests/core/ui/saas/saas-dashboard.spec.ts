@@ -1,6 +1,6 @@
 import { test, expect } from '@playwright/test'
 
-const SAAS_URL = 'https://chat.paicloud.ai'
+const SAAS_URL = process.env.SAAS_URL || 'https://chat-dev.paicloud.ai'
 const SAAS_SESSION = 'reports/saas-session.json'
 
 test.describe('Core — SaaS Dashboard', () => {

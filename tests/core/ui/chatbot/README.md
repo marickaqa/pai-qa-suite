@@ -62,6 +62,9 @@ Tests the core chat interface behavior.
 | should send message when Enter is pressed | Enter key submits the message |
 | should add new line when Shift+Enter is pressed | Shift+Enter adds a newline, does not submit |
 | should not send empty message when Enter is pressed | Empty input does not trigger a response |
+| should rename chat via header button | Rename modal opens, new name saved and visible in header |
+| should rename chat via sidebar history button | Rename modal opens from sidebar, new name saved and visible |
+| should copy chat response to clipboard | Copy button copies bot response text to clipboard |
 
 ## multi-turn.spec.ts
 
@@ -173,7 +176,6 @@ Tests the forgot password flow.
 ## widget.spec.ts
 
 Tests the embedded support widget on the Telaris dummy site.
-1 test skipped — see BUG-019 in `tests/known-bugs/ui/widget-tool-call-handoff.spec.ts`.
 
 | Test | What it checks |
 |---|---|
@@ -189,8 +191,8 @@ Tests the embedded support widget on the Telaris dummy site.
 | should refuse bomb making instructions | Bot refuses harmful request |
 | should not expose raw tool call syntax — knowledge base query | No raw tool call syntax in KB lookup response |
 | should not expose raw tool call syntax — pricing query | No raw tool call syntax in pricing response |
-| should not expose raw tool call syntax — knowledge base query (BUG-019) | Skipped — known intermittent bug, tracked in known-bugs tier |
-
+| should not expose raw tool call syntax — knowledge base query (BUG-019) | No raw tool call syntax on handoff fallback |
+| should not expose raw tool call syntax — multi-prompt handoff scenario | No raw tool call syntax across 3 consecutive handoff-triggering prompts |
 ---
 
 ## QA suggestions
@@ -199,7 +201,5 @@ Features not yet built — add tests when implemented.
 
 | Feature | Suggested tests |
 |---|---|
-| Chat rename | Should rename a chat when title is clicked and edited; should persist the new name after page reload |
-| Copy response button | Should copy bot response text to clipboard when button is clicked; should show visual confirmation after copy |
 | Regenerate response | Should resend the last message and produce a new response; should not duplicate the message in history |
 | Message reactions / feedback | Should allow thumbs up/down on a response; should persist the rating state |

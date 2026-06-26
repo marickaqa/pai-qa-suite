@@ -15,7 +15,7 @@ import fs from 'fs'
 test.describe('SaaS Knowledge', () => {
     test.use({ storageState: 'reports/saas-session.json' })
 
-    const SAAS_URL = process.env.SAAS_URL || 'https://chat.paicloud.ai'
+    const SAAS_URL = process.env.SAAS_URL || 'https://chat-dev.paicloud.ai'
     const AGENT_ID = '77d5b55e-3326-4f2d-8380-b2bef6135552'
     const KNOWLEDGE_URL = `${SAAS_URL}/agent/${AGENT_ID}/knowledge`
 
