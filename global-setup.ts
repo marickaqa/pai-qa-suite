@@ -27,7 +27,7 @@ async function globalSetup(config: FullConfig) {
   await chatPage.close()
   await chatContext.close()
 
-  // SaaS session
+ // SaaS session
   const saasContext = await browser.newContext()
   const saasPage = await saasContext.newPage()
   await saasPage.goto(SAAS_URL + '/login')
@@ -35,6 +35,9 @@ async function globalSetup(config: FullConfig) {
   await saasPage.fill('input[name="email"]', process.env.SAAS_EMAIL || '')
   await saasPage.fill('input[name="password"]', process.env.SAAS_PASSWORD || '')
   await saasPage.click('button[type="submit"]')
+  await saasPage.waitForTimeout(5000)
+  console.log('SaaS URL after submit:', saasPage.url())
+  await saasPage.screenshot({ path: 'reports/saas-login-debug.png' })
   await saasPage.waitForURL((url: URL) => !url.toString().includes('login'), { timeout: 60000 })
   await saasContext.storageState({ path: SAAS_SESSION })
   await saasPage.close()
