@@ -44,7 +44,7 @@ describe('Core — Multi-Tenant Data Isolation', () => {
     try {
       await axios.post(
         `${BASE_URL}/chatbot`,
-        { name: 'isolation-test-bot', slug: 'isolation-test-' + Date.now(), type: 'support' },
+        { name: 'isolation-test-bot', slug: 'isolation-test-' + Date.now(), type: 'support', active: false },
         { headers: { Authorization: `Bearer ${token}`, 'x-organization-id': ORG_2_ID } }
       )
     } catch (error: any) {
@@ -61,6 +61,19 @@ describe('Core — Multi-Tenant Data Isolation', () => {
         { email: 'isolation-test@noctocode.dev', permissions: ['members'] },
         { headers: { Authorization: `Bearer ${token}`, 'x-organization-id': ORG_2_ID } }
       )
+    } catch (error: any) {
+      status = error.response?.status
+    }
+    expect(status).toBe(403)
+  })
+
+  it('should deny access to another organization chatbot documents', async () => {
+    const CHAT_BOT_ID = 'edb91849-b4eb-4dbc-aa9f-5ae816833e56'
+    let status: number = 0
+    try {
+      await axios.get(`${BASE_URL}/chatbot/${CHAT_BOT_ID}/document`, {
+        headers: { Authorization: `Bearer ${token}`, 'x-organization-id': ORG_2_ID }
+      })
     } catch (error: any) {
       status = error.response?.status
     }

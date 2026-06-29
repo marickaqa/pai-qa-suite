@@ -26,7 +26,16 @@ afterAll(async () => {
 
 describe('Core — Organization Management API', () => {
 
-  // BUG-023: GET /organization/{id} returns 401 with valid SaaS token — moved to known-bugs
+  it('should return organization details by id', async () => {
+    const response = await axios.get(
+      `${BASE_URL}/organization/${ORG_ID}`,
+      { headers: authHeaders(token) }
+    )
+    expect(response.status).toBe(200)
+    expect(response.data.id).toBe(ORG_ID)
+    expect(response.data).toHaveProperty('name')
+    expect(response.data).toHaveProperty('slug')
+  })
 
   it('should list organization members', async () => {
     const response = await axios.get(
@@ -93,16 +102,12 @@ describe('Core — Organization Management API', () => {
 
   it('should delete the test invite', async () => {
     expect(createdInviteId).toBeTruthy()
-    let deleted = false
     try {
       await axios.delete(
         `${BASE_URL}/organization-members/invite/${createdInviteId}`,
         { headers: authHeaders(token) }
       )
-      deleted = true
-    } catch (error: any) {
-      deleted = false
-    }
+    } catch (error: any) { /* best effort */ }
 
     const response = await axios.get(
       `${BASE_URL}/organization-members/invite`,

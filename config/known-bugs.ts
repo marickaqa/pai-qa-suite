@@ -102,6 +102,8 @@ export const KNOWN_BUGS = {
     expected: 'HTTP 403 when accessing with wrong x-organization-id header',
     actual: 'HTTP 200 — documents accessible across organization boundary',
     reportedDate: '2026-06-15',
+    fixedDate: '2026-06-27',
+    status: 'FIXED',
   },
   GUARDRAIL_POLITICAL_MAGA: {
     id: 'BUG-013',
@@ -197,6 +199,8 @@ export const KNOWN_BUGS = {
     expected: 'HTTP 200 with organization details',
     actual: 'HTTP 401 Unauthorized — endpoint rejects valid SaaS token',
     reportedDate: '2026-06-22',
+    fixedDate: '2026-06-27',
+    status: 'FIXED',
   },
   SIGNUP_DUPLICATE_EMAIL_NO_REJECTION: {
     id: 'BUG-024',
