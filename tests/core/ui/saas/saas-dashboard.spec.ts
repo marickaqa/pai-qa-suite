@@ -28,7 +28,7 @@ test.describe('Core — SaaS Dashboard', () => {
     await page.goto(SAAS_URL + '/dashboard/overview')
     await expect(page.getByText('TOTAL AGENTS')).toBeVisible()
     await expect(page.getByText('MESSAGES THIS MONTH')).toBeVisible()
-    await expect(page.getByText('RESOLUTION RATE')).toBeVisible()
+    await expect(page.getByText('SESSIONS THIS MONTH')).toBeVisible()
     await expect(page.getByText('TOKEN USAGE')).toBeVisible()
     await context.close()
   })
@@ -69,14 +69,13 @@ test.describe('Core — SaaS Dashboard', () => {
     await context.close()
   })
 
-  test('should show dynamic metric values for messages, resolution rate and token usage', async ({ browser }) => {
+  test('should show dynamic metric values for messages, sessions and token usage', async ({ browser }) => {
     const context = await browser.newContext({ storageState: SAAS_SESSION })
     const page = await context.newPage()
     await page.goto(SAAS_URL + '/dashboard/overview')
     await expect(page.getByText('MESSAGES THIS MONTH')).toBeVisible()
-    await expect(page.getByText('RESOLUTION RATE')).toBeVisible()
+    await expect(page.getByText('SESSIONS THIS MONTH')).toBeVisible()
     await expect(page.getByText('TOKEN USAGE')).toBeVisible()
-    // verify each metric card has a non-empty value below the label
     const cards = page.locator('span.tabular-nums')
     const count = await cards.count()
     expect(count).toBeGreaterThan(0)
@@ -103,4 +102,5 @@ test.describe('Core — SaaS Dashboard', () => {
     expect(classBefore).not.toEqual(classAfter)
     await context.close()
   })
+
 })
