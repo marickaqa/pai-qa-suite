@@ -89,7 +89,7 @@ describe('Core — Chat History API', () => {
     } catch (error: any) {
       status = error.response?.status
     }
-    expect([400, 404]).toContain(status)
+    expect(status).toBe(404)
   })
 
   it('should delete a chat', async () => {
@@ -116,7 +116,7 @@ describe('Core — Chat History API', () => {
     } catch (error: any) {
       status = error.response?.status
     }
-    expect([400, 404]).toContain(status)
+    expect(status).toBe(404)
   })
 
   it('should return limited results when limit param is set', async () => {

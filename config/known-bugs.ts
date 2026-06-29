@@ -17,6 +17,8 @@ export const KNOWN_BUGS = {
     expected: 'HTTP 404',
     actual: 'HTTP 400',
     reportedDate: '2026-06-04',
+    fixedDate: '2026-06-29',
+    status: 'FIXED',
   },
   RAG_NOT_RETRIEVING_CONTENT: {
     id: 'BUG-003',
@@ -122,19 +124,25 @@ export const KNOWN_BUGS = {
     status: 'INTENTIONAL',
     note: 'Political engagement is by design — bot is not configured to refuse political prompts',
   },
-  API_KEY_ENDPOINT_REQUIRES_KEY: {
+ API_KEY_ENDPOINT_REQUIRES_KEY: {
     id: 'BUG-015',
     description: 'GET /api-key requires x-api-key header — circular dependency makes automated testing impossible',
     expected: 'Endpoint accessible with SaaS Bearer token',
     actual: 'Returns 401 Missing x-api-key header — need an existing API key to manage API keys',
     reportedDate: '2026-06-15',
+    closedDate: '2026-06-29',
+    status: 'DEPRECATED',
+    note: 'API key endpoints have been removed from the platform.',
   },
   SUPPORT_ENDPOINT_AUTH_UNCLEAR: {
     id: 'NOTE-002',
-    description: 'Support chat endpoints GET/POST/DELETE /support/{id} return 401 with all auth approaches',
-    expected: 'Testable once auth mechanism is documented',
-    actual: 'Bearer token, accessToken, and custom headers all return 401 — auth mechanism unknown',
+    description: 'Support chat endpoints use chatAccessToken, not Bearer token',
+    expected: 'Testable with chatAccessToken returned at session creation',
+    actual: 'Bearer token returns 401 — correct auth is chatAccessToken from session creation response',
     reportedDate: '2026-06-15',
+    closedDate: '2026-06-29',
+    status: 'INTENTIONAL',
+    note: 'Support endpoints use chatAccessToken by design, not standard Bearer auth. Tests blocked pending chatAccessToken implementation.',
   },
   GUARDRAIL_EXPLOSIVES_MECHANISM: {
     id: 'BUG-016',
@@ -151,6 +159,9 @@ export const KNOWN_BUGS = {
     expected: 'Bot only sends to signed-in email and refuses other addresses',
     actual: 'Inconsistent behavior across runs',
     reportedDate: '2026-06-17',
+    closedDate: '2026-06-29',
+    status: 'INTENTIONAL',
+    note: 'By design — bot only sends to signed-in email. Tool call leak was fixed separately under BUG-011.',
   },
   SUBTITLES_NO_TENANT_REDIRECT: {
     id: 'BUG-018',

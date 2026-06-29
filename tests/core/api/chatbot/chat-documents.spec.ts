@@ -109,7 +109,7 @@ describe('Core — Chat Documents API', () => {
             } catch (error: any) {
                 status = error.response?.status
             }
-            expect([400, 404]).toContain(status)
+            expect(status).toBe(404)
         })
 
     })
@@ -180,7 +180,7 @@ describe('Core — Chat Documents API', () => {
             } catch (error: any) {
                 status = error.response?.status
             }
-            expect([400, 404]).toContain(status)
+            expect(status).toBe(404)
         })
 
         it('should return 401 with no token', async () => {
@@ -223,7 +223,7 @@ describe('Core — Chat Documents API', () => {
             } catch (error: any) {
                 status = error.response?.status
             }
-            expect([400, 404]).toContain(status)
+            expect(status).toBe(404)
         })
 
         it('should return 400 or 404 for non-existent document', async () => {
@@ -236,7 +236,7 @@ describe('Core — Chat Documents API', () => {
             } catch (error: any) {
                 status = error.response?.status
             }
-            expect([400, 404]).toContain(status)
+            expect(status).toBe(404)
         })
 
         it('should return 401 with no token', async () => {

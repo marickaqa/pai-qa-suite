@@ -96,7 +96,7 @@ describe('Core — Chat Images API', () => {
       } catch (error: any) {
         status = error.response?.status
       }
-      expect([400, 404]).toContain(status)
+      expect(status).toBe(404)
     })
 
   })
