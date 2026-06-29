@@ -20,10 +20,12 @@ export const KNOWN_BUGS = {
   },
   RAG_NOT_RETRIEVING_CONTENT: {
     id: 'BUG-003',
-    description: 'Widget RAG retrieval not surfacing crawled Telaris content',
-    expected: 'Bot answers from indexed Telaris knowledge base',
+    description: 'Widget RAG retrieval not surfacing crawled content',
+    expected: 'Bot answers from indexed knowledge base',
     actual: 'Bot answers from general LLM knowledge',
     reportedDate: '2026-06-04',
+    fixedDate: '2026-06-27',
+    status: 'FIXED',
   },
   SYSTEM_PROMPT_LEAK: {
     id: 'BUG-004',
