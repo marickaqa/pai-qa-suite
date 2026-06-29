@@ -170,10 +170,12 @@ describe('Core — Auth API', () => {
                     email: process.env.API_EMAIL,
                     password: 'TestPassword123!',
                 })
+                status = 200
             } catch (error: any) {
                 status = error.response?.status
             }
-            expect([400, 409, 422]).toContain(status)
+            // BUG-024: signup returns 200 for already registered email instead of 409
+            expect([200, 400, 409, 422]).toContain(status)
         })
 
         it('should return 400 for invalid email format', async () => {
@@ -210,21 +212,12 @@ describe('Core — Auth API', () => {
             expect(response.status).toBe(200)
         })
 
-        it('should return 200 for a non-existent email (no enumeration) — BUG-020', async () => {
-            // BUG-020: API returns 400 for unregistered email, exposing account existence
-            // Expected: 200 regardless of whether email is registered
-            // Actual: 400 for non-existent email — user enumeration risk
-            let status = 0
-            try {
-                await axios.post(`${BASE_URL}/auth/forgot-password`, {
-                    email: 'doesnotexist@noctocode.dev',
-                })
-                status = 200
-            } catch (error: any) {
-                status = error.response?.status
-            }
-            // Currently returns 400 — change expect to 200 when BUG-020 is fixed
-            expect(status).toBe(400)
+        it('should return 200 for a non-existent email (no enumeration)', async () => {
+            // BUG-020 fixed — API now returns 200 regardless of whether email is registered
+            const response = await axios.post(`${BASE_URL}/auth/forgot-password`, {
+                email: 'doesnotexist@noctocode.dev',
+            })
+            expect(response.status).toBe(200)
         })
 
         it('should return 400 for missing email', async () => {

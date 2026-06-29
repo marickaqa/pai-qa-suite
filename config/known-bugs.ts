@@ -169,6 +169,8 @@ export const KNOWN_BUGS = {
     expected: 'HTTP 200 regardless of whether email exists (prevent account enumeration)',
     actual: 'HTTP 400 for unregistered email — reveals whether account exists',
     reportedDate: '2026-06-19',
+    fixedDate: '2026-06-27',
+    status: 'FIXED',
   },
   CHAT_GROUP_GET_HANGS: {
     id: 'BUG-021',
@@ -193,5 +195,12 @@ export const KNOWN_BUGS = {
     expected: 'HTTP 200 with organization details',
     actual: 'HTTP 401 Unauthorized — endpoint rejects valid SaaS token',
     reportedDate: '2026-06-22',
+  },
+  SIGNUP_DUPLICATE_EMAIL_NO_REJECTION: {
+    id: 'BUG-024',
+    description: 'POST /auth/signup returns 200 for already registered email instead of 409',
+    expected: 'HTTP 409 Conflict when email is already registered',
+    actual: 'HTTP 200 — no error returned, allows silent duplicate registration attempt',
+    reportedDate: '2026-06-27',
   },
 } as const
