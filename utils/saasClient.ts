@@ -50,7 +50,7 @@ export async function createChatbot(
 ) {
   const response = await axios.post(
     `${BASE_URL}/chatbot`,
-    { name, slug, type },
+    { name, slug, type, active: false },
     { headers: authHeaders(token) }
   )
   return response.data
