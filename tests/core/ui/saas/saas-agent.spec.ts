@@ -75,8 +75,8 @@ test.describe('Core — SaaS Agent Style Config', () => {
     const page = await context.newPage()
     await page.goto(BOT_BASE + '/style-config')
     await expect(page.getByRole('heading', { name: 'Style Config' })).toBeVisible()
-    await expect(page.getByText('Light theme')).toBeVisible()
-    await expect(page.getByText('Dark theme')).toBeVisible()
+    await expect(page.getByText('Light theme', { exact: true }).first()).toBeVisible()
+    await expect(page.getByText('Dark theme', { exact: true }).first()).toBeVisible()
     await context.close()
   })
 

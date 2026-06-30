@@ -80,8 +80,8 @@ test.describe('SaaS AI Assistant', () => {
 
   test('should show all 6 logo upload slots', async ({ page }) => {
     await page.goto(`${AGENT_URL}/style-config`)
-    await expect(page.getByText('Light theme')).toBeVisible()
-    await expect(page.getByText('Dark theme')).toBeVisible()
+    await expect(page.getByText('Light theme', { exact: true }).first()).toBeVisible()
+    await expect(page.getByText('Dark theme', { exact: true }).first()).toBeVisible()
     await expect(page.getByText('Vertical light')).toBeVisible()
     await expect(page.getByText('Vertical dark')).toBeVisible()
     await expect(page.getByText('Icon light')).toBeVisible()
