@@ -218,9 +218,11 @@ export const KNOWN_BUGS = {
   },
   SIGNUP_DUPLICATE_EMAIL_NO_REJECTION: {
     id: 'BUG-024',
-    description: 'POST /auth/signup returns 200 for already registered email instead of 409',
-    expected: 'HTTP 409 Conflict when email is already registered',
-    actual: 'HTTP 200 — no error returned, allows silent duplicate registration attempt',
+    description: 'POST /auth/signup returns 200 for already registered email — allows account enumeration',
+    expected: 'Same response regardless of whether email is already registered (prevent account enumeration)',
+    actual: 'HTTP 200 for duplicate email — attacker can determine which emails have accounts by attempting signup',
     reportedDate: '2026-06-27',
+    fixedDate: '2026-06-30',
+    status: 'FIXED',
   },
 } as const

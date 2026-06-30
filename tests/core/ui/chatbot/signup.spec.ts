@@ -61,15 +61,14 @@ test.describe('Signup', () => {
     await expect(page).toHaveURL(/signup/);
   });
 
-  test.skip('should show error for already registered email', async ({ page }) => {
-    // BUG-024: signup returns 200 for already registered email — no error shown in UI
-    // Unskip when BUG-024 is fixed
+  test('should show generic confirmation for already registered email (no enumeration)', async ({ page }) => {
+    // BUG-024 fixed — same confirmation shown regardless of whether email is registered
     await navigateToSignup(page);
     await page.getByPlaceholder('Enter your email').fill(process.env.API_EMAIL || '');
     await page.getByPlaceholder('Create a password').fill('Password123!');
     await page.getByPlaceholder('Confirm your password').fill('Password123!');
     await page.getByRole('button', { name: 'Sign Up' }).click();
-    await expect(page.getByText(/already exists|already registered|already in use/i)).toBeVisible();
+    await expect(page.getByText(/check your email/i)).toBeVisible();
   });
 
   test('should show sign in link on signup page', async ({ page }) => {

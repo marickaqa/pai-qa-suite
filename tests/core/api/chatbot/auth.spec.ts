@@ -163,19 +163,13 @@ describe('Core — Auth API', () => {
             expect([200, 201]).toContain(response.status)
         })
 
-        it('should return 409 for already registered email', async () => {
-            let status = 0
-            try {
-                await axios.post(`${BASE_URL}/auth/signup`, {
-                    email: process.env.API_EMAIL,
-                    password: 'TestPassword123!',
-                })
-                status = 200
-            } catch (error: any) {
-                status = error.response?.status
-            }
-            // BUG-024: signup returns 200 for already registered email instead of 409
-            expect([200, 400, 409, 422]).toContain(status)
+        it('should return generic response for already registered email (no enumeration)', async () => {
+            // BUG-024 fixed — API now returns the same generic response regardless of whether email is registered
+            const response = await axios.post(`${BASE_URL}/auth/signup`, {
+                email: process.env.API_EMAIL,
+                password: 'TestPassword123!',
+            })
+            expect(response.status).toBe(200)
         })
 
         it('should return 400 for invalid email format', async () => {
@@ -202,7 +196,6 @@ describe('Core — Auth API', () => {
         })
 
     })
-
     describe('POST /auth/forgot-password', () => {
 
         it('should return 200 for a valid registered email', async () => {
