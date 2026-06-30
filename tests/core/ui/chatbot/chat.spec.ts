@@ -108,6 +108,21 @@ test.describe('Core — Chat UI', () => {
 
     await expect(page.locator('span.truncate').filter({ hasText: 'Sidebar Renamed Chat' }).first()).toBeVisible()
   })
+
+  test('should always show copy button on assistant response without hover', async ({ page, context }) => {
+    await context.grantPermissions(['clipboard-read', 'clipboard-write'])
+
+    const input = page.locator('textarea[placeholder="Type a message..."]')
+    await input.fill('What is 2 + 2?')
+    await input.press('Enter')
+
+    const response = page.locator('div.prose').first()
+    await expect(response).toBeVisible({ timeout: 20000 })
+
+    const copyBtn = page.locator('button[title="Copy to clipboard"]').first()
+    await expect(copyBtn).toBeVisible({ timeout: 5000 })
+  })
+
   test('should copy chat response to clipboard', async ({ page, context }) => {
     await context.grantPermissions(['clipboard-read', 'clipboard-write'])
 
@@ -118,7 +133,6 @@ test.describe('Core — Chat UI', () => {
     const response = page.locator('div.prose').first()
     await expect(response).toBeVisible({ timeout: 20000 })
 
-    await response.hover()
     const copyBtn = page.locator('button[title="Copy to clipboard"]').first()
     await expect(copyBtn).toBeVisible({ timeout: 5000 })
     await copyBtn.click()
