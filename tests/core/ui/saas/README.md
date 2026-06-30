@@ -165,3 +165,18 @@ Uses `reports/saas-session.json` for all tests.
 | should show members table with correct columns | Member, Permissions, Joined columns visible |
 | should show Invite member button | Invite member button visible |
 | should show pending invitations section | Pending Invitations heading visible |
+
+## saas-style-config.spec.ts
+
+Tests the Style Config page for chatbot logo and color customization.
+Covers logo upload slots (light/dark theme, icon, vertical variants) and primary/secondary color pickers for light and dark themes.
+
+| Test | What it checks |
+|---|---|
+| should show Style Config heading and description | Heading and description text visible |
+| should show all 6 logo upload slots with correct labels | Light theme, Icon light, Vertical light, Dark theme, Icon dark, Vertical dark labels all visible |
+| should show 6 upload buttons and 6 remove buttons | One Upload and one Remove button per slot |
+| should have 6 file inputs accepting image formats | File inputs accept png, jpeg, svg+xml, webp |
+| should show Light theme and Dark theme color sections with hex inputs | Primary/secondary colour labels visible, all 4 hex values match valid hex format |
+| should show Save changes button | Save changes button visible and enabled |
+| should update hex input when a new value is typed | Typing a new hex value updates the input |

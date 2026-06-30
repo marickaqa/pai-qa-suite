@@ -54,4 +54,5 @@ describe('Core — Chat API', () => {
     expect(response.responseTime).toBeLessThan(30000)
   }, 60000)
 
+  
 })
