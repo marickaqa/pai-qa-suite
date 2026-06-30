@@ -13,12 +13,10 @@ beforeAll(async () => {
 
 describe('Core — Multi-Tenant Data Isolation', () => {
 
-  // BUG-023: GET /organization/{id} returns 401 with valid SaaS token — moved to known-bugs
-
   it('should deny access to another organization chatbots', async () => {
     let status: number = 0
     try {
-      await axios.get(`${BASE_URL}/chatbot`, {
+      await axios.get(`${BASE_URL}/chatbot/list`, {
         headers: { Authorization: `Bearer ${token}`, 'x-organization-id': ORG_2_ID }
       })
     } catch (error: any) {

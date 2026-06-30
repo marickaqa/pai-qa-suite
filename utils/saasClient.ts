@@ -29,7 +29,7 @@ export function authHeaders(token: string) {
 }
 
 export async function listChatbots(token: string) {
-  const response = await axios.get(`${BASE_URL}/chatbot`, {
+  const response = await axios.get(`${BASE_URL}/chatbot/list`, {
     headers: authHeaders(token),
   })
   return response.data
