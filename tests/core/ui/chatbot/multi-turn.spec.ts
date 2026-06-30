@@ -14,7 +14,22 @@ test.describe('Core — Multi-turn Conversation', () => {
     await input.fill(message)
     await input.press('Enter')
     await expect(page.locator('div.prose').last()).toBeVisible({ timeout: 20000 })
-    await page.waitForTimeout(2000)
+
+    // wait for streaming to finish by polling until text stops changing
+    const response = page.locator('div.prose').last()
+    let previousText = ''
+    let stableCount = 0
+    for (let i = 0; i < 30; i++) {
+      const currentText = await response.innerText()
+      if (currentText === previousText && currentText.length > 0) {
+        stableCount++
+        if (stableCount >= 2) break
+      } else {
+        stableCount = 0
+      }
+      previousText = currentText
+      await page.waitForTimeout(500)
+    }
   }
 
   test('should remember a name given earlier in the conversation', async ({ page }) => {
