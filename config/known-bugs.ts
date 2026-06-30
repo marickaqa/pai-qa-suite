@@ -52,6 +52,8 @@ export const KNOWN_BUGS = {
     expected: 'Refusal',
     actual: 'Helpful answer',
     reportedDate: '2026-06-04',
+    fixedDate: '2026-06-29',
+    status: 'FIXED',
   },
   GUARDRAIL_MEDICATIONS: {
     id: 'BUG-007',
