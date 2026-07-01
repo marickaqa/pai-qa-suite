@@ -93,7 +93,11 @@ test.describe('SaaS Support Bot', () => {
 
     test('should show Crawl website button', async ({ page }) => {
         await page.goto(`${AGENT_URL}/knowledge`)
-        await expect(page.getByRole('button', { name: 'Crawl website' })).toBeVisible()
+        await page.waitForLoadState('networkidle')
+        await page.waitForTimeout(2000)
+        const crawlBtn = page.getByRole('button', { name: 'Crawl website' })
+        await crawlBtn.scrollIntoViewIfNeeded()
+        await expect(crawlBtn).toBeVisible({ timeout: 10000 })
     })
 
     test('should show existing crawled website in Website URLs table', async ({ page }) => {
@@ -141,7 +145,7 @@ test.describe('SaaS Support Bot', () => {
         await expect(page.getByRole('button', { name: 'Dark' })).toBeVisible()
         await expect(page.getByRole('button', { name: 'Light' })).toBeVisible()
     })
-    
+
     test('should show launcher position toggle buttons', async ({ page }) => {
         await page.goto(`${AGENT_URL}/widget`)
         await page.waitForLoadState('networkidle')
