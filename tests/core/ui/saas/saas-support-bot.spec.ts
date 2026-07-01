@@ -101,11 +101,12 @@ test.describe('SaaS Support Bot', () => {
         await expect(page.getByText('Completed')).toBeVisible()
     })
 
-    // --- Widget ---
+   // --- Widget ---
 
     test('should show widget page with all config fields', async ({ page }) => {
         await page.goto(`${AGENT_URL}/widget`)
         await page.waitForLoadState('networkidle')
+        await page.waitForTimeout(2000)
         await expect(page.getByText('Header text')).toBeVisible()
         await expect(page.getByText('Theme', { exact: true })).toBeVisible()
         await expect(page.getByText('Primary colour')).toBeVisible()
@@ -115,15 +116,27 @@ test.describe('SaaS Support Bot', () => {
         await expect(page.getByText('Starter questions')).toBeVisible()
     })
 
+    test('should show branding section with widget logo upload slots', async ({ page }) => {
+        await page.goto(`${AGENT_URL}/widget`)
+        await page.waitForLoadState('networkidle')
+        await page.waitForTimeout(2000)
+        await expect(page.getByRole('heading', { name: 'Branding' })).toBeVisible()
+        await expect(page.getByText('Widget logos')).toBeVisible()
+        await expect(page.getByText('Light theme', { exact: true }).first()).toBeVisible()
+        await expect(page.getByText('Dark theme', { exact: true }).first()).toBeVisible()
+    })
+
     test('should show live preview iframe', async ({ page }) => {
         await page.goto(`${AGENT_URL}/widget`)
         await page.waitForLoadState('networkidle')
+        await page.waitForTimeout(2000)
         await expect(page.getByText('Live preview')).toBeVisible()
     })
 
     test('should show theme toggle buttons', async ({ page }) => {
         await page.goto(`${AGENT_URL}/widget`)
         await page.waitForLoadState('networkidle')
+        await page.waitForTimeout(2000)
         await expect(page.getByRole('button', { name: 'System' })).toBeVisible()
         await expect(page.getByRole('button', { name: 'Dark' })).toBeVisible()
         await expect(page.getByRole('button', { name: 'Light' })).toBeVisible()
@@ -132,6 +145,7 @@ test.describe('SaaS Support Bot', () => {
     test('should show launcher position toggle buttons', async ({ page }) => {
         await page.goto(`${AGENT_URL}/widget`)
         await page.waitForLoadState('networkidle')
+        await page.waitForTimeout(2000)
         await expect(page.getByRole('button', { name: 'Left', exact: true })).toBeVisible()
         await expect(page.getByRole('button', { name: 'Right', exact: true })).toBeVisible()
     })
@@ -139,22 +153,24 @@ test.describe('SaaS Support Bot', () => {
     test('should show Add question button for starter questions', async ({ page }) => {
         await page.goto(`${AGENT_URL}/widget`)
         await page.waitForLoadState('networkidle')
+        await page.waitForTimeout(2000)
         await expect(page.getByRole('button', { name: /add question/i })).toBeVisible()
     })
 
     test('should show Save widget button', async ({ page }) => {
         await page.goto(`${AGENT_URL}/widget`)
         await page.waitForLoadState('networkidle')
+        await page.waitForTimeout(2000)
         await expect(page.getByRole('button', { name: 'Save widget' })).toBeVisible()
     })
 
     test('should show embed code section', async ({ page }) => {
         await page.goto(`${AGENT_URL}/widget`)
         await page.waitForLoadState('networkidle')
+        await page.waitForTimeout(2000)
         await expect(page.getByText('Embed code')).toBeVisible()
         await expect(page.getByRole('button', { name: 'HTML' })).toBeVisible()
     })
-
     // --- Danger Zone ---
 
     test('should show danger zone page with Archive and Delete buttons', async ({ page }) => {
