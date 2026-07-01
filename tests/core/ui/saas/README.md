@@ -91,6 +91,7 @@ Destructive actions (archive, delete) are visibility-only — not executed.
 | should show danger zone page with Archive and Delete buttons | Archive chatbot and Delete chatbot buttons are visible |
 | should show archive description text | Archive description text is visible |
 | should show delete warning text | Cannot be undone warning text is visible |
+| should show branding section with widget logo upload slots | Branding heading, Widget logos, Light theme and Dark theme labels visible |
 
 ## saas-ai-assistant.spec.ts
 
@@ -180,3 +181,20 @@ Covers logo upload slots (light/dark theme, icon, vertical variants) and primary
 | should show Light theme and Dark theme color sections with hex inputs | Primary/secondary colour labels visible, all 4 hex values match valid hex format |
 | should show Save changes button | Save changes button visible and enabled |
 | should update hex input when a new value is typed | Typing a new hex value updates the input |
+
+## saas-analytics.spec.ts
+
+Tests the Organization Analytics page at /dashboard/analytics.
+Covers org-wide metrics, activity chart period switching, and guardrail trigger tracking.
+
+| Test | What it checks |
+|---|---|
+| should navigate to analytics page and show Organization overview | Organization overview heading and description visible |
+| should show Messages, Sessions and Tokens used metrics | All three metric labels visible in the overview section |
+| should show percentage change indicators next to metrics | At least one percentage change indicator visible |
+| should show Token usage this month card with progress bar | Token usage card with Input/Output breakdown visible |
+| should show Activity over time chart with period toggle buttons | Chart heading and Weekly/Monthly/Yearly/All time buttons visible |
+| should switch between time periods when toggle buttons are clicked | Clicking each period button updates the chart description |
+| should show chart legend for Messages, Sessions and Tokens | Legend labels for all three metrics visible |
+| should show Guardrail triggers table with correct headers | Table with Category, Count, Last triggered columns visible |
+| should show a Review action for guardrail trigger rows | Review button visible when guardrail triggers exist |
