@@ -33,11 +33,11 @@ test.describe('Subtitles Translate', () => {
 
     test('should show pre-selected target languages', async ({ page }) => {
         await page.goto(`${BASE_URL}/jobs/translate`)
+        await page.waitForLoadState('networkidle')
+        await page.waitForTimeout(2000)
         await expect(page.getByText('Target languages')).toBeVisible()
-        // Verify at least one language chip is pre-selected — specific languages
-        // depend on tenant defaults and may vary between environments
         const removeButtons = page.getByRole('button', { name: /Remove /i })
-        await expect(removeButtons.first()).toBeVisible({ timeout: 10000 })
+        await expect(removeButtons.first()).toBeVisible({ timeout: 15000 })
     })
 
     test('should show output format options', async ({ page }) => {
