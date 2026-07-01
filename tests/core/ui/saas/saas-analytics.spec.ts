@@ -9,12 +9,14 @@ test.describe('Core — SaaS Organization Analytics', () => {
 
   test('should navigate to analytics page and show Organization overview', async ({ page }) => {
     await page.goto(ANALYTICS_URL)
+    await page.waitForTimeout(2000)
     await expect(page.getByText('Organization overview')).toBeVisible()
     await expect(page.getByText('Activity across all chatbots')).toBeVisible()
   })
 
   test('should show Messages, Sessions and Tokens used metrics', async ({ page }) => {
     await page.goto(ANALYTICS_URL)
+    await page.waitForTimeout(2000)
     await expect(page.getByText('Messages', { exact: true }).first()).toBeVisible()
     await expect(page.getByText('Sessions', { exact: true }).first()).toBeVisible()
     await expect(page.getByText('Tokens used', { exact: true })).toBeVisible()

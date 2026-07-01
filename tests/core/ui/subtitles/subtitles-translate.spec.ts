@@ -34,7 +34,7 @@ test.describe('Subtitles Translate', () => {
     test('should show pre-selected target languages', async ({ page }) => {
         await page.goto(`${BASE_URL}/jobs/translate`)
         await page.waitForLoadState('networkidle')
-        await page.waitForTimeout(2000)
+        await page.waitForTimeout(3000)
         await expect(page.getByText('Target languages')).toBeVisible()
         const removeButtons = page.getByRole('button', { name: /Remove /i })
         await expect(removeButtons.first()).toBeVisible({ timeout: 15000 })

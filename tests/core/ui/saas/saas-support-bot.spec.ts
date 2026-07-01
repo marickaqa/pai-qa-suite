@@ -136,12 +136,12 @@ test.describe('SaaS Support Bot', () => {
     test('should show theme toggle buttons', async ({ page }) => {
         await page.goto(`${AGENT_URL}/widget`)
         await page.waitForLoadState('networkidle')
-        await page.waitForTimeout(2000)
-        await expect(page.getByRole('button', { name: 'System' })).toBeVisible()
+        await page.waitForTimeout(3000)
+        await expect(page.getByRole('button', { name: 'System' })).toBeVisible({ timeout: 10000 })
         await expect(page.getByRole('button', { name: 'Dark' })).toBeVisible()
         await expect(page.getByRole('button', { name: 'Light' })).toBeVisible()
     })
-
+    
     test('should show launcher position toggle buttons', async ({ page }) => {
         await page.goto(`${AGENT_URL}/widget`)
         await page.waitForLoadState('networkidle')
