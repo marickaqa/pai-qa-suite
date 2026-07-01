@@ -34,6 +34,7 @@ Uses a fresh context with no session.
 | should show error for invalid email format | Invalid email format stays on signup page |
 | should show error for already registered email | Existing email shows an error message |
 | should show sign in link on signup page | Sign In link is visible on the signup page |
+| should show generic confirmation for already registered email (no enumeration) | Same check your email confirmation shown regardless of whether email is registered |
 
 ## logout.spec.ts
 
@@ -65,6 +66,7 @@ Tests the core chat interface behavior.
 | should rename chat via header button | Rename modal opens, new name saved and visible in header |
 | should rename chat via sidebar history button | Rename modal opens from sidebar, new name saved and visible |
 | should copy chat response to clipboard | Copy button copies bot response text to clipboard |
+| should always show copy button on assistant response without hover | Copy button visible on assistant messages without hovering |
 
 ## multi-turn.spec.ts
 
@@ -193,6 +195,20 @@ Tests the embedded support widget on the Telaris dummy site.
 | should not expose raw tool call syntax — pricing query | No raw tool call syntax in pricing response |
 | should not expose raw tool call syntax — knowledge base query (BUG-019) | No raw tool call syntax on handoff fallback |
 | should not expose raw tool call syntax — multi-prompt handoff scenario | No raw tool call syntax across 3 consecutive handoff-triggering prompts |
+
+## widget-rag.spec.ts
+
+Tests RAG knowledge retrieval accuracy for the embedded support widget.
+Verifies the widget answers from its indexed knowledge base rather than general LLM knowledge.
+
+| Test | What it checks |
+|---|---|
+| should return correct Starter plan price (€19/month) | Bot returns €19 when asked about the Starter plan cost |
+| should confirm there is no data cap on any plan | Bot confirms unlimited data across all plans |
+| should return correct installation time (24-48 hours) | Bot references 24 or 48 hour installation time |
+| should return support phone number | Bot returns 064 064 064 or 080 8000 support number |
+| should return company location (Ljubljana) | Bot references Ljubljana as the company location |
+| should respond to money back guarantee question | Bot returns a relevant refund/guarantee policy response |
 ---
 
 ## QA suggestions
