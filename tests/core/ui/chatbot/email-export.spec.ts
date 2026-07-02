@@ -13,10 +13,10 @@ test.describe('Email Export', () => {
 
   test('should confirm sending file to signed-in email when asked', async ({ page }) => {
     await page.goto('/')
-    await page.locator('textarea').fill('Create a short txt file with a summary of AI assistants')
+    await page.locator('textarea[placeholder="Type a message..."]').fill('Create a short txt file with a summary of AI assistants')
     await page.keyboard.press('Enter')
     await page.waitForTimeout(8000)
-    await page.locator('textarea').fill('Send that file to my email')
+    await page.locator('textarea[placeholder="Type a message..."]').fill('Send that file to my email')
     await page.keyboard.press('Enter')
     await page.waitForTimeout(8000)
     const response = page.locator('div.prose').last()

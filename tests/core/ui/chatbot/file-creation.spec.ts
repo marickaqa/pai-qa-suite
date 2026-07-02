@@ -15,7 +15,7 @@ test.describe('File Creation', () => {
 
   test('should create a TXT file when asked', async ({ page }) => {
     await page.goto('/')
-    await page.locator('textarea').fill('Create a txt file with 3 fun facts about the moon')
+    await page.locator('textarea[placeholder="Type a message..."]').fill('Create a txt file with 3 fun facts about the moon')
     await page.keyboard.press('Enter')
     await page.waitForTimeout(8000)
     const response = page.locator('div.prose').last()
@@ -25,7 +25,7 @@ test.describe('File Creation', () => {
 
   test('should create a PDF file when asked', async ({ page }) => {
     await page.goto('/')
-    await page.locator('textarea').fill('Create a pdf file with a short summary of the solar system')
+    await page.locator('textarea[placeholder="Type a message..."]').fill('Create a pdf file with a short summary of the solar system')
     await page.keyboard.press('Enter')
     await page.waitForTimeout(8000)
     const response = page.locator('div.prose').last()
@@ -35,7 +35,7 @@ test.describe('File Creation', () => {
 
   test('should show a download link or attachment for created TXT file', async ({ page }) => {
     await page.goto('/')
-    await page.locator('textarea').fill('Create a txt file with a short poem about the ocean')
+    await page.locator('textarea[placeholder="Type a message..."]').fill('Create a txt file with a short poem about the ocean')
     await page.keyboard.press('Enter')
     await page.waitForTimeout(8000)
     const response = page.locator('div.prose').last()
@@ -45,7 +45,7 @@ test.describe('File Creation', () => {
 
   test('should show a download link or attachment for created PDF file', async ({ page }) => {
     await page.goto('/')
-    await page.locator('textarea').fill('Create a pdf file with a short poem about the mountains')
+    await page.locator('textarea[placeholder="Type a message..."]').fill('Create a pdf file with a short poem about the mountains')
     await page.keyboard.press('Enter')
     await page.waitForTimeout(8000)
     const response = page.locator('div.prose').last()

@@ -27,6 +27,33 @@ async function globalSetup(config: FullConfig) {
   await chatPage.close()
   await chatContext.close()
 
+  // Custom chatbot session (only if CHATBOT_URL is set and different from CHAT_URL)
+  const CUSTOM_URL = process.env.CHATBOT_URL
+  if (CUSTOM_URL && CUSTOM_URL !== CHAT_URL) {
+    try {
+      const customContext = await browser.newContext()
+      const customPage = await customContext.newPage()
+      await customPage.goto(CUSTOM_URL)
+      await customPage.fill('#email', process.env.API_EMAIL || '')
+      await customPage.fill('#password', process.env.API_PASSWORD || '')
+      await customPage.click('button[type="submit"]')
+      await customPage.waitForURL((url: URL) => !url.toString().includes('login'), { timeout: 35000 })
+      await customContext.storageState({ path: 'reports/custom-session.json' })
+      await customPage.close()
+      await customContext.close()
+      console.log('✅ Custom chatbot session generated')
+    } catch (e: unknown) {
+      const message = e instanceof Error ? e.message : String(e)
+      console.error('❌ Custom chatbot session failed:', message)
+    }
+  } else {
+    // fall back to copying the main chatbot session
+    const fs = await import('fs')
+    if (fs.existsSync('reports/session.json')) {
+      fs.copyFileSync('reports/session.json', 'reports/custom-session.json')
+    }
+  }
+
  // SaaS session
   const saasContext = await browser.newContext()
   const saasPage = await saasContext.newPage()

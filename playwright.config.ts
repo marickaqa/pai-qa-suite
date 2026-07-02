@@ -47,5 +47,14 @@ export default defineConfig({
       testDir: './tests/known-bugs/ui',
       use: { storageState: 'reports/session.json' }
     },
+    {
+      name: 'chatbot-custom',
+      testDir: './tests/core/ui/chatbot',
+      testIgnore: ['**/logout.spec.ts', '**/widget.spec.ts', '**/widget-rag.spec.ts'],
+      use: {
+        baseURL: process.env.CHATBOT_URL || 'https://pc-fe-dev.noctocode.dev',
+        storageState: 'reports/custom-session.json',
+      }
+    },
   ]
 })
