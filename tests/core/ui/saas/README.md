@@ -169,15 +169,16 @@ Uses `reports/saas-session.json` for all tests.
 
 ## saas-style-config.spec.ts
 
-Tests the Style Config page for chatbot logo and color customization.
-Covers logo upload slots (light/dark theme, icon, vertical variants) and primary/secondary color pickers for light and dark themes.
+Tests the Branding page for chatbot logo and color customization.
+Covers favicon and logo upload slots (light/dark theme, icon, vertical variants), primary/secondary color pickers for light and dark themes.
 
 | Test | What it checks |
 |---|---|
-| should show Style Config heading and description | Heading and description text visible |
+| should show Branding heading and description | Heading and description text visible |
+| should show favicon upload slot | Favicon label visible |
 | should show all 6 logo upload slots with correct labels | Light theme, Icon light, Vertical light, Dark theme, Icon dark, Vertical dark labels all visible |
-| should show 6 upload buttons and 6 remove buttons | One Upload and one Remove button per slot |
-| should have 6 file inputs accepting image formats | File inputs accept png, jpeg, svg+xml, webp |
+| should show 7 upload buttons and 7 remove buttons | One Upload and one Remove button per slot including favicon |
+| should have 7 file inputs accepting image formats | Favicon input accepts png, svg, ico; logo inputs accept png, jpeg, svg, webp |
 | should show Light theme and Dark theme color sections with hex inputs | Primary/secondary colour labels visible, all 4 hex values match valid hex format |
 | should show Save changes button | Save changes button visible and enabled |
 | should update hex input when a new value is typed | Typing a new hex value updates the input |
@@ -198,3 +199,48 @@ Covers org-wide metrics, activity chart period switching, and guardrail trigger 
 | should show chart legend for Messages, Sessions and Tokens | Legend labels for all three metrics visible |
 | should show Guardrail triggers table with correct headers | Table with Category, Count, Last triggered columns visible |
 | should show a Review action for guardrail trigger rows | Review button visible when guardrail triggers exist |
+
+## saas-model-config.spec.ts
+
+Tests the Model & Logic page for chatbot model selection and output parameter configuration.
+
+| Test | What it checks |
+|---|---|
+| should show Model & Logic heading and description | Heading and description text visible |
+| should show all 5 sections | Output, Text to Image, Image to Image, Text Ranking, Feature Extraction headings visible |
+| should show section descriptions | Description text for each model section visible |
+| should show 5 model dropdowns with selected values | Each section has a combobox with a non-empty selected model |
+| should show Output parameter inputs | Temperature, Top P, Presence penalty, Frequency penalty labels visible |
+| should show parameter range descriptions | Range descriptions visible for Temperature and Top P |
+| should show Reset to defaults link in Output section | Reset to defaults link visible |
+| should show 5 Save and 5 Discard buttons | One Save and one Discard button per section |
+| should update a parameter input value | Typing a new value updates the Temperature input |
+
+## saas-attributes.spec.ts
+
+Tests the Attributes page for creating and managing conversation tagging attributes.
+Each test is self-contained — created attributes are deleted after.
+
+| Test | What it checks |
+|---|---|
+| should show Attributes heading and description | Heading and description text visible |
+| should show empty state when no attributes exist | No attributes yet message and description visible |
+| should show Add attribute button | Add attribute button visible |
+| should show attribute form when Add attribute is clicked | Type input, Add value, Save and Discard buttons visible |
+| should show Delete type button in attribute form | Delete type button visible in open form |
+| should show value and description inputs when Add value is clicked | Value and description inputs visible after clicking Add value |
+| should hide form when Discard is clicked | Form not visible after clicking Discard |
+| should create and delete an attribute | Attribute created and input value confirmed, deleted successfully |
+
+## saas-conversations.spec.ts
+
+Tests the Conversations inbox page at /dashboard/conversations.
+
+| Test | What it checks |
+|---|---|
+| should navigate to conversations page | All chats label visible on page load |
+| should show chatbot filter list in sidebar | Chatbot names visible in sidebar filter |
+| should show conversation count next to All chats | Numeric count visible next to All chats label |
+| should show empty state when no conversations exist | No conversations yet message visible |
+| should show no conversation selected state in detail panel | No conversation selected and helper text visible in detail panel |
+| should show search input | At least one search input visible |
