@@ -142,4 +142,37 @@ test.describe('Core — Chat UI', () => {
     expect(clipboard.length).toBeGreaterThan(0)
   })
 
+  test('should show download button on assistant response', async ({ page }) => {
+    const input = page.locator('textarea[placeholder="Type a message..."]')
+    await input.fill('What is 2 + 2?')
+    await input.press('Enter')
+    const downloadBtn = page.locator('button[title="Download"]').first()
+    await expect(downloadBtn).toBeVisible({ timeout: 20000 })
+  })
+
+  test('should show PDF Markdown and DOCX options when download button is clicked', async ({ page }) => {
+    const input = page.locator('textarea[placeholder="Type a message..."]')
+    await input.fill('What is 2 + 2?')
+    await input.press('Enter')
+    const downloadBtn = page.locator('button[title="Download"]').first()
+    await expect(downloadBtn).toBeVisible({ timeout: 20000 })
+    await downloadBtn.click()
+    await expect(page.getByText('PDF', { exact: true }).first()).toBeVisible()
+    await expect(page.getByText('Markdown', { exact: true }).first()).toBeVisible()
+    await expect(page.getByText('DOCX', { exact: true }).first()).toBeVisible()
+  })
+
+  test('should close download dropdown when a format is selected', async ({ page }) => {
+    const input = page.locator('textarea[placeholder="Type a message..."]')
+    await input.fill('What is 2 + 2?')
+    await input.press('Enter')
+    const downloadBtn = page.locator('button[title="Download"]').first()
+    await expect(downloadBtn).toBeVisible({ timeout: 20000 })
+    await downloadBtn.click()
+    await expect(page.getByText('PDF', { exact: true }).first()).toBeVisible()
+    await page.getByText('PDF', { exact: true }).first().click()
+    await page.waitForTimeout(500)
+    await expect(page.getByText('PDF', { exact: true }).first()).not.toBeVisible()
+  })
+
 })
