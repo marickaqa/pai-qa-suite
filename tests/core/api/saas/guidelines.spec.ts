@@ -21,7 +21,6 @@ describe('Core — Guidelines & Config API', () => {
     expect(response.status).toBe(200)
     expect(Array.isArray(response.data)).toBe(true)
     expect(response.data.length).toBeGreaterThan(0)
-
     const template = response.data[0]
     expect(template).toHaveProperty('id')
     expect(template).toHaveProperty('name')
@@ -57,7 +56,9 @@ describe('Core — Guidelines & Config API', () => {
     })
   })
 
-  it('should get chatbot with config', async () => {
+  // PENDING: bot config (options/features/tools) removed from GET /chatbot/{id}
+  // Will be re-enabled when GET /chatbot/{id}/config supports a config type for options
+  it.skip('should get chatbot with config', async () => {
     const bot = await getChatbot(token, TEST_BOT_ID)
     expect(bot).toHaveProperty('config')
     expect(bot.config).toHaveProperty('options')
@@ -65,20 +66,19 @@ describe('Core — Guidelines & Config API', () => {
     expect(bot.config.options).toHaveProperty('features')
   })
 
-  it('should show web search is enabled in bot config', async () => {
+  it.skip('should show web search is enabled in bot config', async () => {
     const bot = await getChatbot(token, TEST_BOT_ID)
     expect(typeof bot.config.options.tools.webSearch).toBe('boolean')
   })
 
-  it('should show incognito feature is enabled in bot config', async () => {
+  it.skip('should show incognito feature is enabled in bot config', async () => {
     const bot = await getChatbot(token, TEST_BOT_ID)
     expect(typeof bot.config.options.features.incognito).toBe('boolean')
   })
 
-  it('should update and restore bot web search setting', async () => {
+  it.skip('should update and restore bot web search setting', async () => {
     const bot = await getChatbot(token, TEST_BOT_ID)
     const originalValue = bot.config.options.tools.webSearch
-
     await updateChatbot(token, TEST_BOT_ID, {
       config: {
         ...bot.config,
@@ -88,11 +88,8 @@ describe('Core — Guidelines & Config API', () => {
         }
       }
     })
-
     const updated = await getChatbot(token, TEST_BOT_ID)
     expect(updated.config.options.tools.webSearch).toBe(!originalValue)
-
-    // Restore original value
     await updateChatbot(token, TEST_BOT_ID, {
       config: {
         ...bot.config,

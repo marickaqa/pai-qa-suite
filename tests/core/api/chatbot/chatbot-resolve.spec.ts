@@ -35,7 +35,6 @@ describe('Core — Chatbot Public Resolve API', () => {
     expect(response.data).toHaveProperty('slug')
     expect(response.data).toHaveProperty('type')
     expect(response.data).toHaveProperty('active')
-    expect(response.data).toHaveProperty('config')
     expect(response.data).toHaveProperty('chatbotConfig')
   })
 
