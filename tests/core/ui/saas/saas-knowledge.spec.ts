@@ -34,9 +34,10 @@ test.describe('SaaS Knowledge', () => {
         await page.getByRole('button', { name: 'New folder', exact: true }).click()
         await page.waitForTimeout(300)
         await page.locator('input[placeholder="e.g. Product Documentation"]').first().fill(folderName)
+        const folderResponse = page.waitForResponse(r => r.url().includes('/folder') && r.request().method() === 'POST')
         await page.keyboard.press('Enter')
-        await page.waitForTimeout(1000)
-        await expect(page.getByText(folderName)).toBeVisible()
+        await folderResponse
+        await expect(page.getByText(folderName)).toBeVisible({ timeout: 10000 })
 
         // cleanup — delete the folder
         const row = page.locator('div, tr').filter({ hasText: folderName }).first()

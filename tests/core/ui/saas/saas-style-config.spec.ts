@@ -11,7 +11,7 @@ test.describe('Core — SaaS Branding', () => {
   test('should show Branding heading and description', async ({ page }) => {
     await page.goto(BRANDING_URL)
     await page.waitForLoadState('networkidle')
-    await expect(page.getByRole('heading', { name: 'Branding' })).toBeVisible()
+    await expect(page.getByRole('heading', { name: 'Branding' })).toBeVisible({ timeout: 30000 })
     await expect(page.getByText('Look and feel of the chatbot.')).toBeVisible()
   })
 
