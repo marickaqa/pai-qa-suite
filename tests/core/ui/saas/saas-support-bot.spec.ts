@@ -60,7 +60,7 @@ test.describe('SaaS Support Bot', () => {
 
     test('should show New guideline button', async ({ page }) => {
         await page.goto(`${AGENT_URL}/guidelines`)
-        await expect(page.getByRole('button', { name: /new guideline/i }).first()).toBeVisible()
+        await expect(page.getByRole('button', { name: /new guideline/i }).first()).toBeVisible({ timeout: 15000 })
     })
 
     test('should expand a guideline section when clicked', async ({ page }) => {

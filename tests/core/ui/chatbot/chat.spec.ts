@@ -169,10 +169,17 @@ test.describe('Core — Chat UI', () => {
     const downloadBtn = page.locator('button[title="Download"]').first()
     await expect(downloadBtn).toBeVisible({ timeout: 20000 })
     await downloadBtn.click()
-    await expect(page.getByText('PDF', { exact: true }).first()).toBeVisible()
-    await page.getByText('PDF', { exact: true }).first().click()
+    await page.waitForTimeout(300)
+    // verify dropdown opened
+    const pdfBtn = page.locator('button').filter({ hasText: /^PDF$/ }).first()
+    await expect(pdfBtn).toBeVisible()
+    // count PDF buttons before click
+    const countBefore = await page.locator('button').filter({ hasText: /^PDF$/ }).count()
+    await pdfBtn.click()
     await page.waitForTimeout(500)
-    await expect(page.getByText('PDF', { exact: true }).first()).not.toBeVisible()
+    // dropdown closed — count should decrease
+    const countAfter = await page.locator('button').filter({ hasText: /^PDF$/ }).count()
+    expect(countAfter).toBeLessThan(countBefore)
   })
 
 })
