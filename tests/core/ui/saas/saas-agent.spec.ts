@@ -68,40 +68,6 @@ test.describe('Core — SaaS Agent Guidelines', () => {
 
 })
 
-test.describe('Core — SaaS Agent Style Config', () => {
-
-  test('should show style config page', async ({ browser }) => {
-    const context = await browser.newContext({ storageState: SAAS_SESSION })
-    const page = await context.newPage()
-    await page.goto(BOT_BASE + '/style-config')
-    await expect(page.getByRole('heading', { name: 'Style Config' })).toBeVisible()
-    await expect(page.getByText('Light theme', { exact: true }).first()).toBeVisible()
-    await expect(page.getByText('Dark theme', { exact: true }).first()).toBeVisible()
-    await context.close()
-  })
-
-  test('should show Save changes button', async ({ browser }) => {
-    const context = await browser.newContext({ storageState: SAAS_SESSION })
-    const page = await context.newPage()
-    await page.goto(BOT_BASE + '/style-config')
-    await expect(page.getByRole('button', { name: 'Save changes' })).toBeVisible()
-    await context.close()
-  })
-
-  test('should show Upload buttons for logo slots', async ({ browser }) => {
-    const context = await browser.newContext({ storageState: SAAS_SESSION })
-    const page = await context.newPage()
-    await page.goto(BOT_BASE + '/style-config')
-    await expect(page.getByRole('heading', { name: 'Style Config' })).toBeVisible()
-    const uploadButtons = page.locator('button').filter({ hasText: 'Upload' })
-    await expect(uploadButtons.first()).toBeVisible({ timeout: 10000 })
-    const count = await uploadButtons.count()
-    expect(count).toBeGreaterThanOrEqual(6)
-    await context.close()
-  })
-
-})
-
 test.describe('Core — SaaS Team Management', () => {
 
   test('should show team management page', async ({ browser }) => {

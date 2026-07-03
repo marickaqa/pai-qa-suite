@@ -75,10 +75,10 @@ test.describe('SaaS AI Assistant', () => {
 
   test('should show style config page', async ({ page }) => {
     await page.goto(`${AGENT_URL}/style-config`)
-    await expect(page.getByRole('heading', { name: 'Style Config' })).toBeVisible()
+    await expect(page.getByRole('heading', { name: 'Branding' })).toBeVisible()
   })
 
-  test('should show all 6 logo upload slots', async ({ page }) => {
+  test('should show all 7 logo upload slots', async ({ page }) => {
     await page.goto(`${AGENT_URL}/style-config`)
     await expect(page.getByText('Light theme', { exact: true }).first()).toBeVisible()
     await expect(page.getByText('Dark theme', { exact: true }).first()).toBeVisible()
@@ -86,12 +86,13 @@ test.describe('SaaS AI Assistant', () => {
     await expect(page.getByText('Vertical dark')).toBeVisible()
     await expect(page.getByText('Icon light')).toBeVisible()
     await expect(page.getByText('Icon dark')).toBeVisible()
+    await expect(page.getByText('Favicon', { exact: true }).first()).toBeVisible()
   })
 
-  test('should show at least 6 Upload buttons', async ({ page }) => {
+  test('should show at least 7 Upload buttons', async ({ page }) => {
     await page.goto(`${AGENT_URL}/style-config`)
     const uploadButtons = page.getByRole('button', { name: 'Upload' })
-    await expect(uploadButtons).toHaveCount(6)
+    await expect(uploadButtons).toHaveCount(7)
   })
 
   test('should show Save changes button', async ({ page }) => {
