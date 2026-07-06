@@ -67,6 +67,9 @@ Tests the core chat interface behavior.
 | should rename chat via sidebar history button | Rename modal opens from sidebar, new name saved and visible |
 | should copy chat response to clipboard | Copy button copies bot response text to clipboard |
 | should always show copy button on assistant response without hover | Copy button visible on assistant messages without hovering |
+| should show download button on assistant response | Download button visible on assistant messages |
+| should show PDF Markdown and DOCX options when download button is clicked | Clicking Download shows PDF, Markdown and DOCX format options |
+| should close download dropdown when a format is selected | Selecting a format closes the dropdown |
 
 ## multi-turn.spec.ts
 
