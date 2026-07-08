@@ -110,7 +110,7 @@ Destructive actions (archive, delete) are visibility-only — not executed.
 | should show enable/disable toggle on existing guideline | A toggle switch is visible on an existing guideline |
 | should show style config page | Style Config heading is visible |
 | should show all 6 logo upload slots | Light theme, Dark theme, Vertical light, Vertical dark, Icon light and Icon dark slots are visible |
-| should show at least 6 Upload buttons | Exactly 6 Upload buttons are visible |
+| should show at least 7 Upload buttons | Exactly 7 Upload buttons are visible |
 | should show Save changes button | Save changes button is visible |
 | should show danger zone page with Archive and Delete buttons | Archive chatbot and Delete chatbot buttons are visible |
 | should show archive description text | Archive description text is visible |
@@ -159,9 +159,6 @@ Uses `reports/saas-session.json` for all tests.
 | should show guidelines page with all sections | All guideline sections visible |
 | should show New guideline button in each section | At least one New guideline button visible |
 | should navigate to guidelines from agent sidebar | Sidebar link navigates to guidelines page |
-| should show style config page | Style Config heading, Light and Dark theme visible |
-| should show Save changes button | Save changes button visible |
-| should show Upload buttons for logo slots | At least 6 Upload buttons visible |
 | should show team management page | Team management heading visible |
 | should show members table with correct columns | Member, Permissions, Joined columns visible |
 | should show Invite member button | Invite member button visible |
