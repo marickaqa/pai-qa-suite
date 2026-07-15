@@ -141,3 +141,15 @@ Uses cached SaaS token from global setup.
 | should deny access to another organization members | GET /organization-members | Wrong org header returns 403 |
 | should deny creating resources in another organization | POST /chatbot | Wrong org header returns 403 |
 | should deny inviting members to another organization | POST /organization-members/invite | Wrong org header returns 403 |
+
+## chatbot-resolve.spec.ts
+
+Tests chatbot resolution by header — how the API identifies which chatbot to use without authentication.
+
+| Test | Endpoint | What it checks |
+|---|---|---|
+| should resolve chatbot by x-chatbot-id header | GET /chatbot/resolve | Correct chatbot returned when x-chatbot-id is set |
+| should resolve chatbot by Referer header | GET /chatbot/resolve | Correct chatbot returned when Referer matches domain |
+| should return expected fields in response | GET /chatbot/resolve | Response has id, name, slug, type fields |
+| should not require authentication | GET /chatbot/resolve | Endpoint works without auth token |
+| should fall back to default chatbot when x-chatbot-id is not found | GET /chatbot/resolve | Unknown ID falls back to default chatbot |
