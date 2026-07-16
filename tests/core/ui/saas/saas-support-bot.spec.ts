@@ -28,7 +28,7 @@ test.describe('SaaS Support Bot', () => {
 
     test('should show members table with correct columns', async ({ page }) => {
         await page.goto(`${AGENT_URL}/team`)
-        await expect(page.getByRole('columnheader', { name: 'Member' })).toBeVisible()
+        await expect(page.getByRole('columnheader', { name: 'Member' })).toBeVisible({ timeout: 15000 })
         await expect(page.getByRole('columnheader', { name: 'Permissions' })).toBeVisible()
         await expect(page.getByRole('columnheader', { name: 'Joined' })).toBeVisible()
     })

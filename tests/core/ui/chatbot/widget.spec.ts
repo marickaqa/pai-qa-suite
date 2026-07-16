@@ -5,6 +5,7 @@ const WIDGET_URL = 'https://perception-chatbot-dummy-company-env-testing-noctoco
 async function openWidget(page: any) {
   await page.goto(WIDGET_URL)
   await page.waitForTimeout(2000)
+  await expect(page.locator('button.pai-launcher')).toBeVisible({ timeout: 15000 })
   await page.locator('button.pai-launcher').click()
   await page.waitForTimeout(1000)
 }
