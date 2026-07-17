@@ -9,7 +9,8 @@
     "test:ui:core": "playwright test --project=core-chatbot-ui --project=core-chatbot-ui-logout --project=core-saas-ui --project=core-subtitles-ui",
     "test:ui:bugs": "playwright test tests/known-bugs/ui",
     "test:all": "npm run test:core && npm run test:ui:core",
-    "test:stress:ftp": "vitest run --config vitest.stress.config.ts"
+    "test:stress:ftp": "vitest run --config vitest.stress.config.ts",
+    "test:prod-smoke": "playwright test --config playwright.prod-smoke.config.ts"
   },
   "license": "MIT",
   "devDependencies": {

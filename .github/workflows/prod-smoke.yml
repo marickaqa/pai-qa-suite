@@ -1,0 +1,24 @@
+name: Prod Smoke
+
+# Manual trigger only — run right after a production deploy.
+on:
+  workflow_dispatch:
+
+jobs:
+  prod-smoke:
+    name: Prod Smoke (read-only)
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '20'
+      - run: npm ci
+      - run: npx playwright install chromium --with-deps
+      - run: npm run test:prod-smoke
+        env:
+          ALLOW_PROD: '1'
+          SMOKE_SAAS_URL: https://chat.paicloud.ai
+          SMOKE_SAAS_EMAIL: ${{ secrets.SMOKE_SAAS_EMAIL }}
+          SMOKE_SAAS_PASSWORD: ${{ secrets.SMOKE_SAAS_PASSWORD }}
+          SMOKE_WIDGET_URL: ${{ secrets.SMOKE_WIDGET_URL }}
