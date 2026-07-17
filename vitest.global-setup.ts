@@ -1,8 +1,9 @@
-import axios from 'axios'
+﻿import axios from 'axios'
 import fs from 'fs'
 import path from 'path'
 import dotenv from 'dotenv'
 import { assertNotProd } from './utils/prodGuard'
+import { backendPreflight } from './utils/backendPreflight'
 
 dotenv.config({ path: path.resolve(__dirname, '.env') })
 
@@ -26,5 +27,7 @@ export async function setup() {
 
   fs.mkdirSync(path.dirname(TOKEN_CACHE), { recursive: true })
   fs.writeFileSync(TOKEN_CACHE, JSON.stringify({ chatToken, saasToken }))
-  console.log('✅ API tokens cached')
+  console.log('API tokens cached')
+
+  await backendPreflight(BASE_URL, chatToken, saasToken)
 }
