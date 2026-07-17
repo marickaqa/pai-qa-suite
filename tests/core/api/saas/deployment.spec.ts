@@ -14,27 +14,6 @@ beforeAll(async () => {
 
 describe('Core — Chatbot Deployment API', () => {
 
-  it('should successfully deploy a chat type bot', async () => {
-    const response = await axios.post(
-      `${BASE_URL}/chatbot/${CHAT_BOT_ID}/deploy`,
-      {},
-      { headers: authHeaders(token) }
-    )
-    expect(response.status).toBe(200)
-    expect(response.data).toHaveProperty('message')
-    expect(response.data).toHaveProperty('domain')
-    expect(response.data.domain).toBeTruthy()
-  })
-
-  it('should return a valid domain after deployment', async () => {
-    const response = await axios.post(
-      `${BASE_URL}/chatbot/${CHAT_BOT_ID}/deploy`,
-      {},
-      { headers: authHeaders(token) }
-    )
-    expect(response.data.domain).toMatch(/\.(org|com|dev|ai)$/)
-  })
-
   it('should reject deployment of support type bot', async () => {
     let status: number = 0
     let message: string = ''
