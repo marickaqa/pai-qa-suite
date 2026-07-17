@@ -1,1 +1,0 @@
-Hello from the automated test suite.

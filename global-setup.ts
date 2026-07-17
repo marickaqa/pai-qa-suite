@@ -1,4 +1,4 @@
-import { chromium, FullConfig } from '@playwright/test'
+import { chromium, FullConfig, Page } from '@playwright/test'
 import path from 'path'
 import dotenv from 'dotenv'
 
@@ -12,39 +12,59 @@ const CHAT_URL = process.env.CHAT_URL || 'https://pc-fe-dev.noctocode.dev'
 const SAAS_URL = process.env.SAAS_URL || 'https://chat-dev.paicloud.ai'
 const SUBTITLES_URL = process.env.SUBTITLES_URL || 'https://subtitles-dev.paicloud.ai'
 
+// On failure, capture a screenshot for local debugging.
+// reports/ is fully gitignored, so these can never end up in the repo.
+async function captureFailure(page: Page, name: string, error: unknown) {
+  const message = error instanceof Error ? error.message : String(error)
+  console.error(`❌ ${name} session generation failed: ${message}`)
+  try {
+    await page.screenshot({ path: `reports/${name}-login-failure.png` })
+    console.error(`   Screenshot saved to reports/${name}-login-failure.png (local only, gitignored)`)
+  } catch {
+    // page may already be closed — nothing more we can do
+  }
+}
+
 async function globalSetup(config: FullConfig) {
   const browser = await chromium.launch()
 
   // Chatbot session
   const chatContext = await browser.newContext()
   const chatPage = await chatContext.newPage()
-  await chatPage.goto(CHAT_URL)
-  await chatPage.fill('#email', process.env.API_EMAIL || '')
-  await chatPage.fill('#password', process.env.API_PASSWORD || '')
-  await chatPage.click('button[type="submit"]')
-  await chatPage.waitForURL((url: URL) => !url.toString().includes('login'), { timeout: 35000 })
-  await chatContext.storageState({ path: CHAT_SESSION })
-  await chatPage.close()
-  await chatContext.close()
+  try {
+    await chatPage.goto(CHAT_URL)
+    await chatPage.fill('#email', process.env.API_EMAIL || '')
+    await chatPage.fill('#password', process.env.API_PASSWORD || '')
+    await chatPage.click('button[type="submit"]')
+    await chatPage.waitForURL((url: URL) => !url.toString().includes('login'), { timeout: 35000 })
+    await chatContext.storageState({ path: CHAT_SESSION })
+    console.log('✅ Chatbot session generated')
+  } catch (e: unknown) {
+    await captureFailure(chatPage, 'chatbot', e)
+    throw e
+  } finally {
+    await chatPage.close()
+    await chatContext.close()
+  }
 
   // Custom chatbot session (only if CHATBOT_URL is set and different from CHAT_URL)
   const CUSTOM_URL = process.env.CHATBOT_URL
   if (CUSTOM_URL && CUSTOM_URL !== CHAT_URL) {
+    const customContext = await browser.newContext()
+    const customPage = await customContext.newPage()
     try {
-      const customContext = await browser.newContext()
-      const customPage = await customContext.newPage()
       await customPage.goto(CUSTOM_URL)
       await customPage.fill('#email', process.env.API_EMAIL || '')
       await customPage.fill('#password', process.env.API_PASSWORD || '')
       await customPage.click('button[type="submit"]')
       await customPage.waitForURL((url: URL) => !url.toString().includes('login'), { timeout: 35000 })
       await customContext.storageState({ path: 'reports/custom-session.json' })
-      await customPage.close()
-      await customContext.close()
       console.log('✅ Custom chatbot session generated')
     } catch (e: unknown) {
-      const message = e instanceof Error ? e.message : String(e)
-      console.error('❌ Custom chatbot session failed:', message)
+      await captureFailure(customPage, 'custom-chatbot', e)
+    } finally {
+      await customPage.close()
+      await customContext.close()
     }
   } else {
     // fall back to copying the main chatbot session
@@ -54,26 +74,30 @@ async function globalSetup(config: FullConfig) {
     }
   }
 
- // SaaS session
+  // SaaS session
   const saasContext = await browser.newContext()
   const saasPage = await saasContext.newPage()
-  await saasPage.goto(SAAS_URL + '/login')
-  await saasPage.waitForLoadState('networkidle')
-  await saasPage.fill('input[name="email"]', process.env.SAAS_EMAIL || '')
-  await saasPage.fill('input[name="password"]', process.env.SAAS_PASSWORD || '')
-  await saasPage.click('button[type="submit"]')
-  await saasPage.waitForTimeout(5000)
-  console.log('SaaS URL after submit:', saasPage.url())
-  await saasPage.screenshot({ path: 'reports/saas-login-debug.png' })
-  await saasPage.waitForURL((url: URL) => !url.toString().includes('login'), { timeout: 60000 })
-  await saasContext.storageState({ path: SAAS_SESSION })
-  await saasPage.close()
-  await saasContext.close()
+  try {
+    await saasPage.goto(SAAS_URL + '/login')
+    await saasPage.waitForLoadState('networkidle')
+    await saasPage.fill('input[name="email"]', process.env.SAAS_EMAIL || '')
+    await saasPage.fill('input[name="password"]', process.env.SAAS_PASSWORD || '')
+    await saasPage.click('button[type="submit"]')
+    await saasPage.waitForURL((url: URL) => !url.toString().includes('login'), { timeout: 60000 })
+    await saasContext.storageState({ path: SAAS_SESSION })
+    console.log('✅ SaaS session generated')
+  } catch (e: unknown) {
+    await captureFailure(saasPage, 'saas', e)
+    throw e
+  } finally {
+    await saasPage.close()
+    await saasContext.close()
+  }
 
   // Subtitles session
+  const subtitlesContext = await browser.newContext()
+  const subtitlesPage = await subtitlesContext.newPage()
   try {
-    const subtitlesContext = await browser.newContext()
-    const subtitlesPage = await subtitlesContext.newPage()
     await subtitlesPage.goto(SUBTITLES_URL + '/login')
     await subtitlesPage.fill('input[name="email"]', process.env.SUBTITLES_QA_EMAIL || '')
     await subtitlesPage.fill('input[name="password"]', process.env.SUBTITLES_QA_PASSWORD || '')
@@ -86,12 +110,12 @@ async function globalSetup(config: FullConfig) {
       await subtitlesPage.waitForTimeout(3000)
     }
     await subtitlesContext.storageState({ path: SUBTITLES_SESSION })
-    await subtitlesPage.close()
-    await subtitlesContext.close()
     console.log('✅ Subtitles session generated')
   } catch (e: unknown) {
-    const message = e instanceof Error ? e.message : String(e)
-    console.error('❌ Subtitles session generation failed:', message)
+    await captureFailure(subtitlesPage, 'subtitles', e)
+  } finally {
+    await subtitlesPage.close()
+    await subtitlesContext.close()
   }
 
   await browser.close()

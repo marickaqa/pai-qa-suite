@@ -6,16 +6,16 @@ node_modules/
 .env.*
 !.env.example
 
-# Session files — never commit these
-reports/session.json
-reports/saas-session.json
-reports/subtitles-session.json
-reports/api-token.json
+# Reports — deny everything, always.
+# Sessions, tokens, screenshots, eval output all live here and none of it
+# belongs in git. Deny-all means a new debug artifact can never leak again.
+reports/*
+!reports/.gitkeep
 
-# Test output
-reports/latency.json
-reports/eval-report.json
+# Playwright output
 test-results/
+playwright-report/
+blob-report/
 
 # TypeScript
 dist/
@@ -27,5 +27,3 @@ npm-debug.log*
 
 # OS
 .DS_Store
-
-reports/custom-session.json
