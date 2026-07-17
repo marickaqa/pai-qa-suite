@@ -1,6 +1,7 @@
 import { chromium, FullConfig, Page } from '@playwright/test'
 import path from 'path'
 import dotenv from 'dotenv'
+import { assertNotProd } from './utils/prodGuard'
 
 dotenv.config({ path: path.resolve(__dirname, '.env') })
 
@@ -26,6 +27,8 @@ async function captureFailure(page: Page, name: string, error: unknown) {
 }
 
 async function globalSetup(config: FullConfig) {
+  assertNotProd()
+
   const browser = await chromium.launch()
 
   // Chatbot session

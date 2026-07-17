@@ -4,6 +4,7 @@ export default defineConfig({
   test: {
     testTimeout: 60000,
     retry: 0,
-    include: ['tests/monitoring/**/*.spec.ts']
+    include: ['tests/monitoring/**/*.spec.ts'],
+    globalSetup: './vitest.guard-setup.ts',
   }
 })
