@@ -2,18 +2,11 @@ import { describe, it, expect } from 'vitest'
 import axios from 'axios'
 import dotenv from 'dotenv'
 import path from 'path'
+import { getChatToken, getFreshChatToken } from '../../../../utils/tokenCache'
 
 dotenv.config({ path: path.resolve(__dirname, '../../../../.env') })
 
 const BASE_URL = process.env.API_BASE_URL || 'https://pc-be-dev.noctocode.dev'
-
-async function getChatToken(): Promise<string> {
-    const response = await axios.post(`${BASE_URL}/auth/signin`, {
-        email: process.env.API_EMAIL,
-        password: process.env.API_PASSWORD,
-    })
-    return response.data.token
-}
 
 describe('Core — Auth API', () => {
 
@@ -123,7 +116,8 @@ describe('Core — Auth API', () => {
     describe('POST /auth/signout', () => {
 
         it('should return 200 when signing out with valid token', async () => {
-            const token = await getChatToken()
+            // fresh throwaway token — signing out must not invalidate the shared cached token
+            const token = await getFreshChatToken()
             const response = await axios.post(
                 `${BASE_URL}/auth/signout`,
                 {},
@@ -133,7 +127,8 @@ describe('Core — Auth API', () => {
         })
 
         it('should invalidate the token after signout', async () => {
-            const token = await getChatToken()
+            // fresh throwaway token — this test destroys it, so it must not use the shared cached token
+            const token = await getFreshChatToken()
             await axios.post(
                 `${BASE_URL}/auth/signout`,
                 {},
