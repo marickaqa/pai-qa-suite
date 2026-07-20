@@ -105,8 +105,10 @@ test.describe('SaaS Support Bot', () => {
         await gotoAgentPage(page, 'knowledge', async () => {
             await expect(page.getByRole('heading', { name: 'Knowledge' })).toBeVisible({ timeout: READY })
         })
-        await expect(page.getByText('Files')).toBeVisible()
-        await expect(page.getByText('Website URLs')).toBeVisible()
+        // Use headings, not getByText: "Files" also matches "No files yet".
+        // Generous timeout — sections paint after the page heading on slow loads.
+        await expect(page.getByRole('heading', { name: 'Files' })).toBeVisible({ timeout: 15000 })
+        await expect(page.getByRole('heading', { name: 'Website URLs' })).toBeVisible({ timeout: 15000 })
     })
 
     test('should show Upload file and New folder buttons', async ({ page }) => {
@@ -198,7 +200,7 @@ test.describe('SaaS Support Bot', () => {
         await gotoAgentPage(page, 'widget', async () => {
             await expect(page.getByText('Embed code')).toBeVisible({ timeout: READY })
         })
-        await expect(page.getByRole('button', { name: 'HTML' })).toBeVisible()
+        await expect(page.getByRole('button', { name: 'HTML' })).toBeVisible({ timeout: 15000 })
     })
 
     // --- Danger Zone ---
