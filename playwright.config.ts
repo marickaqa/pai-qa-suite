@@ -7,7 +7,10 @@ dotenv.config({ path: path.resolve(__dirname, '.env') })
 export default defineConfig({
   globalSetup: './global-setup.ts',
   timeout: 60000,
-  retries: 1,
+  // More retries in CI to absorb transient dev-backend slowness (pages
+  // occasionally don't render within timeout). Locally keep it low for fast,
+  // honest feedback while developing.
+  retries: process.env.CI ? 2 : 0,
   workers: 1,
   use: {
     baseURL: process.env.CHAT_URL || 'https://pc-fe-dev.noctocode.dev',
