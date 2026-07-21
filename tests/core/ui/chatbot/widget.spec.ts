@@ -27,22 +27,39 @@ async function openWidget(page: Page) {
 // Send a prompt and return the settled assistant reply text.
 // "Settled" = a new assistant bubble exists and its text has stopped
 // growing for two consecutive polls (streaming finished).
+// Assistant replies are .pai-bubble NOT inside a .pai-message-stack (user
+// messages are wrapped in .pai-message-stack). We detect them in the DOM via
+// closest(), which is unambiguous — a CSS :not() with a descendant proved
+// unreliable. Returns the count of assistant bubbles currently rendered.
+async function countAssistantBubbles(page: Page): Promise<number> {
+  return page.evaluate(() =>
+    Array.from(document.querySelectorAll('.pai-bubble'))
+      .filter(b => !b.closest('.pai-message-stack')).length
+  )
+}
+
+async function lastAssistantText(page: Page): Promise<string> {
+  return page.evaluate(() => {
+    const assistant = Array.from(document.querySelectorAll('.pai-bubble'))
+      .filter(b => !b.closest('.pai-message-stack'))
+    const last = assistant[assistant.length - 1] as HTMLElement | undefined
+    return last ? last.innerText.trim() : ''
+  })
+}
+
 async function sendPrompt(page: Page, prompt: string): Promise<string> {
   const input = page.locator('textarea.pai-input')
-  const bubbles = page.locator('.pai-bubble')
   const sendBtn = page.locator('button.pai-send')
 
-  // wait until the widget is idle and ready to accept a new message:
-  // input editable and empty (previous reply finished clearing it)
+  // wait until the widget is idle and ready to accept a new message
   await expect(input).toBeEditable({ timeout: 45000 })
   await expect(input).toHaveValue('', { timeout: 45000 })
 
-  const countBefore = await bubbles.count()
+  const assistantBefore = await countAssistantBubbles(page)
 
   await input.fill(prompt)
 
-  // the send button enables reactively once the input has text; wait for that,
-  // then click it. Fall back to Enter only if the button never enables.
+  // send button enables reactively once the input has text; fall back to Enter
   try {
     await expect(sendBtn).toBeEnabled({ timeout: 5000 })
     await sendBtn.click()
@@ -50,8 +67,7 @@ async function sendPrompt(page: Page, prompt: string): Promise<string> {
     await input.press('Enter')
   }
 
-  // confirm the message was actually sent: input clears. If it didn't clear,
-  // the send didn't register — retry once with Enter before giving up.
+  // confirm the message was sent: input clears (retry once with Enter if not)
   try {
     await expect(input).toHaveValue('', { timeout: 10000 })
   } catch {
@@ -59,24 +75,23 @@ async function sendPrompt(page: Page, prompt: string): Promise<string> {
     await expect(input).toHaveValue('', { timeout: 10000 })
   }
 
-  // wait for a new bubble beyond the pre-send count
+  // wait for a NEW assistant bubble (not the user's echo)
   await expect
-    .poll(async () => await bubbles.count(), { timeout: 45000, message: 'no new bubble after sending prompt' })
-    .toBeGreaterThan(countBefore)
+    .poll(() => countAssistantBubbles(page), { timeout: 45000, message: 'assistant reply did not appear' })
+    .toBeGreaterThan(assistantBefore)
 
-  // wait for the last bubble's text to stop changing (streaming settled)
-  const last = bubbles.last()
+  // wait for the assistant reply text to stop changing (streaming settled)
   let previous = ''
   await expect
     .poll(async () => {
-      const current = (await last.innerText().catch(() => '')).trim()
+      const current = await lastAssistantText(page)
       const stable = current.length > 0 && current === previous
       previous = current
       return stable
     }, { timeout: 45000, intervals: [1000], message: 'assistant reply did not settle' })
     .toBe(true)
 
-  return (await last.innerText()).trim()
+  return await lastAssistantText(page)
 }
 
 const checkNoToolCallLeak = (response: string) => {
