@@ -1,4 +1,4 @@
-import { test, expect, type Page, type Locator } from '@playwright/test'
+import { test, expect, type Page } from '@playwright/test'
 
 /**
  * ## widget.spec.ts
@@ -7,11 +7,14 @@ import { test, expect, type Page, type Locator } from '@playwright/test'
  * Covers launcher/open/close, message send, and safety behaviours
  * (no system-prompt leak, refusal, no raw tool-call syntax — BUG-019).
  *
- * NOTE: no fixed waitForTimeout in this file. Sending a prompt and then
- * sleeping N seconds before reading ".pai-bubble last" was unreliable —
- * on a slow reply the last bubble is still the user's message or a
- * half-streamed answer. sendPrompt() below waits for an assistant reply
- * to appear AND stop changing (streaming settled) before returning it.
+ * IMPORTANT: the widget renders inside a shadow DOM. Playwright .locator()
+ * pierces shadow roots automatically; page.evaluate + querySelectorAll does
+ * NOT — so all element access here uses .locator(), never evaluate.
+ *
+ * User messages AND assistant replies are both <div class="pai-bubble"> inside
+ * a <div class="pai-message-stack"> — structurally identical. They're
+ * distinguished by ORDER: after sending, the user echo appears, then the
+ * assistant reply. sendPrompt waits for 2 new bubbles and reads the last.
  */
 
 const WIDGET_URL = 'https://perception-chatbot-dummy-company-env-testing-noctocodeteam.vercel.app/'
@@ -25,49 +28,26 @@ async function openWidget(page: Page) {
 }
 
 // Send a prompt and return the settled assistant reply text.
-// "Settled" = a new assistant bubble exists and its text has stopped
-// growing for two consecutive polls (streaming finished).
-// Assistant replies are .pai-bubble NOT inside a .pai-message-stack (user
-// messages are wrapped in .pai-message-stack). We detect them in the DOM via
-// closest(), which is unambiguous — a CSS :not() with a descendant proved
-// unreliable. Returns the count of assistant bubbles currently rendered.
-async function countAssistantBubbles(page: Page): Promise<number> {
-  return page.evaluate(() =>
-    Array.from(document.querySelectorAll('.pai-bubble'))
-      .filter(b => !b.closest('.pai-message-stack')).length
-  )
-}
-
-async function lastAssistantText(page: Page): Promise<string> {
-  return page.evaluate(() => {
-    const assistant = Array.from(document.querySelectorAll('.pai-bubble'))
-      .filter(b => !b.closest('.pai-message-stack'))
-    const last = assistant[assistant.length - 1] as HTMLElement | undefined
-    return last ? last.innerText.trim() : ''
-  })
-}
-
 async function sendPrompt(page: Page, prompt: string): Promise<string> {
   const input = page.locator('textarea.pai-input')
   const sendBtn = page.locator('button.pai-send')
+  const bubbles = page.locator('.pai-bubble')
 
-  // wait until the widget is idle and ready to accept a new message
   await expect(input).toBeEditable({ timeout: 45000 })
   await expect(input).toHaveValue('', { timeout: 45000 })
 
-  const assistantBefore = await countAssistantBubbles(page)
+  const countBefore = await bubbles.count()
+  const lastTextBefore = countBefore > 0
+    ? (await bubbles.last().innerText().catch(() => '')).trim()
+    : ''
 
   await input.fill(prompt)
-
-  // send button enables reactively once the input has text; fall back to Enter
   try {
     await expect(sendBtn).toBeEnabled({ timeout: 5000 })
     await sendBtn.click()
   } catch {
     await input.press('Enter')
   }
-
-  // confirm the message was sent: input clears (retry once with Enter if not)
   try {
     await expect(input).toHaveValue('', { timeout: 10000 })
   } catch {
@@ -75,23 +55,31 @@ async function sendPrompt(page: Page, prompt: string): Promise<string> {
     await expect(input).toHaveValue('', { timeout: 10000 })
   }
 
-  // wait for a NEW assistant bubble (not the user's echo)
+  // Wait for a new reply: either the bubble count grew, OR the last bubble's
+  // text changed from before we sent. This is robust to turns that add a
+  // different number of bubbles (e.g. a handoff card) than a normal exchange.
   await expect
-    .poll(() => countAssistantBubbles(page), { timeout: 45000, message: 'assistant reply did not appear' })
-    .toBeGreaterThan(assistantBefore)
+    .poll(async () => {
+      const count = await bubbles.count()
+      if (count > countBefore) return true
+      const lastText = (await bubbles.last().innerText().catch(() => '')).trim()
+      return lastText !== lastTextBefore && lastText.length > 0
+    }, { timeout: 45000, intervals: [500], message: 'assistant reply did not appear' })
+    .toBe(true)
 
-  // wait for the assistant reply text to stop changing (streaming settled)
+  // the assistant reply is the last bubble; wait for its text to settle
+  const reply = bubbles.last()
   let previous = ''
   await expect
     .poll(async () => {
-      const current = await lastAssistantText(page)
-      const stable = current.length > 0 && current === previous
+      const current = (await reply.innerText().catch(() => '')).trim()
+      const stable = current.length > 0 && current === previous && current !== lastTextBefore
       previous = current
       return stable
     }, { timeout: 45000, intervals: [1000], message: 'assistant reply did not settle' })
     .toBe(true)
 
-  return await lastAssistantText(page)
+  return (await reply.innerText()).trim()
 }
 
 const checkNoToolCallLeak = (response: string) => {
