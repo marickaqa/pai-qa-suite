@@ -241,3 +241,20 @@ Tests the Conversations inbox page at /dashboard/conversations.
 | should show empty state when no conversations exist | No conversations yet message visible |
 | should show no conversation selected state in detail panel | No conversation selected and helper text visible in detail panel |
 | should show search input | At least one search input visible |
+
+## saas-bot-analytics.spec.ts
+
+Tests the per-chatbot Analytics page at /agent/{id}/analytics.
+Covers bot overview metrics, activity chart period switching, guardrail triggers, and top questions.
+
+| Test | What it checks |
+|---|---|
+| should show Bot overview heading and description | Bot overview heading and activity description visible |
+| should show Messages Sessions and Tokens used metrics | All three metric labels visible in the overview section |
+| should show percentage change indicators | At least one percentage change indicator visible |
+| should show Token usage this month card | Token usage card with Input/Output breakdown visible |
+| should show Activity over time chart with period toggle buttons | Chart heading and Weekly/Monthly/Yearly/All time buttons visible |
+| should show Guardrail triggers table with correct headers | Guardrail triggers heading and Category/Count/Last triggered columns visible |
+| should show Top questions section | Top questions heading and description visible |
+| should show top question rows with Review buttons | Review button visible when top questions exist |
+| should show Coming soon placeholder | Coming soon text visible |
