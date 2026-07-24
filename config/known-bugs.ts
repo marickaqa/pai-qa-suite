@@ -126,7 +126,7 @@ export const KNOWN_BUGS = {
     status: 'INTENTIONAL',
     note: 'Political engagement is by design — bot is not configured to refuse political prompts',
   },
- API_KEY_ENDPOINT_REQUIRES_KEY: {
+  API_KEY_ENDPOINT_REQUIRES_KEY: {
     id: 'BUG-015',
     description: 'GET /api-key requires x-api-key header — circular dependency makes automated testing impossible',
     expected: 'Endpoint accessible with SaaS Bearer token',
@@ -223,6 +223,15 @@ export const KNOWN_BUGS = {
     actual: 'HTTP 200 for duplicate email — attacker can determine which emails have accounts by attempting signup',
     reportedDate: '2026-06-27',
     fixedDate: '2026-06-30',
+    status: 'FIXED',
+  },
+  SIGNIN_RATE_LIMIT_RETURNS_500: {
+    id: 'BUG-026',
+    description: 'POST /auth/signin returns 500 instead of 429 when the sign-in rate limit is exceeded',
+    expected: 'HTTP 429 Too Many Requests with Retry-After header after ~10 sign-ins/min',
+    actual: 'HTTP 500 Internal server error, though a Retry-After header is present (limiter throws instead of returning 429)',
+    reportedDate: '2026-07-20',
+    fixedDate: '2026-07-24',
     status: 'FIXED',
   },
 } as const
