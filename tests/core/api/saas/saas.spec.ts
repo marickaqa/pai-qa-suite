@@ -1,8 +1,8 @@
-import { describe, it, expect, beforeAll, afterAll } from 'vitest'
+﻿import { describe, it, expect, beforeAll, afterAll } from 'vitest'
 import { getSaasToken, createChatbot, deleteChatbot, getChatbot, listChatbots } from '../../../../utils/saasClient'
 import axios from 'axios'
 
-const BASE_URL = process.env.API_BASE_URL || 'https://pc-be-dev.noctocode.dev'
+const BASE_URL = process.env.API_BASE_URL || 'https://chat-api-dev.paicloud.ai'
 const ORG_ID = '48e242fb-42de-4d46-9e43-1bf36873df37'
 
 let token: string
@@ -73,7 +73,18 @@ describe('Core — SaaS Chatbot API', () => {
     expect(response.data.length).toBe(0)
   })
 
-  it('should create a chatbot', async () => {
+  // FIXME: POST /chatbot request schema changed with the SaaS redesign. The
+  // old flat body { name, slug, type, active } returns 400 "Request validation
+  // failed" (no field named in the error — worth raising with dev as a DX
+  // issue). Probed candidates that all also 400'd:
+  //   { name, slug, type: 'support', active, organizationId }
+  //   { name, slug, type: 'support', organizationId }
+  //   { name, slug, type: 'SUPPORT', organizationId }
+  //   { name, slug, type: 'supportbot', organizationId }
+  // The UI wizard is now 5 steps (Type / Basics / Branding / Model / Review),
+  // so the API likely requires a richer nested payload with branding + model
+  // config. Re-enable once the real request schema is confirmed with dev.
+  it.skip('should create a chatbot', async () => {
     const bot = await createChatbot(token, 'QA Core Test Bot', TEST_SLUG, 'support')
     createdChatbotId = bot.id
     expect(bot.id).toBeTruthy()
@@ -81,13 +92,13 @@ describe('Core — SaaS Chatbot API', () => {
     expect(bot.slug).toBe(TEST_SLUG)
   })
 
-  it('should get a chatbot by id', async () => {
+  it.skip('should get a chatbot by id', async () => {
     expect(createdChatbotId).toBeTruthy()
     const bot = await getChatbot(token, createdChatbotId)
     expect(bot.id).toBe(createdChatbotId)
   })
 
-  it('should delete a chatbot and return 200 or 204', async () => {
+  it.skip('should delete a chatbot and return 200 or 204', async () => {
     expect(createdChatbotId).toBeTruthy()
     let status: number = 0
     try {

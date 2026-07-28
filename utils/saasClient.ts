@@ -4,7 +4,7 @@ import path from 'path'
 
 dotenv.config({ path: path.resolve(__dirname, '../.env') })
 
-const BASE_URL = process.env.API_BASE_URL || 'https://pc-be-dev.noctocode.dev'
+const BASE_URL = process.env.API_BASE_URL || 'https://chat-api-dev.paicloud.ai'
 const ORG_ID = '48e242fb-42de-4d46-9e43-1bf36873df37'
 
 let cachedToken: string | null = null

@@ -13,7 +13,6 @@ has none). Several tests guard that repoint by asserting the active org.
 - Sandbox support bot (safe to mutate incl. handoff verification): marija test
 
 **Known bugs surfaced by this suite** (see `test.fixme` in the relevant spec):
-- Signup with an existing email — confirmed correct (anti-enumeration), not a bug.
 - API key creation on **Settings** and **API & Usage** both fail with an
   "Invalid origin" popup on submit (origin/CORS check), reported to dev.
 - The **create-agent wizard** no longer auto-populates the slug from the name
