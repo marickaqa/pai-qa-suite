@@ -1,20 +1,23 @@
-import { test, expect } from '@playwright/test'
+import { test, expect, type Page } from '@playwright/test'
 import { getSaasToken, deleteChatbot } from '../../../../utils/saasClient'
 
 /**
  * ## saas-create-agent.spec.ts
  *
- * Tests the Create New Agent flow at chat.paicloud.ai/agent/new.
- * Covers form visibility, type toggle defaults, validation, and successful creation.
+ * Create New Agent flow at /new — a 5-step wizard:
+ * Type -> Basics -> Branding -> Model -> Review(Launch).
  *
- * Uses reports/saas-session.json for authenticated tests.
- * Created agents are deleted after each creation test to avoid env clutter.
+ * No type is preselected: the Support card must be CLICKED before Continue
+ * enables. The "Conversational chatbot" type is the hidden Chatbots product
+ * ("Coming soon"), parked as test.fixme. Support creation walks all five steps
+ * and launches, then deletes the created agent via saasClient.
  */
 
 test.describe('SaaS Create Agent', () => {
   test.use({ storageState: 'reports/saas-session.json' })
 
   const SAAS_URL = process.env.SAAS_URL || 'https://chat-dev.paicloud.ai'
+  const NEW_AGENT_URL = `${SAAS_URL}/new`
 
   let createdAgentId: string | null = null
 
@@ -31,97 +34,117 @@ test.describe('SaaS Create Agent', () => {
     }
   })
 
-  // --- Form visibility ---
+  const supportCard = (page: Page) => page.getByRole('button', { name: /Support chatbot/i })
+  const continueBtn = (page: Page) => page.getByRole('button', { name: 'Continue' })
 
- test('should show create agent form with all fields', async ({ page }) => {
-    await page.goto(`${SAAS_URL}/agent/new`)
-    await expect(page.locator('input[name="name"]')).toBeVisible()
-    await expect(page.locator('input[name="slug"]')).toBeVisible()
-    await expect(page.getByRole('button', { name: 'Chat', exact: true })).toBeVisible()
-    await expect(page.getByRole('button', { name: 'Support', exact: true })).toBeVisible()
-    await expect(page.getByRole('button', { name: 'Create agent' })).toBeVisible()
+  async function gotoWizard(page: Page) {
+    await page.goto(NEW_AGENT_URL)
+    // Anchor on the Support type card (the "Step 1 of 5" label text isn't reliable).
+    await expect(supportCard(page)).toBeVisible({ timeout: 45000 })
+  }
+
+  // Select Support type so Continue enables, then advance to Basics.
+  async function selectSupportAndContinue(page: Page) {
+    await supportCard(page).click()
+    await expect(supportCard(page)).toHaveAttribute('aria-pressed', 'true')
+    await expect(continueBtn(page)).toBeEnabled()
+    await continueBtn(page).click()
+  }
+
+  // --- Step 1: Type ---
+
+  test('should show step 1 with Support and Conversational type cards', async ({ page }) => {
+    await gotoWizard(page)
+    await expect(supportCard(page)).toBeVisible()
+    await expect(page.getByRole('button', { name: /Conversational chatbot/i })).toBeVisible()
+    // No type is selected initially, so Continue is disabled.
+    await expect(continueBtn(page)).toBeDisabled()
   })
 
-  test('should default to Chat type when opened via ?type=chat', async ({ page }) => {
-    await page.goto(`${SAAS_URL}/agent/new?type=chat`)
-    await expect(page.getByRole('button', { name: 'Chat', exact: true })).toHaveAttribute('aria-pressed', 'true')
-    await expect(page.getByRole('button', { name: 'Support', exact: true })).toHaveAttribute('aria-pressed', 'false')
+  test('should show the wizard step indicators', async ({ page }) => {
+    await gotoWizard(page)
+    for (const step of ['Type', 'Basics', 'Branding', 'Model', 'Review']) {
+      await expect(page.getByText(step, { exact: true }).first()).toBeVisible()
+    }
   })
 
-  test('should default to Support type when opened via ?type=support', async ({ page }) => {
-    await page.goto(`${SAAS_URL}/agent/new?type=support`)
-    await expect(page.getByRole('button', { name: 'Support', exact: true })).toHaveAttribute('aria-pressed', 'true')
-    await expect(page.getByRole('button', { name: 'Chat', exact: true })).toHaveAttribute('aria-pressed', 'false')
+  test('should enable Continue once the Support type is selected', async ({ page }) => {
+    await gotoWizard(page)
+    await expect(continueBtn(page)).toBeDisabled()
+    await supportCard(page).click()
+    await expect(supportCard(page)).toHaveAttribute('aria-pressed', 'true')
+    await expect(continueBtn(page)).toBeEnabled()
   })
 
-  test('should toggle from Chat to Support when Support is clicked', async ({ page }) => {
-    await page.goto(`${SAAS_URL}/agent/new?type=chat`)
-    await page.getByRole('button', { name: 'Support', exact: true }).click()
-    await expect(page.getByRole('button', { name: 'Support', exact: true })).toHaveAttribute('aria-pressed', 'true')
-    await expect(page.getByRole('button', { name: 'Chat', exact: true })).toHaveAttribute('aria-pressed', 'false')
+  // FIXME: Conversational (chat) type is the hidden Chatbots product
+  // ("Coming soon") — re-enable when it ships.
+  test.fixme('should allow selecting the Conversational type', async ({ page }) => {
+    await gotoWizard(page)
+    await page.getByRole('button', { name: /Conversational chatbot/i }).click()
+    await expect(page.getByRole('button', { name: /Conversational chatbot/i })).toHaveAttribute('aria-pressed', 'true')
   })
 
-  test('should toggle from Support to Chat when Chat is clicked', async ({ page }) => {
-    await page.goto(`${SAAS_URL}/agent/new?type=support`)
-    await page.getByRole('button', { name: 'Chat', exact: true }).click()
-    await expect(page.getByRole('button', { name: 'Chat', exact: true })).toHaveAttribute('aria-pressed', 'true')
-    await expect(page.getByRole('button', { name: 'Support', exact: true })).toHaveAttribute('aria-pressed', 'false')
+  // --- Step 2: Basics ---
+
+  test('should advance to Basics with Name and Slug fields', async ({ page }) => {
+    await gotoWizard(page)
+    await selectSupportAndContinue(page)
+    await expect(page.locator('input[placeholder="Acme Support Bot"]').first()).toBeVisible({ timeout: 15000 })
+    await expect(page.locator('input[placeholder="acme-support-bot"]').first()).toBeVisible()
+    await expect(page.getByText(/Lowercase letters, numbers, and hyphens only/i)).toBeVisible()
   })
 
-  // --- Validation ---
-
-  test('should not submit with empty name', async ({ page }) => {
-    await page.goto(`${SAAS_URL}/agent/new`)
-    await page.locator('input[name="slug"]').fill('test-agent')
-    await page.getByRole('button', { name: 'Create agent' }).click()
-    await page.waitForTimeout(1000)
-    await expect(page).toHaveURL(/agent\/new/)
+  // FIXME (regression): the new wizard no longer auto-populates the slug from
+  // the name — it did in the old create form. The slug stays empty after typing
+  // the name. Reported as a bug; re-enable (test.fixme -> test) once fixed.
+  test.fixme('should auto-populate the slug from the name in Basics', async ({ page }) => {
+    await gotoWizard(page)
+    await selectSupportAndContinue(page)
+    const slug = page.locator('input[placeholder="acme-support-bot"]').first()
+    await expect(slug).toBeVisible({ timeout: 15000 })
+    await page.locator('input[placeholder="Acme Support Bot"]').first().fill('My QA Support Agent')
+    await expect(slug).not.toHaveValue('', { timeout: 10000 })
   })
 
-  test('should not submit with empty slug', async ({ page }) => {
-    await page.goto(`${SAAS_URL}/agent/new`)
-    await page.locator('input[name="name"]').fill('Test Agent')
-    await page.locator('input[name="slug"]').clear()
-    await page.getByRole('button', { name: 'Create agent' }).click()
-    await page.waitForTimeout(1000)
-    await expect(page).toHaveURL(/agent\/new/)
-  })
+  // --- Full creation (Support) ---
 
-  test('should auto-populate slug from name', async ({ page }) => {
-    await page.goto(`${SAAS_URL}/agent/new`)
-    await page.locator('input[name="name"]').fill('My Test Agent')
-    await page.waitForTimeout(500)
-    const slugValue = await page.locator('input[name="slug"]').inputValue()
-    expect(slugValue.length).toBeGreaterThan(0)
-  })
+  test('should create a support agent through the wizard and launch', async ({ page }) => {
+    await gotoWizard(page)
+    const stamp = Date.now()
 
-  // --- Creation ---
+    // Step 1: select Support -> Continue
+    await selectSupportAndContinue(page)
 
-  test('should create a chat agent and redirect to agent page', async ({ page }) => {
-    await page.goto(`${SAAS_URL}/agent/new?type=chat`)
-    const timestamp = Date.now()
-    await page.locator('input[name="name"]').fill(`QA Chat Agent ${timestamp}`)
-    await page.waitForTimeout(500)
-    await page.locator('input[name="slug"]').fill(`qa-chat-${timestamp}`)
-    await page.getByRole('button', { name: 'Create agent' }).click()
-    await page.waitForURL(url => !url.toString().includes('agent/new'), { timeout: 20000 })
-    expect(page.url()).not.toContain('agent/new')
+    // Step 2: Basics
+    const nameInput = page.locator('input[placeholder="Acme Support Bot"]').first()
+    await expect(nameInput).toBeVisible({ timeout: 15000 })
+    await nameInput.fill(`QA Support Agent ${stamp}`)
+    // Slug does not auto-populate (see fixme above) — fill it directly.
+    const slug = page.locator('input[placeholder="acme-support-bot"]').first()
+    await slug.fill(`qa-support-${stamp}`)
+    await continueBtn(page).click()
 
+    // Step 3: Branding — Header text is REQUIRED (empty header keeps Launch
+    // disabled at Review). Its input shares the same placeholder as the Basics
+    // Name field with no id/label wiring, so scope to the container that holds
+    // the "Header text" label specifically.
+    await expect(page.getByText('Header text')).toBeVisible({ timeout: 15000 })
+    const headerTextField = page.locator('div').filter({ has: page.getByText('Header text', { exact: false }) }).last().locator('input')
+    await headerTextField.fill(`QA Support Agent ${stamp}`)
+    await continueBtn(page).click()
+
+    // Step 4: Model -> Continue (defaults are fine)
+    await expect(page.getByText('Model & logic')).toBeVisible({ timeout: 15000 })
+    await continueBtn(page).click()
+
+    // Step 5: Review -> Launch
+    await expect(page.getByRole('button', { name: 'Launch' })).toBeVisible({ timeout: 15000 })
+    await page.getByRole('button', { name: 'Launch' }).click()
+
+    // Redirects to the created agent's page.
+    await page.waitForURL(url => !url.toString().includes('/new'), { timeout: 30000 })
     const match = page.url().match(/\/agent\/([a-f0-9-]{36})/)
-    if (match) createdAgentId = match[1]
-  })
-
-  test('should create a support agent and redirect to agent page', async ({ page }) => {
-    await page.goto(`${SAAS_URL}/agent/new?type=support`)
-    const timestamp = Date.now()
-    await page.locator('input[name="name"]').fill(`QA Support Agent ${timestamp}`)
-    await page.waitForTimeout(500)
-    await page.locator('input[name="slug"]').fill(`qa-support-${timestamp}`)
-    await page.getByRole('button', { name: 'Create agent' }).click()
-    await page.waitForURL(url => !url.toString().includes('agent/new'), { timeout: 20000 })
-    expect(page.url()).not.toContain('agent/new')
-
-    const match = page.url().match(/\/agent\/([a-f0-9-]{36})/)
+    expect(match, 'expected to land on /agent/{id}').not.toBeNull()
     if (match) createdAgentId = match[1]
   })
 })

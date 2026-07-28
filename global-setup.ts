@@ -9,7 +9,17 @@ const CHAT_SESSION = 'reports/session.json'
 const SAAS_SESSION = 'reports/saas-session.json'
 const SUBTITLES_SESSION = 'reports/subtitles-session.json'
 
-const CHAT_URL = process.env.CHAT_URL || 'https://pc-fe-dev.noctocode.dev'
+// CHAT_URL has no fallback: a stale hardcoded default is itself a silent-failure
+// risk (it already went stale once, during the pc-*-dev -> egle.chat migration).
+// Missing env should fail loudly here rather than quietly hit the wrong domain.
+function requireEnv(name: string): string {
+  const value = process.env[name]
+  if (!value) {
+    throw new Error(`${name} is not set in .env — see env.example`)
+  }
+  return value
+}
+const CHAT_URL = requireEnv('CHAT_URL')
 const SAAS_URL = process.env.SAAS_URL || 'https://chat-dev.paicloud.ai'
 const SUBTITLES_URL = process.env.SUBTITLES_URL || 'https://subtitles-dev.paicloud.ai'
 
@@ -77,18 +87,39 @@ async function globalSetup(config: FullConfig) {
     }
   }
 
-  // SaaS session
+  // SaaS session — logged in as qa-saas and switched into the noctocode.dev org,
+  // which holds the real fixtures (support bots, conversations, agent 77d5b55e).
+  // Left on its default org (Trump Media) the account has no support bots and no
+  // conversations, so the data-dependent SaaS specs would have nothing to test.
   const saasContext = await browser.newContext()
   const saasPage = await saasContext.newPage()
   try {
     await saasPage.goto(SAAS_URL + '/login')
-    await saasPage.waitForLoadState('networkidle')
+    // Condition-based wait instead of networkidle (which can hang on the SPA).
+    await saasPage.locator('input[name="email"]').waitFor({ state: 'visible', timeout: 30000 })
     await saasPage.fill('input[name="email"]', process.env.SAAS_EMAIL || '')
     await saasPage.fill('input[name="password"]', process.env.SAAS_PASSWORD || '')
     await saasPage.click('button[type="submit"]')
     await saasPage.waitForURL((url: URL) => !url.toString().includes('login'), { timeout: 60000 })
+
+    // Switch the active org to noctocode.dev. Idempotent: skip if already there.
+    // The org picker is the sidebar button carrying the chevrons-up-down icon;
+    // its dropdown lists each org as a button (the account button also contains
+    // the org domain via the user's email, so we exclude the one with an "@").
+    const orgTrigger = saasPage.locator('button:has(svg.lucide-chevrons-up-down)')
+    await orgTrigger.waitFor({ state: 'visible', timeout: 30000 })
+    const activeOrg = (await orgTrigger.textContent()) || ''
+    if (!activeOrg.includes('noctocode.dev')) {
+      await orgTrigger.click()
+      await saasPage.getByRole('button', { name: /noctocode\.dev/i }).filter({ hasNotText: '@' }).click()
+      await saasPage
+        .locator('button:has(svg.lucide-chevrons-up-down)')
+        .filter({ hasText: 'noctocode.dev' })
+        .waitFor({ state: 'visible', timeout: 15000 })
+    }
+
     await saasContext.storageState({ path: SAAS_SESSION })
-    console.log('✅ SaaS session generated')
+    console.log('✅ SaaS session generated (org: noctocode.dev)')
   } catch (e: unknown) {
     await captureFailure(saasPage, 'saas', e)
     throw e

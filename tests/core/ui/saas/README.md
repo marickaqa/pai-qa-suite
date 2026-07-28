@@ -1,260 +1,284 @@
 # SaaS UI Tests
 
-Tests for the PAI SaaS dashboard at chat.paicloud.ai.
-Uses `reports/saas-session.json` for all authenticated tests.
-Auth tests use a fresh context with no session.
+Tests for the PAI SaaS dashboard at chat-dev.paicloud.ai.
+Uses `reports/saas-session.json` for all authenticated tests. Auth tests use a
+fresh context with no session. `global-setup.ts` logs the qa-saas session in
+and switches its active org to **noctocode.dev** (it has real support bots,
+conversations, and knowledge/guideline fixtures — the default org otherwise
+has none). Several tests guard that repoint by asserting the active org.
+
+**Test agents:**
+- Support bot: Telaris, `77d5b55e-3326-4f2d-8380-b2bef6135552`
+- Chatbot: noctocode-test, `edb91849-b4eb-4dbc-aa9f-5ae816833e56`
+- Sandbox support bot (safe to mutate incl. handoff verification): marija test
+
+**Known bugs surfaced by this suite** (see `test.fixme` in the relevant spec):
+- Signup with an existing email — confirmed correct (anti-enumeration), not a bug.
+- API key creation on **Settings** and **API & Usage** both fail with an
+  "Invalid origin" popup on submit (origin/CORS check), reported to dev.
+- The **create-agent wizard** no longer auto-populates the slug from the name
+  (regression vs. the old create form), reported to dev.
+- **Features** page: the RAG toggle hydrates slowly and isn't reliably present
+  within default timeouts — parked pending a longer-wait fix, not a product bug.
+
+**Retired files:** `saas-support-bot.spec.ts` (relocated into `saas-team`,
+`saas-widget`, `saas-danger-zone`), `saas-agent.spec.ts` and
+`saas-ai-assistant.spec.ts` (fully duplicated by the dedicated specs below —
+deleted).
+
+---
 
 ## saas-auth.spec.ts
 
-Tests the PAI SaaS authentication flows.
-Google OAuth is deferred — not automatable without a real Google session.
-Uses a fresh context with no session for all tests.
+Authentication flows: sign in, sign up, the no-org empty state, OAuth button
+presence, logout, and the organization picker. Google/Apple OAuth are deferred
+— buttons are asserted present/linked, not exercised. Logout uses a throwaway
+session so it can never invalidate the shared session file.
 
 | Test | What it checks |
 |---|---|
-| should show sign in form | Email, password fields and Sign In button are visible |
-| should show Create an account link on login page | Create an account link is visible on login page |
-| should sign in with valid credentials | Valid credentials redirect away from login page |
-| should show error with wrong password | Wrong password stays on login page |
-| should not sign in with empty email | Empty email does not proceed past login |
-| should not sign in with empty password | Empty password does not proceed past login |
-| should show sign up form | Email, password fields and Sign Up button are visible |
-| should show sign in link on signup page | Sign In link is visible on signup page |
+| should show sign in form | Email, password fields and Sign In button visible |
+| should show Create an account link on login page | Link visible |
+| should show Forgot password link on login page | Link visible |
+| should render Google and Apple OAuth buttons | Buttons render, link to /api/auth/google and /api/auth/apple |
+| should sign in with valid credentials | Redirects away from login |
+| should show error with wrong password | "Invalid email or password" renders, stays on login |
+| should not sign in with empty email | Does not authenticate |
+| should not sign in with empty password | Does not authenticate |
+| should show sign up form | Fields and Sign Up button visible |
+| should show sign in link on signup page | Link visible |
 | should navigate to signup from login page | Create an account link navigates to /signup |
-| should not submit signup with empty fields | Empty form stays on signup page |
-| should show error for already registered email | Existing email stays on signup page |
-| should show no-org empty state for user without organization | User with no org sees the no-organization screen |
+| should not submit signup with empty fields | Stays on signup page |
+| should not reveal whether an email is already registered | Neutral "check your email" confirmation, no existence-revealing error (anti-enumeration; API side tracked as BUG-020) |
+| should show no-org empty state for user without organization | No-org screen visible (requires `SAAS_NO_ORG_EMAIL`/`PASSWORD`) |
+| should show the organization picker with the current org | Picker shows noctocode.dev (also guards the global-setup repoint) |
+| should switch active organization via the picker | Switches to Trump Media, restores noctocode.dev on teardown |
+| should keep the session when logout is cancelled | Cancel keeps the user signed in |
+| should log out and return to the login page | Confirming the logout dialog ends the session |
 
 ## saas-dashboard.spec.ts
 
-Tests the PAI SaaS dashboard overview page.
-Uses `reports/saas-session.json` for all tests.
+The org overview page at `/dashboard/overview`. Numeric assertions are
+value-agnostic consistency checks (total == breakdown == listed rows), so they
+hold regardless of how many agents the active org has.
 
 | Test | What it checks |
 |---|---|
-| should redirect unauthenticated users to login | Accessing dashboard without session redirects to login |
-| should login and land on dashboard | Authenticated session lands on dashboard URL |
-| should show key dashboard metrics | Total agents, messages, resolution rate, token usage labels are visible |
-| should show support bots and AI assistants sections | Both bot type sections visible on overview |
-| should show organization name in sidebar | noctocode.dev visible in sidebar |
-| should show New button on dashboard | New button visible for creating agents |
-| should show total agents count as a number | Total agents card shows a numeric value |
-| should show dynamic metric values for messages, resolution rate and token usage | All three metric cards have numeric values |
-| should show theme toggle button on dashboard | Toggle theme button is visible |
-| should toggle from dark to light mode when theme button is clicked | Clicking toggle changes the HTML class |
-
-## saas-create-agent.spec.ts
-
-Tests the Create New Agent flow at chat.paicloud.ai/agent/new.
-Covers form visibility, type toggle defaults, validation, and successful creation.
-
-| Test | What it checks |
-|---|---|
-| should show create agent form with all fields | Name, slug, Chat/Support toggle and Create agent button are visible |
-| should default to Chat type when opened via ?type=chat | Chat button is pressed, Support is not |
-| should default to Support type when opened via ?type=support | Support button is pressed, Chat is not |
-| should toggle from Chat to Support when Support is clicked | Support becomes pressed after clicking |
-| should toggle from Support to Chat when Chat is clicked | Chat becomes pressed after clicking |
-| should not submit with empty name | Empty name stays on create page |
-| should not submit with empty slug | Empty slug stays on create page |
-| should auto-populate slug from name | Slug field populates after typing a name |
-| should create a chat agent and redirect to agent page | Chat agent creation redirects away from /agent/new |
-| should create a support agent and redirect to agent page | Support agent creation redirects away from /agent/new |
-
-## saas-support-bot.spec.ts
-
-Tests the support bot agent pages at chat.paicloud.ai.
-Uses the stable Telaris test agent for all tests.
-Destructive actions (archive, delete) are visibility-only — not executed.
-
-| Test | What it checks |
-|---|---|
-| should show team page with Add member button | Agent team heading and Add member button are visible |
-| should show members table with correct columns | Member, Permissions and Joined column headers are visible |
-| should show role descriptions on team page | Admin, Analytics and Chats role descriptions are visible |
-| should open Add member dialog when button is clicked | Clicking Add member opens a dialog |
-| should show guidelines page with all sections | Guidelines heading and all section names are visible |
-| should show New guideline button | At least one New guideline button is visible |
-| should expand a guideline section when clicked | Clicking a section reveals the New guideline button |
-| should show enable/disable toggle on existing guideline | A toggle switch is visible on an existing guideline |
-| should show knowledge page with Files and Website URLs sections | Knowledge heading, Files and Website URLs sections are visible |
-| should show Upload file and New folder buttons | Upload file and New folder buttons are visible |
-| should show Crawl website button | Crawl website button is visible |
-| should show existing crawled website in Website URLs table | A completed crawl entry is visible |
-| should show widget page with all config fields | Header text, Theme, Primary colour, Launcher position, spacing and Starter questions are visible |
-| should show live preview iframe | Live preview section is visible |
-| should show theme toggle buttons | System, Dark and Light theme buttons are visible |
-| should show launcher position toggle buttons | Left and Right position buttons are visible |
-| should show Add question button for starter questions | Add question button is visible |
-| should show Save widget button | Save widget button is visible |
-| should show embed code section | Embed code section and HTML button are visible |
-| should show danger zone page with Archive and Delete buttons | Archive chatbot and Delete chatbot buttons are visible |
-| should show archive description text | Archive description text is visible |
-| should show delete warning text | Cannot be undone warning text is visible |
-| should show branding section with widget logo upload slots | Branding heading, Widget logos, Light theme and Dark theme labels visible |
-
-## saas-ai-assistant.spec.ts
-
-Tests the AI assistant agent pages at chat.paicloud.ai.
-Uses the stable AI assistant test agent for all tests.
-Destructive actions (archive, delete) are visibility-only — not executed.
-
-| Test | What it checks |
-|---|---|
-| should show team page with Add member button | Agent team heading and Add member button are visible |
-| should show members table with correct columns | Member, Permissions and Joined column headers are visible |
-| should show role descriptions on team page | Admin, Analytics and Chats role descriptions are visible |
-| should open Add member dialog when button is clicked | Clicking Add member opens a dialog |
-| should show guidelines page with all sections | Guidelines heading and all section names are visible |
-| should show New guideline button | At least one New guideline button is visible |
-| should show enable/disable toggle on existing guideline | A toggle switch is visible on an existing guideline |
-| should show style config page | Style Config heading is visible |
-| should show all 6 logo upload slots | Light theme, Dark theme, Vertical light, Vertical dark, Icon light and Icon dark slots are visible |
-| should show at least 7 Upload buttons | Exactly 7 Upload buttons are visible |
-| should show Save changes button | Save changes button is visible |
-| should show danger zone page with Archive and Delete buttons | Archive chatbot and Delete chatbot buttons are visible |
-| should show archive description text | Archive description text is visible |
-| should show delete warning text | Cannot be undone warning text is visible |
-
-## saas-guidelines.spec.ts
-
-Tests guideline CRUD operations on the Telaris support bot agent.
-Each test is self-contained — created guidelines are deleted after.
-
-| Test | What it checks |
-|---|---|
-| should show New guideline form when button is clicked | Clicking New guideline shows name, content, Create and Cancel fields |
-| should cancel guideline creation when Cancel is clicked | Clicking Cancel hides the form |
-| should not submit guideline with empty name | Empty name keeps the form visible |
-| should not submit guideline with empty content | Empty content keeps the form visible |
-| should create a new guideline and show it in the section | New guideline appears in the section after creation |
-| should enable and disable a guideline toggle | Toggle state changes after clicking |
-| should delete a guideline | Guideline disappears after deletion via the edit dialog |
-
-## saas-knowledge.spec.ts
-
-Tests knowledge CRUD operations on the Telaris support bot agent.
-Each test is self-contained — created items are deleted after where possible.
-
-| Test | What it checks |
-|---|---|
-| should show folder name input when New folder is clicked | Clicking New folder shows the folder name input |
-| should create a new folder and show it in the list | New folder appears in the list after creation |
-| should show upload area when Upload file is clicked | Clicking Upload file shows the drag & drop area and Cancel button |
-| should close upload area when Cancel is clicked | Clicking Cancel hides the upload area |
-| should upload a file and show it in the list | Uploaded file appears in the knowledge list |
-| should show crawl form when Crawl website is clicked | Clicking Crawl website shows the URL input and Start crawling button |
-| should not start crawling with empty URL | Start crawling button is disabled when URL is empty |
-| should show Add pattern button in crawl form | Add pattern button is visible in the crawl form |
-
-## saas-agent.spec.ts
-
-Tests PAI SaaS agent pages — knowledge, guidelines, style config, and team management.
-Uses `reports/saas-session.json` for all tests.
-
-| Test | What it checks |
-|---|---|
-| should show knowledge page with files and crawl sections | Files heading, Website URLs, Upload and Crawl buttons visible |
-| should navigate to knowledge from agent sidebar | Sidebar link navigates to knowledge page |
-| should show guidelines page with all sections | All guideline sections visible |
-| should show New guideline button in each section | At least one New guideline button visible |
-| should navigate to guidelines from agent sidebar | Sidebar link navigates to guidelines page |
-| should show team management page | Team management heading visible |
-| should show members table with correct columns | Member, Permissions, Joined columns visible |
-| should show Invite member button | Invite member button visible |
-| should show pending invitations section | Pending Invitations heading visible |
-
-## saas-style-config.spec.ts
-
-Tests the Branding page for chatbot logo and color customization.
-Covers favicon and logo upload slots (light/dark theme, icon, vertical variants), primary/secondary color pickers for light and dark themes.
-
-| Test | What it checks |
-|---|---|
-| should show Branding heading and description | Heading and description text visible |
-| should show favicon upload slot | Favicon label visible |
-| should show all 6 logo upload slots with correct labels | Light theme, Icon light, Vertical light, Dark theme, Icon dark, Vertical dark labels all visible |
-| should show 7 upload buttons and 7 remove buttons | One Upload and one Remove button per slot including favicon |
-| should have 7 file inputs accepting image formats | Favicon input accepts png, svg, ico; logo inputs accept png, jpeg, svg, webp |
-| should show Light theme and Dark theme color sections with hex inputs | Primary/secondary colour labels visible, all 4 hex values match valid hex format |
-| should show Save changes button | Save changes button visible and enabled |
-| should update hex input when a new value is typed | Typing a new hex value updates the input |
+| should redirect unauthenticated users to login | No session redirects to login |
+| should land on the overview page | Authenticated session reaches /dashboard/ |
+| should show the four key metric cards | Total agents, messages, sessions, token usage cards visible |
+| should keep TOTAL AGENTS consistent with the Support/Chatbot breakdown | total == support + chatbot |
+| should list exactly as many agents as the counts claim | Listed rows match the breakdown and total |
+| should show Support bots and Chatbots sections | Both sections visible; Chatbots carries "Coming soon" |
+| should show the organization picker in the sidebar | Picker visible, shows active org |
+| should show the primary navigation and coming-soon items | Nav items visible (Admin Panel included — qa-saas is a platform admin) |
+| should toggle the Support bots nav dropdown when clicked | Toggles when enabled; asserts disabled state when the org has zero support bots |
+| should show the New button | Visible |
+| should show the theme toggle button | Visible |
+| should toggle the theme and restore it | Toggles the `html` class, then restores it |
 
 ## saas-analytics.spec.ts
 
-Tests the Organization Analytics page at /dashboard/analytics.
-Covers org-wide metrics, activity chart period switching, and guardrail trigger tracking.
+Org-wide analytics at `/dashboard/analytics`. The numeric checks never hardcode
+a value — they assert relationships that only fail if two independently
+computed figures actually disagree.
 
 | Test | What it checks |
 |---|---|
-| should navigate to analytics page and show Organization overview | Organization overview heading and description visible |
-| should show Messages, Sessions and Tokens used metrics | All three metric labels visible in the overview section |
-| should show percentage change indicators next to metrics | At least one percentage change indicator visible |
-| should show Token usage this month card with progress bar | Token usage card with Input/Output breakdown visible |
-| should show Activity over time chart with period toggle buttons | Chart heading and Weekly/Monthly/Yearly/All time buttons visible |
-| should switch between time periods when toggle buttons are clicked | Clicking each period button updates the chart description |
-| should show chart legend for Messages, Sessions and Tokens | Legend labels for all three metrics visible |
-| should show Guardrail triggers table with correct headers | Table with Category, Count, Last triggered columns visible |
-| should show a Review action for guardrail trigger rows | Review button visible when guardrail triggers exist |
-
-## saas-model-config.spec.ts
-
-Tests the Model & Logic page for chatbot model selection and output parameter configuration.
-
-| Test | What it checks |
-|---|---|
-| should show Model & Logic heading and description | Heading and description text visible |
-| should show all 5 sections | Output, Text to Image, Image to Image, Text Ranking, Feature Extraction headings visible |
-| should show section descriptions | Description text for each model section visible |
-| should show 5 model dropdowns with selected values | Each section has a combobox with a non-empty selected model |
-| should show Output parameter inputs | Temperature, Top P, Presence penalty, Frequency penalty labels visible |
-| should show parameter range descriptions | Range descriptions visible for Temperature and Top P |
-| should show Reset to defaults link in Output section | Reset to defaults link visible |
-| should show 5 Save and 5 Discard buttons | One Save and one Discard button per section |
-| should update a parameter input value | Typing a new value updates the Temperature input |
-
-## saas-attributes.spec.ts
-
-Tests the Attributes page for creating and managing conversation tagging attributes.
-Each test is self-contained — created attributes are deleted after.
-
-| Test | What it checks |
-|---|---|
-| should show Attributes heading and description | Heading and description text visible |
-| should show empty state when no attributes exist | No attributes yet message and description visible |
-| should show Add attribute button | Add attribute button visible |
-| should show attribute form when Add attribute is clicked | Type input, Add value, Save and Discard buttons visible |
-| should show Delete type button in attribute form | Delete type button visible in open form |
-| should show value and description inputs when Add value is clicked | Value and description inputs visible after clicking Add value |
-| should hide form when Discard is clicked | Form not visible after clicking Discard |
-| should create and delete an attribute | Attribute created and input value confirmed, deleted successfully |
+| should navigate to analytics and show the org overview | Heading and description visible |
+| should show Messages, Sessions and Tokens used metrics | All three labels visible |
+| should show percentage-change indicators next to metrics | At least one visible |
+| should show the token-usage card with input/output breakdown | Card with Input/Output visible |
+| token usage total equals input plus output | Exact integer sum check on the token card |
+| overview month stats reconcile with the analytics page | Overview and analytics figures agree within a small tolerance |
+| should show the Activity over time chart with metric and period toggles | All/Messages/Sessions/Tokens and Weekly/Monthly/Yearly/All time buttons visible |
+| metric toggles are clickable and update the selection | Each metric toggle becomes the active selection |
+| period toggles are clickable and update the selection | Each period toggle becomes the active selection |
+| should show the chart legend for Messages, Sessions and Tokens | Legend labels visible |
+| should show the Guardrail triggers table with correct headers | Table + Category/Count/Last triggered columns visible |
+| should show a Review action for guardrail trigger rows when present | Review button visible if any rows exist |
 
 ## saas-conversations.spec.ts
 
-Tests the Conversations inbox page at /dashboard/conversations.
+Conversations inbox at `/dashboard/conversations`, tested against noctocode.dev
+(populated with real support bots and conversations). Human handoff is
+verified read-only on an **already** handed-off conversation — "Enable
+Handoff" is one-way (no disable) and is never clicked in automation. Send is
+never clicked either; typing into an active Reply field is enough to prove the
+channel is live.
 
 | Test | What it checks |
 |---|---|
-| should navigate to conversations page | All chats label visible on page load |
-| should show chatbot filter list in sidebar | Chatbot names visible in sidebar filter |
-| should show conversation count next to All chats | Numeric count visible next to All chats label |
-| should show empty state when no conversations exist | No conversations yet message visible |
-| should show no conversation selected state in detail panel | No conversation selected and helper text visible in detail panel |
-| should show search input | At least one search input visible |
+| should navigate to the conversations page | "All chats" visible |
+| should show a numeric conversation count for All chats | Count is a valid number |
+| should show support-bot filter pills | telaris pill visible |
+| should select a support bot when its filter pill is clicked | Pill gains the selected (teal) styling |
+| should show conversation rows once a bot is selected | Rows render after selecting marija test |
+| should open the top conversation when a bot is selected | Detail panel populates (Started header, Send button) |
+| should show the Enable Handoff control on a non-handed-off conversation | Button visible; NOT clicked |
+| should allow replying on an already-handed-off conversation | Reply input active, Send disabled until typed, then enabled; Send never clicked |
+| should show the search input | Visible |
+
+## saas-knowledge.spec.ts
+
+Files, folders, and website crawling on the Telaris support bot. Self-contained
+CRUD with verified teardown (created folders/files are deleted and confirmed
+gone — this matters: unswept `qa-*` files get RAG-indexed on Telaris, per
+BUG-003 history).
+
+Covers: heading/sections, New folder (create + validation + delete), Upload
+file dialog, file upload + verified delete, Website URLs section, Crawl website
+form (open, empty-URL validation, Add pattern — both include/exclude sections).
+
+## saas-guidelines.spec.ts
+
+Guideline sections (Communication style, Context and clarification, Content
+and sources, Spam, etc.) on the Telaris support bot. Self-contained CRUD with
+verified teardown.
+
+Covers: heading/sections, New guideline form, section expand/collapse,
+enable/disable toggle on an existing guideline, create-then-delete with
+verified teardown, and choosing a **Prompt Template** to prefill the form
+(read-only — Cancelled, never saved).
+
+## saas-attributes.spec.ts
+
+Custom conversation-tagging attributes on the noctocode-test chatbot. Cleanup
+is `afterEach` and **scoped to `qa-*` attributes only** — it never touches a
+pre-existing (real) attribute, and the empty-state test branches on whether
+the agent currently has any.
+
+| Test | What it checks |
+|---|---|
+| should show Attributes heading and description | Visible |
+| should show either the empty state or an existing attribute list | Branches on current state — never assumes empty |
+| should show Add attribute button | Visible |
+| should show attribute form when Add attribute is clicked | Type input, Add value, Save, Discard visible |
+| should show Delete type button in attribute form | Visible |
+| should show value and description inputs when Add value is clicked | Visible |
+| should hide form when Discard is clicked | Form disappears |
+| should create and delete an attribute | Created, verified, deleted — only ever touches its own `qa-attr-*` card |
+
+## saas-model-config.spec.ts
+
+Model & Logic page: Output (model, temperature, top P, presence/frequency
+penalty), Text to Image, Image to Image, Text Ranking, and Feature Extraction
+sections, each with Save/Discard.
+
+## saas-style-config.spec.ts
+
+Branding page at `/agent/{id}/style-config` — a separate route from `/widget`
+(no nav link; reachable only by direct URL). Favicon + 6 logo upload slots,
+7 upload/remove button pairs, file-format-restricted inputs, Light/Dark theme
+hex color inputs, Save changes.
 
 ## saas-bot-analytics.spec.ts
 
-Tests the per-chatbot Analytics page at /agent/{id}/analytics.
-Covers bot overview metrics, activity chart period switching, guardrail triggers, and top questions.
+Per-bot analytics at `/agent/{id}/analytics` — same shape as org analytics,
+scoped to one bot, brought to the same rigor.
 
 | Test | What it checks |
 |---|---|
-| should show Bot overview heading and description | Bot overview heading and activity description visible |
-| should show Messages Sessions and Tokens used metrics | All three metric labels visible in the overview section |
-| should show percentage change indicators | At least one percentage change indicator visible |
-| should show Token usage this month card | Token usage card with Input/Output breakdown visible |
-| should show Activity over time chart with period toggle buttons | Chart heading and Weekly/Monthly/Yearly/All time buttons visible |
-| should show Guardrail triggers table with correct headers | Guardrail triggers heading and Category/Count/Last triggered columns visible |
-| should show Top questions section | Top questions heading and description visible |
-| should show top question rows with Review buttons | Review button visible when top questions exist |
-| should show Coming soon placeholder | Coming soon text visible |
+| should show Bot overview heading and description | Rename-tolerant (chatbot/agent/bot) |
+| should show Messages Sessions and Tokens used metrics | Visible |
+| should show percentage change indicators | Visible |
+| should show Token usage this month card | Card with Input/Output visible |
+| bot token usage total equals input plus output | Exact integer sum check |
+| should show Activity over time chart with period toggle buttons | Visible |
+| should show Guardrail triggers table with correct headers | Rename-tolerant subtitle |
+| should show Coming soon placeholder | Scoped to `main` (sidebar also has "Coming soon" nav badges) |
+
+## saas-team.spec.ts
+
+Per-agent Team page (`/agent/{id}/team`) — the full 7-permission model (Admin,
+Analytics, Chats, Members, Guidance, Knowledge, Style). All actions are
+mutation-safe: the Add-member dialog is opened, its structure and live
+member-search filter are verified, then **Cancelled** — no member is added,
+removed, or re-roled.
+
+## saas-widget.spec.ts
+
+Widget page (`/agent/{id}/widget`) — header text, welcome message, theme,
+primary colour, launcher position, spacing, starter questions, live preview,
+Save widget, embed code. Relocated from the retired `saas-support-bot.spec.ts`.
+
+## saas-danger-zone.spec.ts
+
+Archive/Delete on `/agent/{id}/danger-zone`. Visibility-only — both actions are
+irreversible on a real agent and are never clicked. Button labels are matched
+by verb (`/archive/i`, `/delete/i`) to survive renaming.
+
+## saas-legal.spec.ts
+
+Legal page (`/agent/{id}/legal`) — Data usage URL, Privacy policy URL, Terms
+and conditions URL, Save legal links. Read-only: Save is never clicked (it
+rewrites the real widget's legal links). One test types into a field and
+confirms a reload discards the change.
+
+**Deferred, tracked gap:** the actual widget-side consequence of these URLs
+(the first-message consent line; the "⋯" menu showing Privacy/Terms only when
+set) is not covered — it requires mutating these URLs and loading the embedded
+widget on the dummy site.
+
+## saas-features.spec.ts
+
+Per-agent Features page — currently only the RAG toggle. **2 of 3 tests are
+`test.fixme`**: the RAG row and switch hydrate slowly and aren't reliably
+present within the default timeout (needs a longer wait, not a product fix).
+The switch is never clicked even once un-parked — it persists immediately and
+would change how the bot answers, so coverage is read-only by design.
+
+## saas-api-usage.spec.ts
+
+Per-agent API key page. Read-only coverage is live; the actual generate flow
+is `test.fixme` — clicking "Generate API key" raises an "Invalid origin"
+popup, reported to dev.
+
+## saas-settings.spec.ts
+
+Workspace Settings (`/dashboard/settings`) — Organization name/slug display,
+workspace API keys. Same "Invalid origin" bug as API & Usage on key creation —
+parked as `test.fixme`. Org name/slug assertions double as a guard on the
+noctocode.dev repoint.
+
+## saas-workspace-team.spec.ts
+
+Workspace-level Team page (`/dashboard/team`) — distinct from the per-agent
+Team page. 4-permission model (Admin/Chatbots/Members/Billing), Pending
+Invitations section. The Invite dialog **sends a real email on submit**, so
+every path through it ends in Cancel — no invite is ever sent.
+
+## saas-create-agent.spec.ts
+
+The 5-step creation wizard at `/new` (Type → Basics → Branding → Model →
+Review). No type is preselected — the Support card must be clicked before
+Continue enables. The "Conversational chatbot" type is the hidden Chatbots
+product ("Coming soon") and is `test.fixme`. Header text is a required field on
+the Branding step (Launch stays disabled at Review otherwise). The full
+creation test walks all 5 steps, launches a real support agent, and deletes it
+via `saasClient.deleteChatbot`.
+
+| Test | What it checks |
+|---|---|
+| should show step 1 with Support and Conversational type cards | Both cards visible; Continue disabled until a type is chosen |
+| should show the wizard step indicators | Type/Basics/Branding/Model/Review visible |
+| should enable Continue once the Support type is selected | Disabled → click → enabled |
+| should allow selecting the Conversational type | `fixme` — hidden Chatbots product |
+| should advance to Basics with Name and Slug fields | Visible after selecting Support |
+| should auto-populate the slug from the name in Basics | `fixme` — regression, slug no longer auto-populates |
+| should create a support agent through the wizard and launch | Full 5-step walk, launches, redirects to `/agent/{id}`, deleted in teardown |
+
+## saas-admin-organizations.spec.ts
+
+Admin Panel → Organizations (`/dashboard/admin/organizations`). Requires an
+admin session (qa-saas is a platform admin). **Highest-stakes spec in the
+suite** — the live org list includes noctocode.dev and Trump Media, which the
+whole SaaS suite depends on. Every delete is hard-guarded to `qa-org-*` rows
+only (a helper throws rather than delete anything else), with an `afterEach`
+sweep for any leftover `qa-org-*` from a crashed test.
+
+## saas-admin-prompt-templates.spec.ts
+
+Admin Panel → Prompt Templates (`/dashboard/admin/prompt-templates`). Platform-
+wide templates — CRUD limited to `qa-template-*` names, verified teardown plus
+an `afterEach` safety-net sweep.

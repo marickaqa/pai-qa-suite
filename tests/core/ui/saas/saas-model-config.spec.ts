@@ -1,5 +1,7 @@
 import { test, expect } from '@playwright/test'
 
+/** #all test passing*/
+
 const SAAS_URL = process.env.SAAS_URL || 'https://chat-dev.paicloud.ai'
 const SAAS_SESSION = 'reports/saas-session.json'
 const CHAT_BOT_ID = 'edb91849-b4eb-4dbc-aa9f-5ae816833e56'

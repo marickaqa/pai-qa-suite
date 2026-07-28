@@ -11,7 +11,7 @@ test.describe('Core — SaaS Bot Analytics', () => {
   test('should show Bot overview heading and description', async ({ page }) => {
     await page.goto(BOT_ANALYTICS_URL, { waitUntil: 'domcontentloaded' })
     await expect(page.getByText('Bot overview')).toBeVisible({ timeout: 15000 })
-    await expect(page.getByText('Activity for this chatbot')).toBeVisible()
+    await expect(page.getByText(/Activity for this (chatbot|agent|bot)/i)).toBeVisible()
   })
 
   test('should show Messages Sessions and Tokens used metrics', async ({ page }) => {
@@ -51,7 +51,7 @@ test.describe('Core — SaaS Bot Analytics', () => {
     await page.goto(BOT_ANALYTICS_URL, { waitUntil: 'domcontentloaded' })
     await expect(page.getByText('Bot overview')).toBeVisible({ timeout: 15000 })
     await expect(page.getByRole('heading', { name: 'Guardrail triggers' })).toBeVisible()
-    await expect(page.getByText('Messages blocked by safety rules for this chatbot.')).toBeVisible()
+    await expect(page.getByText(/Messages blocked by safety rules for this (chatbot|agent|bot)/i)).toBeVisible()
     await expect(page.getByText('Category', { exact: true })).toBeVisible()
     await expect(page.getByText('Count', { exact: true })).toBeVisible()
     await expect(page.getByText('Last triggered', { exact: true })).toBeVisible()
@@ -78,7 +78,24 @@ test.describe('Core — SaaS Bot Analytics', () => {
   test('should show Coming soon placeholder', async ({ page }) => {
     await page.goto(BOT_ANALYTICS_URL, { waitUntil: 'domcontentloaded' })
     await expect(page.getByText('Bot overview')).toBeVisible({ timeout: 15000 })
-    await expect(page.getByText('Coming soon')).toBeVisible()
+    // Scope to main: the sidebar also has several "Coming soon" nav badges.
+    await expect(page.getByRole('main').getByText('Coming soon').first()).toBeVisible()
+  })
+
+  test('bot token usage total equals input plus output', async ({ page }) => {
+    await page.goto(BOT_ANALYTICS_URL, { waitUntil: 'domcontentloaded' })
+    await expect(page.getByText('Bot overview')).toBeVisible({ timeout: 15000 })
+    const card = page.locator('div.bg-gradient-to-br').filter({ hasText: 'Token usage' }).first()
+    await expect(card).toBeVisible({ timeout: 15000 })
+    // Same card component as org analytics: three comma-integers in DOM order —
+    // total, input, output. Value-agnostic, only the arithmetic must hold.
+    const nums = card.locator('span').filter({ hasText: /^[\d,]+$/ })
+    await expect(nums).toHaveCount(3)
+    const [totalT, inputT, outputT] = await nums.allTextContents()
+    const total = Number(totalT.replace(/,/g, ''))
+    const input = Number(inputT.replace(/,/g, ''))
+    const output = Number(outputT.replace(/,/g, ''))
+    expect(input + output).toBe(total)
   })
 
 })

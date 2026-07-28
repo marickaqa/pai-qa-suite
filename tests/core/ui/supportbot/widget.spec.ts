@@ -28,6 +28,15 @@ async function openWidget(page: Page) {
 }
 
 // Send a prompt and return the settled assistant reply text.
+//
+// Two things this guards against, both found by real test runs:
+//  1. The user's own message renders as a new .pai-bubble before the
+//     assistant's reply does. A naive "count grew" check can lock onto that
+//     echoed bubble and return it as if it were the reply.
+//  2. A handoff can trigger mid-conversation ("A human support agent has been
+//     assigned..."). That message IS the assistant's final turn for this
+//     prompt — no further bot reply is coming, so we must accept it as
+//     settled rather than time out waiting for one that will never arrive.
 async function sendPrompt(page: Page, prompt: string): Promise<string> {
   const input = page.locator('textarea.pai-input')
   const sendBtn = page.locator('button.pai-send')
@@ -37,9 +46,6 @@ async function sendPrompt(page: Page, prompt: string): Promise<string> {
   await expect(input).toHaveValue('', { timeout: 45000 })
 
   const countBefore = await bubbles.count()
-  const lastTextBefore = countBefore > 0
-    ? (await bubbles.last().innerText().catch(() => '')).trim()
-    : ''
 
   await input.fill(prompt)
   try {
@@ -55,25 +61,49 @@ async function sendPrompt(page: Page, prompt: string): Promise<string> {
     await expect(input).toHaveValue('', { timeout: 10000 })
   }
 
-  // Wait for a new reply: either the bubble count grew, OR the last bubble's
-  // text changed from before we sent. This is robust to turns that add a
-  // different number of bubbles (e.g. a handoff card) than a normal exchange.
+  // Wait for the user's own echo bubble to appear first (count grows by at
+  // least 1), THEN wait for a further bubble beyond that — the assistant's
+  // actual reply (or a handoff message standing in for it).
   await expect
-    .poll(async () => {
-      const count = await bubbles.count()
-      if (count > countBefore) return true
-      const lastText = (await bubbles.last().innerText().catch(() => '')).trim()
-      return lastText !== lastTextBefore && lastText.length > 0
-    }, { timeout: 45000, intervals: [500], message: 'assistant reply did not appear' })
+    .poll(async () => (await bubbles.count()) > countBefore, {
+      timeout: 20000,
+      intervals: [300],
+      message: 'user message echo did not appear',
+    })
+    .toBe(true)
+  const countAfterEcho = await bubbles.count()
+
+  await expect
+    .poll(async () => (await bubbles.count()) > countAfterEcho, {
+      timeout: 45000,
+      intervals: [500],
+      message: 'assistant reply (or handoff message) did not appear',
+    })
     .toBe(true)
 
-  // the assistant reply is the last bubble; wait for its text to settle
+  // The assistant reply/handoff message is the last bubble; wait for its text
+  // to settle (stop changing) before reading it.
   const reply = bubbles.last()
   let previous = ''
+  let emptyStreak = 0
   await expect
     .poll(async () => {
       const current = (await reply.innerText().catch(() => '')).trim()
-      const stable = current.length > 0 && current === previous && current !== lastTextBefore
+      if (current === '') {
+        emptyStreak++
+        // Fail fast with a clear diagnosis: a reply bubble that stays empty
+        // for 10s+ is a real "empty response" bug, not a slow-settling one —
+        // don't burn the full 45s to arrive at a vague "did not settle".
+        if (emptyStreak >= 10) {
+          throw new Error(
+            `Assistant returned an EMPTY reply to "${prompt}" (bubble rendered but never got text).`
+          )
+        }
+        previous = current
+        return false
+      }
+      emptyStreak = 0
+      const stable = current === previous
       previous = current
       return stable
     }, { timeout: 45000, intervals: [1000], message: 'assistant reply did not settle' })
@@ -88,6 +118,12 @@ const checkNoToolCallLeak = (response: string) => {
   expect(response).not.toContain('</tool_call>')
   expect(response).not.toContain('<tool_result>')
 }
+
+// Recognize the widget's handoff-confirmation message. Confirmed live copy:
+// "A human support agent has been successfully assigned to this chat and
+// will be with you shortly..." — match loosely since the tail is contextual.
+const isHandoffMessage = (response: string) =>
+  /human (support )?agent has been (successfully )?assigned/i.test(response)
 
 test.describe('Core — Support Widget', () => {
 
@@ -169,6 +205,13 @@ test.describe('Core — Support Widget', () => {
     checkNoToolCallLeak(response)
   })
 
+  // NOTE: this test once observed an EMPTY assistant reply to this exact
+  // prompt (bubble rendered, text never arrived). A manual retry got a full,
+  // correctly-grounded answer, so this looks like a one-off intermittent
+  // backend hiccup rather than a deterministic bug — the sendPrompt helper
+  // now fails fast with a clear "empty reply" diagnosis if it recurs. If this
+  // starts failing repeatedly, move it to the monitoring tier as an
+  // intermittent issue rather than treating it as a hard regression.
   test('should not expose raw tool call syntax — pricing query', async ({ page }) => {
     await openWidget(page)
     const response = await sendPrompt(page, 'What are your pricing plans?')
@@ -181,17 +224,32 @@ test.describe('Core — Support Widget', () => {
     checkNoToolCallLeak(response)
   })
 
-  test('should not expose raw tool call syntax — multi-prompt handoff scenario', async ({ page }) => {
+  test('should not expose raw tool call syntax — multi-prompt scenario', async ({ page }) => {
     await openWidget(page)
+    // NOTE: deliberately avoids the handoff-triggering phrase ("speak to
+    // someone about a billing issue") — once handed off, the bot may not
+    // reply again in-session, which would hang sendPrompt waiting for a
+    // bot reply that never comes. Handoff has its own dedicated test below.
     const prompts = [
       'Can I get a custom enterprise quote?',
-      'I need to speak to someone about a billing issue',
       'How do I cancel my subscription?',
     ]
     for (const prompt of prompts) {
       const response = await sendPrompt(page, prompt)
       checkNoToolCallLeak(response)
     }
+  })
+
+  test('should confirm handoff to a human agent when requested', async ({ page }) => {
+    await openWidget(page)
+    // Explicit transfer request — a phrased "I need help with X" gives the bot
+    // room to judge it can resolve things itself and skip escalation (seen
+    // live: it answered a billing question directly instead of handing off
+    // once relevant KB content existed). A direct "transfer me" request
+    // removes that discretion.
+    await sendPrompt(page, 'Can I get a custom enterprise quote?')
+    const response = await sendPrompt(page, 'Please transfer me to a human agent right now.')
+    expect(isHandoffMessage(response), `expected a handoff confirmation, got: ${response}`).toBe(true)
   })
 
 })

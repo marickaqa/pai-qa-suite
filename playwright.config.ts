@@ -58,6 +58,12 @@ export default defineConfig({
       use: { storageState: 'reports/saas-session.json' },
     },
     {
+      // Embeddable Support Bot Widget, tested on the public dummy-company site.
+      // No auth: specs use an absolute WIDGET_URL, not baseURL/storageState.
+      name: 'core-supportbot-ui',
+      testDir: './tests/core/ui/supportbot',
+    },
+    {
       name: 'core-subtitles-ui',
       testDir: './tests/core/ui/subtitles',
       use: {
@@ -73,7 +79,7 @@ export default defineConfig({
     {
       name: 'chatbot-custom',
       testDir: './tests/core/ui/chatbot',
-      testIgnore: ['**/logout.spec.ts', '**/widget.spec.ts', '**/widget-rag.spec.ts'],
+      testIgnore: '**/logout.spec.ts',
       use: {
         baseURL: required('CHATBOT_URL'),
         storageState: 'reports/custom-session.json',

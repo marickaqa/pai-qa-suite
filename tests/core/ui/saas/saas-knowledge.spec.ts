@@ -145,20 +145,22 @@ test.describe('SaaS Knowledge', () => {
 
     test('should show crawl form when Crawl website is clicked', async ({ page }) => {
         await gotoKnowledge(page)
-        await page.getByRole('button', { name: 'Crawl website' }).click()
+        await page.getByRole('button', { name: 'Crawl website', exact: true }).click()
         await expect(page.locator('input[placeholder="https://docs.example.com"]')).toBeVisible()
         await expect(page.getByRole('button', { name: 'Start crawling' })).toBeVisible()
     })
 
     test('should not start crawling with empty URL', async ({ page }) => {
         await gotoKnowledge(page)
-        await page.getByRole('button', { name: 'Crawl website' }).click()
+        await page.getByRole('button', { name: 'Crawl website', exact: true }).click()
         await expect(page.getByRole('button', { name: 'Start crawling' })).toBeDisabled()
     })
 
     test('should show Add pattern button in crawl form', async ({ page }) => {
         await gotoKnowledge(page)
-        await page.getByRole('button', { name: 'Crawl website' }).click()
-        await expect(page.getByRole('button', { name: 'Add pattern' })).toBeVisible()
+        await page.getByRole('button', { name: 'Crawl website', exact: true }).click()
+        // The redesigned crawl form has two "Add pattern" buttons (include /
+        // exclude URL patterns); asserting the first confirms the control renders.
+        await expect(page.getByRole('button', { name: 'Add pattern' }).first()).toBeVisible()
     })
 })

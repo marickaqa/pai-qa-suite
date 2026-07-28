@@ -125,4 +125,16 @@ test.describe('SaaS Guidelines', () => {
         await deleteGuideline(page, name)
         await expect(page.getByText(name)).not.toBeVisible({ timeout: 10000 })
     })
+
+    test('should prefill the form when a prompt template is chosen', async ({ page }) => {
+        await gotoGuidelines(page)
+        await openNewGuidelineForm(page)
+        const content = page.locator('textarea[name="content"]')
+        const before = await content.inputValue()
+        // Choosing a prompt template fills the form as a starting point. We assert
+        // the content changes, then Cancel — no guideline is saved (zero mutation).
+        await page.getByRole('button', { name: /Use simple language/ }).click()
+        await expect(content).not.toHaveValue(before)
+        await page.getByRole('button', { name: 'Cancel' }).click()
+    })
 })
