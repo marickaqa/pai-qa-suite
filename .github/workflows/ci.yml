@@ -22,8 +22,8 @@ jobs:
           API_PASSWORD: ${{ secrets.API_PASSWORD }}
           SAAS_EMAIL: ${{ secrets.SAAS_EMAIL }}
           SAAS_PASSWORD: ${{ secrets.SAAS_PASSWORD }}
-          API_BASE_URL: https://pc-be-dev.noctocode.dev
-          CHAT_URL: https://pc-fe-dev.noctocode.dev
+          API_BASE_URL: https://chat-api-dev.paicloud.ai
+          CHAT_URL: https://dev.egle.chat
           FTP_HOST: ${{ secrets.FTP_HOST }}
           FTP_USER: ${{ secrets.FTP_USER }}
           FTP_PASSWORD: ${{ secrets.FTP_PASSWORD }}
@@ -48,8 +48,8 @@ jobs:
           API_PASSWORD: ${{ secrets.API_PASSWORD }}
           SAAS_EMAIL: ${{ secrets.SAAS_EMAIL }}
           SAAS_PASSWORD: ${{ secrets.SAAS_PASSWORD }}
-          API_BASE_URL: https://pc-be-dev.noctocode.dev
-          CHAT_URL: https://pc-fe-dev.noctocode.dev
+          API_BASE_URL: https://chat-api-dev.paicloud.ai
+          CHAT_URL: https://dev.egle.chat
           SAAS_URL: https://chat-dev.paicloud.ai
           SUBTITLES_URL: https://subtitles-dev.paicloud.ai
           SUBTITLES_QA_EMAIL: ${{ secrets.SUBTITLES_QA_EMAIL }}
@@ -74,8 +74,8 @@ jobs:
           API_PASSWORD: ${{ secrets.API_PASSWORD }}
           SAAS_EMAIL: ${{ secrets.SAAS_EMAIL }}
           SAAS_PASSWORD: ${{ secrets.SAAS_PASSWORD }}
-          API_BASE_URL: https://pc-be-dev.noctocode.dev
-          CHAT_URL: https://pc-fe-dev.noctocode.dev
+          API_BASE_URL: https://chat-api-dev.paicloud.ai
+          CHAT_URL: https://dev.egle.chat
           SAAS_URL: https://chat-dev.paicloud.ai
       - run: npm run test:ui:bugs || true
         env:
@@ -83,8 +83,8 @@ jobs:
           API_PASSWORD: ${{ secrets.API_PASSWORD }}
           SAAS_EMAIL: ${{ secrets.SAAS_EMAIL }}
           SAAS_PASSWORD: ${{ secrets.SAAS_PASSWORD }}
-          API_BASE_URL: https://pc-be-dev.noctocode.dev
-          CHAT_URL: https://pc-fe-dev.noctocode.dev
+          API_BASE_URL: https://chat-api-dev.paicloud.ai
+          CHAT_URL: https://dev.egle.chat
           SAAS_URL: https://chat-dev.paicloud.ai
           SUBTITLES_URL: https://subtitles-dev.paicloud.ai
           SUBTITLES_NO_TENANT_EMAIL: ${{ secrets.SUBTITLES_NO_TENANT_EMAIL }}
@@ -106,6 +106,6 @@ jobs:
         env:
           API_EMAIL: ${{ secrets.API_EMAIL }}
           API_PASSWORD: ${{ secrets.API_PASSWORD }}
-          API_BASE_URL: https://pc-be-dev.noctocode.dev
-          CHAT_URL: https://pc-fe-dev.noctocode.dev
+          API_BASE_URL: https://chat-api-dev.paicloud.ai
+          CHAT_URL: https://dev.egle.chat
           GROQ_API_KEY: ${{ secrets.GROQ_API_KEY }}
