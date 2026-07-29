@@ -1,24 +1,14 @@
-﻿import { describe, it, expect, beforeAll } from 'vitest'
+import { describe, it, expect } from 'vitest'
 import { sendPrompt } from '../../../../utils/chatClient'
 import { validateChatResponse } from '../../../../utils/schemaValidator'
 
-/**
- * Each of these tests calls sendPrompt, which does POST /chat (create session)
- * + POST /message/{chatId}. Four back-to-back tests with fresh sessions was
- * enough to trigger per-user rate limits on dev — a small inter-test delay
- * spaces the messages out so the burst isn't the same rapid-fire pattern.
- * If 429s persist, that's real signal to raise with dev, not test flakiness.
- */
+// NOTE: sendPrompt (utils/chatClient.ts) now retries on 429 with backoff, so
+// the manual inter-test delays that were briefly added here are no longer
+// needed and have been removed — the fix belongs in the shared client, not
+// duplicated per file.
 describe('Core — Schema Validation', () => {
 
-  // Small breathing room between tests to avoid tripping the /message
-  // rate limit. NOT a retry — a genuine burst-avoidance measure.
-  beforeAll(async () => {
-    await new Promise(r => setTimeout(r, 500))
-  })
-
   it('should return a valid response schema', async () => {
-    await new Promise(r => setTimeout(r, 500))
     const response = await sendPrompt('Who are you?')
     if (response.status >= 500) {
       console.warn(`Server error ${response.status} — skipping`)
@@ -31,7 +21,6 @@ describe('Core — Schema Validation', () => {
   }, 30000)
 
   it('should always return a string message, never null or undefined', async () => {
-    await new Promise(r => setTimeout(r, 500))
     const response = await sendPrompt('What is 2 + 2?')
     if (response.status >= 500) {
       console.warn(`Server error ${response.status} — skipping`)
@@ -43,7 +32,6 @@ describe('Core — Schema Validation', () => {
   }, 30000)
 
   it('should always return a positive response time', async () => {
-    await new Promise(r => setTimeout(r, 500))
     const response = await sendPrompt('Hello')
     if (response.status >= 500) {
       console.warn(`Server error ${response.status} — skipping`)
@@ -53,7 +41,6 @@ describe('Core — Schema Validation', () => {
   }, 30000)
 
   it('should return a message with meaningful content, not just whitespace', async () => {
-    await new Promise(r => setTimeout(r, 500))
     const response = await sendPrompt('What is the capital of Germany?')
     if (response.status >= 500) {
       console.warn(`Server error ${response.status} — skipping`)
