@@ -1,7 +1,5 @@
 import { test, expect } from '@playwright/test'
 
-/** #all test passing*/
-
 const SAAS_URL = process.env.SAAS_URL || 'https://chat-dev.paicloud.ai'
 const SAAS_SESSION = 'reports/saas-session.json'
 const CHAT_BOT_ID = 'edb91849-b4eb-4dbc-aa9f-5ae816833e56'
@@ -80,6 +78,21 @@ test.describe('Core — SaaS Model & Logic', () => {
     const saveButtons = page.getByRole('button', { name: 'Save' })
     const discardButtons = page.getByRole('button', { name: 'Discard' })
     await expect(saveButtons.first()).toBeVisible({ timeout: 15000 })
+
+    // Seen once: a transient double-render briefly paints extra Discard
+    // buttons right after hydration, before settling to the real count. Wait
+    // for the count to stop changing across consecutive reads rather than
+    // reading it once and racing the flicker.
+    let previous = -1
+    await expect
+      .poll(async () => {
+        const current = await discardButtons.count()
+        const stable = current === previous && current > 0
+        previous = current
+        return stable
+      }, { timeout: 10000, intervals: [500], message: 'discard button count did not stabilize' })
+      .toBe(true)
+
     const saveCount = await saveButtons.count()
     expect(saveCount).toBeGreaterThan(0)
     await expect(discardButtons).toHaveCount(saveCount)
