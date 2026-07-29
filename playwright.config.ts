@@ -30,8 +30,19 @@ export default defineConfig({
   // More retries in CI to absorb transient dev-backend slowness (pages
   // occasionally don't render within timeout). Locally keep it low for fast,
   // honest feedback while developing.
-  retries: process.env.CI ? 2 : 0,
+  retries: process.env.CI ? 3 : 0,
   workers: 1,
+  expect: {
+    // Global default for expect().toBeVisible() etc. Today's CI runs showed
+    // a recurring pattern: some assertions with the 5s built-in default
+    // timed out, some with an explicit 10-15s override still timed out, and
+    // even one with an explicit 30s override failed once. Patching each
+    // flaky assertion's timeout individually was whack-a-mole — a different
+    // test failed on every run. Raising the GLOBAL default gives every
+    // assertion in the suite more patience against a shared dev backend that
+    // is occasionally slow, without hunting down each one by hand.
+    timeout: 10000,
+  },
   use: {
     baseURL: required('CHAT_URL'),
     storageState: 'reports/session.json',

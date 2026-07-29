@@ -115,7 +115,7 @@ test.describe('Core — Chat UI', () => {
     await renameInput.fill('Sidebar Renamed Chat')
     await page.getByRole('button', { name: 'Save' }).click()
 
-    await expect(page.locator('span.truncate').filter({ hasText: 'Sidebar Renamed Chat' }).first()).toBeVisible({ timeout: 10000 })
+    await expect(page.locator('span.truncate').filter({ hasText: 'Sidebar Renamed Chat' }).first()).toBeVisible({ timeout: 20000 })
   })
 
   test('should always show copy button on assistant response without hover', async ({ page, context }) => {
@@ -184,10 +184,12 @@ test.describe('Core — Chat UI', () => {
     await expect(pdfBtn).toBeVisible()
     const countBefore = await page.locator('button').filter({ hasText: /^PDF$/ }).count()
     await pdfBtn.click()
-    // dropdown closes — the PDF option count drops (auto-waits via poll)
+    // dropdown closes — the PDF option count drops (auto-waits via poll).
+    // Generous timeout: closing likely waits on a download/network action
+    // completing before the dropdown dismisses, not just a UI state flip.
     await expect.poll(async () =>
       page.locator('button').filter({ hasText: /^PDF$/ }).count(),
-      { timeout: 10000 }
+      { timeout: 20000 }
     ).toBeLessThan(countBefore)
   })
 
