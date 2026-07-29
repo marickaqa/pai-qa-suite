@@ -5,7 +5,7 @@
  * Usage:  npx tsx probe-saas-api.ts   (from repo root)
  * Paste the output back so we can fix the API specs against real data.
  */
-import { getSaasToken, authHeaders } from './utils/saasClient'
+import { getSaasToken, authHeaders } from '../utils/saasClient'
 import axios from 'axios'
 
 const BASE_URL = process.env.API_BASE_URL || 'https://chat-api-dev.paicloud.ai'

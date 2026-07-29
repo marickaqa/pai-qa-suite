@@ -1,8 +1,8 @@
-﻿import { getSaasToken, authHeaders } from './utils/saasClient'
+import { getSaasToken, authHeaders } from '../utils/saasClient'
 import axios from 'axios'
 
 const BASE_URL = process.env.API_BASE_URL || 'https://chat-api-dev.paicloud.ai'
-const ORG_2_ID = '270794fc-2c87-4aec-b801-c37e804fb852' // "blank org" — qa-saas is NOT a member
+const ORG_2_ID = '270794fc-2c87-4aec-b801-c37e804fb852' // "blank org" � qa-saas is NOT a member
 
 async function main() {
   const token = await getSaasToken()

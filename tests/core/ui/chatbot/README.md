@@ -178,40 +178,15 @@ Tests the forgot password flow.
 | should show confirmation screen after submitting email | Check your email screen shown after submission |
 | should navigate back to login when Sign in is clicked | Sign in link navigates back to login |
 
-## widget.spec.ts
+## Relocated: widget.spec.ts, widget-rag.spec.ts
 
-Tests the embedded support widget on the Telaris dummy site.
-
-| Test | What it checks |
-|---|---|
-| should show the chat launcher button | Launcher button visible on page load |
-| should open the widget when launcher is clicked | Input textarea visible after opening |
-| should show greeting message on open | First bot bubble visible after opening |
-| should send a message and clear the input | Input cleared after sending |
-| should send message with Enter key | Enter key submits the message |
-| should not send empty message | Send button disabled with empty input |
-| should close the widget when close button is clicked | Input not visible after closing |
-| should handle special characters without crashing | Special chars sent without errors |
-| should not expose system prompt instructions | Raw system prompt text not visible |
-| should refuse bomb making instructions | Bot refuses harmful request |
-| should not expose raw tool call syntax — knowledge base query | No raw tool call syntax in KB lookup response |
-| should not expose raw tool call syntax — pricing query | No raw tool call syntax in pricing response |
-| should not expose raw tool call syntax — knowledge base query (BUG-019) | No raw tool call syntax on handoff fallback |
-| should not expose raw tool call syntax — multi-prompt handoff scenario | No raw tool call syntax across 3 consecutive handoff-triggering prompts |
-
-## widget-rag.spec.ts
-
-Tests RAG knowledge retrieval accuracy for the embedded support widget.
-Verifies the widget answers from its indexed knowledge base rather than general LLM knowledge.
-
-| Test | What it checks |
-|---|---|
-| should return correct Starter plan price (€19/month) | Bot returns €19 when asked about the Starter plan cost |
-| should confirm there is no data cap on any plan | Bot confirms unlimited data across all plans |
-| should return correct installation time (24-48 hours) | Bot references 24 or 48 hour installation time |
-| should return support phone number | Bot returns 064 064 064 or 080 8000 support number |
-| should return company location (Ljubljana) | Bot references Ljubljana as the company location |
-| should respond to money back guarantee question | Bot returns a relevant refund/guarantee policy response |
+Moved to `tests/core/ui/supportbot/` (2026-07-28) — a dedicated project
+(`core-supportbot-ui`) since the embedded support widget needs no auth/session
+and shouldn't share this folder's `storageState`/`baseURL` setup. Both files
+were also hardened while moving: a two-phase send/reply wait (fixes mistaking
+the user's own echoed message for the assistant's reply), an empty-reply
+fast-fail, live handoff-confirmation detection, and closed-launcher unread
+badge coverage. See `tests/core/ui/supportbot/README.md` for current details.
 ---
 
 ## QA suggestions
