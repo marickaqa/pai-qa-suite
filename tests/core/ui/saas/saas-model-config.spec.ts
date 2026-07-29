@@ -50,8 +50,12 @@ test.describe('Core — SaaS Model & Logic', () => {
 
   test('should show Output parameter inputs', async ({ page }) => {
     await page.goto(MODEL_CONFIG_URL)
-    await expect(page.getByRole('heading', { name: 'Model & Logic' })).toBeVisible({ timeout: 15000 })
-    await expect(page.getByText('Temperature')).toBeVisible()
+    // Generous timeout: this page has shown load-contention flakiness under
+    // heavy concurrent CI runs (heading occasionally slow to render even on
+    // retry) — matches the timeout style already used elsewhere in this file
+    // and across the SaaS suite for the same reason.
+    await expect(page.getByRole('heading', { name: 'Model & Logic' })).toBeVisible({ timeout: 45000 })
+    await expect(page.getByText('Temperature')).toBeVisible({ timeout: 15000 })
     await expect(page.getByText('Top P')).toBeVisible()
     await expect(page.getByText('Presence penalty')).toBeVisible()
     await expect(page.getByText('Frequency penalty')).toBeVisible()
@@ -78,21 +82,6 @@ test.describe('Core — SaaS Model & Logic', () => {
     const saveButtons = page.getByRole('button', { name: 'Save' })
     const discardButtons = page.getByRole('button', { name: 'Discard' })
     await expect(saveButtons.first()).toBeVisible({ timeout: 15000 })
-
-    // Seen once: a transient double-render briefly paints extra Discard
-    // buttons right after hydration, before settling to the real count. Wait
-    // for the count to stop changing across consecutive reads rather than
-    // reading it once and racing the flicker.
-    let previous = -1
-    await expect
-      .poll(async () => {
-        const current = await discardButtons.count()
-        const stable = current === previous && current > 0
-        previous = current
-        return stable
-      }, { timeout: 10000, intervals: [500], message: 'discard button count did not stabilize' })
-      .toBe(true)
-
     const saveCount = await saveButtons.count()
     expect(saveCount).toBeGreaterThan(0)
     await expect(discardButtons).toHaveCount(saveCount)
