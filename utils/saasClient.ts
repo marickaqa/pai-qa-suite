@@ -1,4 +1,4 @@
-import axios from 'axios'
+import { apiClient as axios } from './apiClient'
 import dotenv from 'dotenv'
 import path from 'path'
 

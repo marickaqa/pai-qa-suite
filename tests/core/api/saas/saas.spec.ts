@@ -1,6 +1,6 @@
 ﻿import { describe, it, expect, beforeAll, afterAll } from 'vitest'
 import { getSaasToken, createChatbot, deleteChatbot, getChatbot, listChatbots } from '../../../../utils/saasClient'
-import axios from 'axios'
+import { apiClient as axios } from '../../../../utils/apiClient'
 
 const BASE_URL = process.env.API_BASE_URL || 'https://chat-api-dev.paicloud.ai'
 const ORG_ID = '48e242fb-42de-4d46-9e43-1bf36873df37'

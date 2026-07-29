@@ -1,8 +1,8 @@
 import { describe, it, expect, beforeAll } from 'vitest'
 import { getSaasToken, authHeaders, getChatbot, updateChatbot } from '../../../../utils/saasClient'
-import axios from 'axios'
+import { apiClient as axios } from '../../../../utils/apiClient'
 
-const BASE_URL = process.env.API_BASE_URL || 'https://pc-be-dev.noctocode.dev'
+const BASE_URL = process.env.API_BASE_URL || 'https://chat-api-dev.paicloud.ai'
 const TEST_BOT_ID = '77d5b55e-3326-4f2d-8380-b2bef6135552'
 
 let token: string
