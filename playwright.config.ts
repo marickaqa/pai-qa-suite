@@ -24,37 +24,6 @@ function required(name: string): string {
   return value
 }
 
-/**
- * Some projects (currently: chatbot-custom) are local-only and never invoked
- * by any CI job — but Playwright evaluates the ENTIRE projects array at
- * config-load time, before applying any --project filter. That meant a
- * missing CHATBOT_URL (never set as a CI secret, since chatbot-custom isn't
- * part of any CI script) blocked every project in the run, including ones
- * that had nothing to do with it.
- *
- * This checks whether the given project was actually requested via
- * --project on the command line. If a --project filter is present and this
- * project isn't in it, the var is allowed to be missing (a placeholder is
- * returned — it will never be used to make a real request). If no --project
- * filter is given at all (meaning every project might run), or this project
- * IS explicitly requested, the var is required as normal.
- */
-function requiredForProject(name: string, projectName: string): string {
-  const argv = process.argv
-  const projectFlags: string[] = []
-  for (let i = 0; i < argv.length; i++) {
-    if (argv[i] === '--project') projectFlags.push(argv[i + 1])
-    else if (argv[i].startsWith('--project=')) projectFlags.push(argv[i].slice('--project='.length))
-  }
-  const noFilter = projectFlags.length === 0
-  const thisProjectSelected = projectFlags.includes(projectName)
-
-  if (!noFilter && !thisProjectSelected) {
-    return `unused-${name}` // this project won't run; the value is never touched
-  }
-  return required(name)
-}
-
 export default defineConfig({
   globalSetup: './global-setup.ts',
   timeout: 60000,
@@ -108,11 +77,27 @@ export default defineConfig({
       use: { storageState: 'reports/session.json' },
     },
     {
+      // Local-only project, never invoked by any CI job (not in ci.yml).
+      // CHATBOT_URL is deliberately NOT required() here. An earlier attempt
+      // used an argv-sniffing helper (requiredForProject) to only enforce
+      // this when chatbot-custom was actually selected via --project — but
+      // that broke in CI (it still threw even though chatbot-custom was
+      // never requested), most likely because this config also declares
+      // globalSetup, and Playwright's handling of that phase means
+      // process.argv inside config-load isn't a reliable signal to sniff.
+      // Simplest and bulletproof: just read the env var directly, possibly
+      // undefined. Every spec file in this suite already builds its own
+      // absolute URL from an env var with its own fallback/guard (this
+      // project's specs do the same with CHATBOT_URL) rather than relying on
+      // Playwright's own baseURL for navigation, so an undefined baseURL
+      // here is harmless unless someone actually runs chatbot-custom without
+      // setting CHATBOT_URL — in which case that project's own specs will
+      // surface a clear enough error at that point.
       name: 'chatbot-custom',
       testDir: './tests/core/ui/chatbot',
       testIgnore: '**/logout.spec.ts',
       use: {
-        baseURL: requiredForProject('CHATBOT_URL', 'chatbot-custom'),
+        baseURL: process.env.CHATBOT_URL,
         storageState: 'reports/custom-session.json',
       },
     },
