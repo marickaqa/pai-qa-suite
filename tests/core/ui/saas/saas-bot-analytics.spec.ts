@@ -1,4 +1,5 @@
 import { test, expect } from '@playwright/test'
+import { gotoSaasOrgScoped } from '@utils/saasOrg'
 
 const SAAS_URL = process.env.SAAS_URL || 'https://chat-dev.paicloud.ai'
 const SAAS_SESSION = 'reports/saas-session.json'
@@ -9,13 +10,13 @@ test.describe('Core — SaaS Bot Analytics', () => {
   test.use({ storageState: SAAS_SESSION })
 
   test('should show Bot overview heading and description', async ({ page }) => {
-    await page.goto(BOT_ANALYTICS_URL, { waitUntil: 'domcontentloaded' })
+    await gotoSaasOrgScoped(page, BOT_ANALYTICS_URL)
     await expect(page.getByText('Bot overview')).toBeVisible({ timeout: 15000 })
     await expect(page.getByText(/Activity for this (chatbot|agent|bot)/i)).toBeVisible()
   })
 
   test('should show Messages Sessions and Tokens used metrics', async ({ page }) => {
-    await page.goto(BOT_ANALYTICS_URL, { waitUntil: 'domcontentloaded' })
+    await gotoSaasOrgScoped(page, BOT_ANALYTICS_URL)
     await expect(page.getByText('Bot overview')).toBeVisible({ timeout: 15000 })
     await expect(page.getByText('Messages', { exact: true }).first()).toBeVisible()
     await expect(page.getByText('Sessions', { exact: true }).first()).toBeVisible()
@@ -23,7 +24,7 @@ test.describe('Core — SaaS Bot Analytics', () => {
   })
 
   test('should show percentage change indicators', async ({ page }) => {
-    await page.goto(BOT_ANALYTICS_URL, { waitUntil: 'domcontentloaded' })
+    await gotoSaasOrgScoped(page, BOT_ANALYTICS_URL)
     await expect(page.getByText('Bot overview')).toBeVisible({ timeout: 15000 })
     const percentages = page.getByText(/[+-]\d+(\.\d+)?%/)
     const count = await percentages.count()
@@ -31,7 +32,7 @@ test.describe('Core — SaaS Bot Analytics', () => {
   })
 
   test('should show Token usage this month card', async ({ page }) => {
-    await page.goto(BOT_ANALYTICS_URL, { waitUntil: 'domcontentloaded' })
+    await gotoSaasOrgScoped(page, BOT_ANALYTICS_URL)
     await expect(page.getByText('Bot overview')).toBeVisible({ timeout: 15000 })
     await expect(page.getByText('Token usage', { exact: false }).first()).toBeVisible()
     await expect(page.getByText(/Input/i)).toBeVisible()
@@ -39,7 +40,7 @@ test.describe('Core — SaaS Bot Analytics', () => {
   })
 
   test('should show Activity over time chart with period toggle buttons', async ({ page }) => {
-    await page.goto(BOT_ANALYTICS_URL, { waitUntil: 'domcontentloaded' })
+    await gotoSaasOrgScoped(page, BOT_ANALYTICS_URL)
     await expect(page.getByText('Bot overview')).toBeVisible({ timeout: 15000 })
     await expect(page.getByText('Activity over time')).toBeVisible()
     for (const label of ['Weekly', 'Monthly', 'Yearly', 'All time']) {
@@ -48,7 +49,7 @@ test.describe('Core — SaaS Bot Analytics', () => {
   })
 
   test('should show Guardrail triggers table with correct headers', async ({ page }) => {
-    await page.goto(BOT_ANALYTICS_URL, { waitUntil: 'domcontentloaded' })
+    await gotoSaasOrgScoped(page, BOT_ANALYTICS_URL)
     await expect(page.getByText('Bot overview')).toBeVisible({ timeout: 15000 })
     await expect(page.getByRole('heading', { name: 'Guardrail triggers' })).toBeVisible()
     await expect(page.getByText(/Messages blocked by safety rules for this (chatbot|agent|bot)/i)).toBeVisible()
@@ -58,14 +59,14 @@ test.describe('Core — SaaS Bot Analytics', () => {
   })
 
   test('should show Top questions section', async ({ page }) => {
-    await page.goto(BOT_ANALYTICS_URL, { waitUntil: 'domcontentloaded' })
+    await gotoSaasOrgScoped(page, BOT_ANALYTICS_URL)
     await expect(page.getByText('Bot overview')).toBeVisible({ timeout: 15000 })
     await expect(page.getByText('Top questions')).toBeVisible()
     await expect(page.getByText('Most-asked queries this period.')).toBeVisible()
   })
 
   test('should show top question rows with Review buttons', async ({ page }) => {
-    await page.goto(BOT_ANALYTICS_URL, { waitUntil: 'domcontentloaded' })
+    await gotoSaasOrgScoped(page, BOT_ANALYTICS_URL)
     await expect(page.getByText('Bot overview')).toBeVisible({ timeout: 15000 })
     await expect(page.getByText('Top questions')).toBeVisible()
     const reviewBtns = page.getByRole('button', { name: 'Review' })
@@ -76,14 +77,14 @@ test.describe('Core — SaaS Bot Analytics', () => {
   })
 
   test('should show Coming soon placeholder', async ({ page }) => {
-    await page.goto(BOT_ANALYTICS_URL, { waitUntil: 'domcontentloaded' })
+    await gotoSaasOrgScoped(page, BOT_ANALYTICS_URL)
     await expect(page.getByText('Bot overview')).toBeVisible({ timeout: 15000 })
     // Scope to main: the sidebar also has several "Coming soon" nav badges.
     await expect(page.getByRole('main').getByText('Coming soon').first()).toBeVisible()
   })
 
   test('bot token usage total equals input plus output', async ({ page }) => {
-    await page.goto(BOT_ANALYTICS_URL, { waitUntil: 'domcontentloaded' })
+    await gotoSaasOrgScoped(page, BOT_ANALYTICS_URL)
     await expect(page.getByText('Bot overview')).toBeVisible({ timeout: 15000 })
     const card = page.locator('div.bg-gradient-to-br').filter({ hasText: 'Token usage' }).first()
     await expect(card).toBeVisible({ timeout: 15000 })

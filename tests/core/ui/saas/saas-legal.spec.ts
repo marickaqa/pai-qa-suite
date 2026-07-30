@@ -33,9 +33,9 @@ async function gotoLegal(page: Page) {
 test.describe('Core — SaaS Legal', () => {
   test.use({ storageState: SAAS_SESSION })
 
-  test('should show the Legal heading and description', async ({ page }) => {
+ test('should show the Legal heading and description', async ({ page }) => {
     await gotoLegal(page)
-    await expect(page.getByText('Links shown to end users in the embedded widget.')).toBeVisible()
+    await expect(page.getByText(/Add links to your policies/i)).toBeVisible()
   })
 
   test('should show all three legal URL inputs as url-typed fields', async ({ page }) => {

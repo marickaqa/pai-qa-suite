@@ -1,4 +1,5 @@
 import { test, expect, type Page } from '@playwright/test'
+import { gotoSaasOrgScoped } from '@utils/saasOrg'
 
 /**
  * ## saas-workspace-team.spec.ts
@@ -21,7 +22,7 @@ const TEAM_URL = `${SAAS_URL}/dashboard/team`
 const PERMISSIONS = ['Admin', 'Chatbots', 'Members', 'Billing']
 
 async function gotoTeam(page: Page) {
-  await page.goto(TEAM_URL)
+  await gotoSaasOrgScoped(page, TEAM_URL)
   await expect(
     page.getByRole('heading', { name: 'Team management' }),
     'workspace team page did not render'

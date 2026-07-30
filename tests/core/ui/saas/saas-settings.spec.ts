@@ -1,4 +1,5 @@
 import { test, expect, type Page } from '@playwright/test'
+import { gotoSaasOrgScoped } from '@utils/saasOrg'
 
 /**
  * ## saas-settings.spec.ts
@@ -21,7 +22,7 @@ const SAAS_SESSION = 'reports/saas-session.json'
 const SETTINGS_URL = `${SAAS_URL}/dashboard/settings`
 
 async function gotoSettings(page: Page) {
-  await page.goto(SETTINGS_URL)
+  await gotoSaasOrgScoped(page, SETTINGS_URL)   // was: await page.goto(SETTINGS_URL)
   await expect(
     page.getByRole('heading', { name: 'Settings' }),
     'settings page did not render'

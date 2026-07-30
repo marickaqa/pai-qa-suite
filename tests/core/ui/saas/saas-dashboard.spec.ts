@@ -1,4 +1,5 @@
 import { test, expect, type Page } from '@playwright/test'
+import { gotoSaasOrgScoped } from '@utils/saasOrg'
 
 /**
  * ## saas-dashboard.spec.ts
@@ -51,22 +52,22 @@ test.describe('Core — SaaS Dashboard', () => {
         test.use({ storageState: { cookies: [], origins: [] } })
 
         test('should redirect unauthenticated users to login', async ({ page }) => {
-            await page.goto(SAAS_URL + OVERVIEW)
-            await page.waitForURL(/login/, { timeout: 20000 })
-            expect(page.url()).toContain('login')
-        })
+  await page.goto(SAAS_URL + OVERVIEW)   // NOT gotoSaasOrgScoped — no session, no picker
+  await page.waitForURL(/login/, { timeout: 20000 })
+  expect(page.url()).toContain('login')
+})
     })
 
     // --- Authenticated (inherits the project's saved SaaS session) ---
 
     test.describe('authenticated', () => {
         test('should land on the overview page', async ({ page }) => {
-            await page.goto(SAAS_URL + OVERVIEW)
+            await gotoSaasOrgScoped(page, SAAS_URL + OVERVIEW)
             expect(page.url()).toContain('/dashboard/')
         })
 
         test('should show the four key metric cards', async ({ page }) => {
-            await page.goto(SAAS_URL + OVERVIEW)
+            await gotoSaasOrgScoped(page, SAAS_URL + OVERVIEW)
             await expect(page.getByText('TOTAL AGENTS')).toBeVisible()
             await expect(page.getByText('MESSAGES THIS MONTH')).toBeVisible()
             await expect(page.getByText('SESSIONS THIS MONTH')).toBeVisible()
@@ -74,14 +75,14 @@ test.describe('Core — SaaS Dashboard', () => {
         })
 
         test('should keep TOTAL AGENTS consistent with the Support/Chatbot breakdown', async ({ page }) => {
-            await page.goto(SAAS_URL + OVERVIEW)
+            await gotoSaasOrgScoped(page, SAAS_URL + OVERVIEW)
             const { total, support, chatbot, totalText } = await readAgentCounts(page)
             expect(totalText).toMatch(/^\d+$/)
             expect(support + chatbot).toBe(total)
         })
 
         test('should list exactly as many agents as the counts claim', async ({ page }) => {
-            await page.goto(SAAS_URL + OVERVIEW)
+            await gotoSaasOrgScoped(page, SAAS_URL + OVERVIEW)
             const { total, support, chatbot } = await readAgentCounts(page)
 
             const listedSupport = await supportCard(page).locator('a[href^="/agent/"]').count()
@@ -93,7 +94,7 @@ test.describe('Core — SaaS Dashboard', () => {
         })
 
         test('should show Support bots and Chatbots sections', async ({ page }) => {
-            await page.goto(SAAS_URL + OVERVIEW)
+            await gotoSaasOrgScoped(page, SAAS_URL + OVERVIEW)
             await expect(page.getByText('Embeddable widgets grounded on your docs.')).toBeVisible()
             await expect(page.getByText('Open-ended assistants with tools and memory.')).toBeVisible()
             // Chatbots ships as Coming soon.
@@ -101,13 +102,13 @@ test.describe('Core — SaaS Dashboard', () => {
         })
 
         test('should show the organization picker in the sidebar', async ({ page }) => {
-            await page.goto(SAAS_URL + OVERVIEW)
+            await gotoSaasOrgScoped(page, SAAS_URL + OVERVIEW)
             await expect(orgTrigger(page)).toBeVisible()
-            await expect(orgTrigger(page)).toContainText(/Trump Media|noctocode\.dev/i)
+            await expect(orgTrigger(page)).toContainText(/noctocode\.dev/i)
         })
 
         test('should show the primary navigation and coming-soon items', async ({ page }) => {
-            await page.goto(SAAS_URL + OVERVIEW)
+            await gotoSaasOrgScoped(page, SAAS_URL + OVERVIEW)
             // qa-saas is a platform admin, so Admin Panel is visible in the nav.
             for (const item of ['Overview', 'Analytics', 'Support bots', 'Conversations', 'Team', 'Settings', 'Admin Panel']) {
                 await expect(page.getByText(item, { exact: true }).first()).toBeVisible()
@@ -117,7 +118,7 @@ test.describe('Core — SaaS Dashboard', () => {
         })
 
         test('should toggle the Support bots nav dropdown when clicked', async ({ page }) => {
-            await page.goto(SAAS_URL + OVERVIEW)
+            await gotoSaasOrgScoped(page, SAAS_URL + OVERVIEW)
             const navBtn = page.locator('button:has(svg.lucide-headphones)').filter({ hasText: 'Support bots' })
             await expect(navBtn).toBeVisible()
 
@@ -137,19 +138,19 @@ test.describe('Core — SaaS Dashboard', () => {
         })
 
         test('should show the New button', async ({ page }) => {
-            await page.goto(SAAS_URL + OVERVIEW)
+            await gotoSaasOrgScoped(page, SAAS_URL + OVERVIEW)
             await expect(page.getByRole('button', { name: /new/i }).first()).toBeVisible()
         })
 
         test('should show the theme toggle button', async ({ page }) => {
-            await page.goto(SAAS_URL + OVERVIEW)
+            await gotoSaasOrgScoped(page, SAAS_URL + OVERVIEW)
             // NOTE: assumes the toggle's aria-label is still "Toggle theme".
             // If this fails, send me the button's DOM.
             await expect(page.getByRole('button', { name: 'Toggle theme' })).toBeVisible()
         })
 
         test('should toggle the theme and restore it', async ({ page }) => {
-            await page.goto(SAAS_URL + OVERVIEW)
+            await gotoSaasOrgScoped(page, SAAS_URL + OVERVIEW)
             const html = page.locator('html')
             const before = (await html.getAttribute('class')) ?? ''
             const toggle = page.getByRole('button', { name: 'Toggle theme' })

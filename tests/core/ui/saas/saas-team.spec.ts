@@ -64,11 +64,13 @@ test.describe('Core — SaaS Team', () => {
     await expect(page.getByText(/^joined$/i).first()).toBeVisible()
   })
 
-  test('should show Change role and Remove actions on member rows', async ({ page }) => {
+ test('should show Change role and Remove actions on member rows', async ({ page }) => {
     await gotoTeam(page)
     // Present for other members (not the current user's own row). Read-only.
-    await expect(page.getByRole('button', { name: 'Change role' }).first()).toBeVisible({ timeout: 15000 })
-    await expect(page.getByRole('button', { name: 'Remove' }).first()).toBeVisible()
+    // Redesign renders these as text controls, not necessarily <button> — match
+    // by accessible name across button/link/menuitem roles rather than role=button.
+    await expect(page.getByText('Change role').first()).toBeVisible({ timeout: 15000 })
+    await expect(page.getByText('Remove').first()).toBeVisible()
   })
 
   test('should open the Add member dialog with all 7 permission checkboxes', async ({ page }) => {

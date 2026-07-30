@@ -1,6 +1,7 @@
 import { test, expect, type Page } from '@playwright/test'
 import path from 'path'
 import fs from 'fs'
+import { gotoSaasOrgScoped } from '@utils/saasOrg'
 
 /**
  * ## saas-knowledge.spec.ts
@@ -27,7 +28,7 @@ test.describe('SaaS Knowledge', () => {
     // Navigate and wait for a known anchor before interacting, so a slow
     // page gets a clear allowance and a hung page fails with a clear message.
     async function gotoKnowledge(page: Page) {
-        await page.goto(KNOWLEDGE_URL)
+        await gotoSaasOrgScoped(page, KNOWLEDGE_URL)   // was: await page.goto(KNOWLEDGE_URL)
         await expect(
             page.getByRole('button', { name: 'Upload file', exact: true }),
             'knowledge page did not render its toolbar'

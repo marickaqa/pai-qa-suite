@@ -1,4 +1,5 @@
 import { test, expect, type Page } from '@playwright/test'
+import { gotoSaasOrgScoped } from '@utils/saasOrg'
 
 /**
  * ## saas-analytics.spec.ts
@@ -45,13 +46,13 @@ async function readOrgRow(page: Page, label: string): Promise<string> {
 
 test.describe('Core — SaaS Organization Analytics', () => {
     test('should navigate to analytics and show the org overview', async ({ page }) => {
-        await page.goto(ANALYTICS_URL)
+        await gotoSaasOrgScoped(page, ANALYTICS_URL)
         await expect(page.getByText('Organization overview')).toBeVisible({ timeout: 30000 })
         await expect(page.getByText(/Activity across all agents/i)).toBeVisible()
     })
 
     test('should show Messages, Sessions and Tokens used metrics', async ({ page }) => {
-        await page.goto(ANALYTICS_URL)
+        await gotoSaasOrgScoped(page, ANALYTICS_URL)
         await expect(page.getByText('Organization overview')).toBeVisible({ timeout: 30000 })
         await expect(page.getByText('Messages', { exact: true }).first()).toBeVisible()
         await expect(page.getByText('Sessions', { exact: true }).first()).toBeVisible()
@@ -59,13 +60,13 @@ test.describe('Core — SaaS Organization Analytics', () => {
     })
 
     test('should show percentage-change indicators next to metrics', async ({ page }) => {
-        await page.goto(ANALYTICS_URL)
+        await gotoSaasOrgScoped(page, ANALYTICS_URL)
         await expect(page.getByText('Organization overview')).toBeVisible({ timeout: 30000 })
         expect(await page.getByText(/[+-]\d+(\.\d+)?%/).count()).toBeGreaterThan(0)
     })
 
     test('should show the token-usage card with input/output breakdown', async ({ page }) => {
-        await page.goto(ANALYTICS_URL)
+        await gotoSaasOrgScoped(page, ANALYTICS_URL)
         const card = page.locator('div.bg-gradient-to-br').filter({ hasText: 'Token usage' }).first()
         await expect(card).toBeVisible({ timeout: 30000 })
         await expect(card.getByText('Input', { exact: true })).toBeVisible()
@@ -73,7 +74,7 @@ test.describe('Core — SaaS Organization Analytics', () => {
     })
 
     test('token usage total equals input plus output', async ({ page }) => {
-        await page.goto(ANALYTICS_URL)
+        await gotoSaasOrgScoped(page, ANALYTICS_URL)
         const card = page.locator('div.bg-gradient-to-br').filter({ hasText: 'Token usage' }).first()
         await expect(card).toBeVisible({ timeout: 30000 })
         // The card holds exactly three comma-formatted integers, in DOM order:
@@ -88,14 +89,14 @@ test.describe('Core — SaaS Organization Analytics', () => {
     })
 
     test('overview month stats reconcile with the analytics page', async ({ page }) => {
-        await page.goto(OVERVIEW_URL)
+        await gotoSaasOrgScoped(page, OVERVIEW_URL)
         const ov = {
             messages: await readOverviewMetric(page, 'MESSAGES THIS MONTH'),
             sessions: await readOverviewMetric(page, 'SESSIONS THIS MONTH'),
             tokens: await readOverviewMetric(page, 'TOKEN USAGE'),
         }
 
-        await page.goto(ANALYTICS_URL)
+        await gotoSaasOrgScoped(page, ANALYTICS_URL)
         await expect(page.getByText('Organization overview')).toBeVisible({ timeout: 30000 })
         const an = {
             messages: await readOrgRow(page, 'Messages'),
@@ -112,7 +113,7 @@ test.describe('Core — SaaS Organization Analytics', () => {
     })
 
     test('should show the Activity over time chart with metric and period toggles', async ({ page }) => {
-        await page.goto(ANALYTICS_URL)
+        await gotoSaasOrgScoped(page, ANALYTICS_URL)
         await expect(page.getByText('Activity over time')).toBeVisible({ timeout: 30000 })
         for (const label of ['All', 'Messages', 'Sessions', 'Tokens']) {
             await expect(page.getByRole('button', { name: label, exact: true })).toBeVisible()
@@ -123,7 +124,7 @@ test.describe('Core — SaaS Organization Analytics', () => {
     })
 
     test('metric toggles are clickable and update the selection', async ({ page }) => {
-        await page.goto(ANALYTICS_URL)
+        await gotoSaasOrgScoped(page, ANALYTICS_URL)
         await expect(page.getByText('Activity over time')).toBeVisible({ timeout: 30000 })
         const group = page.locator('div.overflow-x-auto')
             .filter({ has: page.getByRole('button', { name: 'Messages', exact: true }) })
@@ -135,7 +136,7 @@ test.describe('Core — SaaS Organization Analytics', () => {
     })
 
     test('period toggles are clickable and update the selection', async ({ page }) => {
-        await page.goto(ANALYTICS_URL)
+        await gotoSaasOrgScoped(page, ANALYTICS_URL)
         await expect(page.getByText('Activity over time')).toBeVisible({ timeout: 30000 })
         const group = page.locator('div.overflow-x-auto')
             .filter({ has: page.getByRole('button', { name: 'Weekly', exact: true }) })
@@ -147,7 +148,7 @@ test.describe('Core — SaaS Organization Analytics', () => {
     })
 
     test('should show the chart legend for Messages, Sessions and Tokens', async ({ page }) => {
-        await page.goto(ANALYTICS_URL)
+        await gotoSaasOrgScoped(page, ANALYTICS_URL)
         await expect(page.getByText('Activity over time')).toBeVisible({ timeout: 30000 })
         await expect(page.getByText('Messages', { exact: true }).first()).toBeVisible()
         await expect(page.getByText('Sessions', { exact: true }).first()).toBeVisible()
@@ -160,7 +161,7 @@ test.describe('Core — SaaS Organization Analytics', () => {
     // (chatbots|agents). If these fail, send me the current DOM.
 
     test('should show the Guardrail triggers table with correct headers', async ({ page }) => {
-        await page.goto(ANALYTICS_URL)
+        await gotoSaasOrgScoped(page, ANALYTICS_URL)
         await expect(page.getByRole('heading', { name: 'Guardrail triggers' })).toBeVisible({ timeout: 30000 })
         await expect(page.getByText(/Messages blocked by safety rules across all (chatbots|agents)/i)).toBeVisible()
         await expect(page.getByText('Category', { exact: true })).toBeVisible()
@@ -169,7 +170,7 @@ test.describe('Core — SaaS Organization Analytics', () => {
     })
 
     test('should show a Review action for guardrail trigger rows when present', async ({ page }) => {
-        await page.goto(ANALYTICS_URL)
+        await gotoSaasOrgScoped(page, ANALYTICS_URL)
         await expect(page.getByRole('heading', { name: 'Guardrail triggers' })).toBeVisible({ timeout: 30000 })
         const reviewBtns = page.getByRole('button', { name: 'Review' })
         if (await reviewBtns.count() > 0) {

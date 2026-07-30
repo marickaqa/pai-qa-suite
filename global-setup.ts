@@ -1,4 +1,4 @@
-import { chromium, FullConfig, Page } from '@playwright/test'
+import { chromium, expect, FullConfig, Page } from '@playwright/test'
 import path from 'path'
 import dotenv from 'dotenv'
 import { assertNotProd } from './utils/prodGuard'
@@ -102,21 +102,35 @@ async function globalSetup(config: FullConfig) {
     await saasPage.click('button[type="submit"]')
     await saasPage.waitForURL((url: URL) => !url.toString().includes('login'), { timeout: 60000 })
 
-    // Switch the active org to noctocode.dev. Idempotent: skip if already there.
-    // The org picker is the sidebar button carrying the chevrons-up-down icon;
-    // its dropdown lists each org as a button (the account button also contains
-    // the org domain via the user's email, so we exclude the one with an "@").
     const orgTrigger = saasPage.locator('button:has(svg.lucide-chevrons-up-down)')
     await orgTrigger.waitFor({ state: 'visible', timeout: 30000 })
     const activeOrg = (await orgTrigger.textContent()) || ''
     if (!activeOrg.includes('noctocode.dev')) {
       await orgTrigger.click()
-      await saasPage.getByRole('button', { name: /noctocode\.dev/i }).filter({ hasNotText: '@' }).click()
-      await saasPage
-        .locator('button:has(svg.lucide-chevrons-up-down)')
-        .filter({ hasText: 'noctocode.dev' })
-        .waitFor({ state: 'visible', timeout: 15000 })
+      // The open dropdown holds TWO noctocode.dev buttons: the sidebar trigger
+      // itself (rounded-[10px]) and the menu item (rounded-md). The old
+      // hasNotText('@') filter matched both -> strict-mode ambiguity, which is
+      // why this switch was intermittently landing on the wrong element. Target
+      // the menu item specifically.
+      await saasPage.getByRole('menuitem', { name: /noctocode\.dev/i })
+        .or(saasPage.locator('button.rounded-md').filter({ hasText: /noctocode\.dev/i }))
+        .first()
+        .click()
+      await expect(orgTrigger).toContainText('noctocode.dev', { timeout: 15000 })
     }
+
+    // The active org is server-side state keyed to the token, and the SPA
+    // cold-boots on the account default (Acme Corp) before reconciling. A hard
+    // reload forces a fresh server read: if the switch persisted for this token
+    // it comes back as noctocode.dev. We assert AFTER the reload so a switch
+    // that didn't stick fails setup loudly instead of saving a session that
+    // boots every spec on the wrong org.
+    await saasPage.reload()
+    await orgTrigger.waitFor({ state: 'visible', timeout: 30000 })
+    await expect(
+      orgTrigger,
+      'SaaS session did not persist noctocode.dev after reload — aborting setup'
+    ).toContainText('noctocode.dev', { timeout: 30000 })
 
     await saasContext.storageState({ path: SAAS_SESSION })
     console.log('✅ SaaS session generated (org: noctocode.dev)')

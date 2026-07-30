@@ -1,4 +1,5 @@
 import { test, expect, type Page } from '@playwright/test'
+import { gotoSaasOrgScoped, waitForOrgSettled } from '@utils/saasOrg'
 
 /**
  * ## saas-auth.spec.ts
@@ -198,6 +199,7 @@ test.describe('SaaS Auth', () => {
 
         test('should keep the session when logout is cancelled', async ({ page }) => {
             await page.goto(SAAS_URL)
+            await waitForOrgSettled(page)
             await page.getByRole('button', { name: 'Log out' }).click()
             const dialog = page.getByRole('dialog')
             await expect(dialog).toBeVisible()
@@ -208,7 +210,7 @@ test.describe('SaaS Auth', () => {
         })
     })
 
-    // --- Logout (fresh throwaway session; never touches the shared file) ---
+   // --- Logout (fresh throwaway session; never touches the shared file) ---
 
     test.describe('logout', () => {
         test.use({ storageState: { cookies: [], origins: [] } })
@@ -219,16 +221,21 @@ test.describe('SaaS Auth', () => {
             await passwordInput(page).fill(process.env.SAAS_PASSWORD || '')
             await signInButton(page).click()
             await page.waitForURL(url => !url.toString().includes('login'), { timeout: 20000 })
+            await waitForOrgSettled(page)   // let hydration re-render finish first
 
-            // Logout is a confirmation-dialog flow: the sidebar icon opens a
+            // Logout is a confirmation-dialog flow: the sidebar control opens a
             // Radix dialog; the red "Logout" button inside it does the deed.
-            await page.getByRole('button', { name: 'Log out' }).click()
+            const logoutTrigger = page.getByRole('button', { name: 'Log out' })
+            await expect(logoutTrigger).toBeVisible()
+            await logoutTrigger.click()
+
             const dialog = page.getByRole('dialog')
             await expect(dialog).toBeVisible()
             await dialog.getByRole('button', { name: 'Logout' }).click()
+
             // Once logged out the authed sidebar (and its logout control) is gone,
             // whether "home" resolves to /login or a landing page.
             await expect(page.getByRole('button', { name: 'Log out' })).toHaveCount(0, { timeout: 20000 })
         })
     })
-})
+}) 
