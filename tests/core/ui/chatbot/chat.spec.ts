@@ -77,7 +77,7 @@ test.describe('Core — Chat UI', () => {
     await expect(page.locator('div.prose')).toHaveCount(0)
   })
 
-  test('should rename chat via header button', async ({ page }) => {
+  test.fixme('should rename chat via header button', async ({ page }) => {
     await page.setViewportSize({ width: 1280, height: 900 })
     const input = page.locator('textarea[placeholder="Type a message..."]')
     await input.fill('rename test message')

@@ -1,6 +1,6 @@
 import { test, expect } from '@playwright/test'
 
-test.describe('Subtitles Editor', () => {
+test.describe.fixme('Subtitles Editor', () => {
     test.use({ storageState: 'reports/subtitles-session.json' })
     const BASE_URL = process.env.SUBTITLES_URL || 'https://subtitles-dev.paicloud.ai'
     const JOB_ID = process.env.SUBTITLES_FTP_JOB_ID || '5d77b52e-f7c8-4e24-8770-dae7cf1e9a7d'

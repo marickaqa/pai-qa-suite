@@ -210,7 +210,7 @@ test.describe('SaaS Auth', () => {
         })
     })
 
-   // --- Logout (fresh throwaway session; never touches the shared file) ---
+    // --- Logout (fresh throwaway session; never touches the shared file) ---
 
     test.describe('logout', () => {
         test.use({ storageState: { cookies: [], origins: [] } })
